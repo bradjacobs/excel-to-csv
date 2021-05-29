@@ -2,12 +2,12 @@
 - [Background](#Background)
 - [Usage](#Usage)
   * [Overview](#Overview)
-    + [Builder Details](#Builder Details)
-    + [ExcelReader Details](#ExcelReader Details)
+    + [Builder&#32;Details](#Builder&#32;Details)
+    + [ExcelReader&#32;Details](#ExcelReader&#32;Details)
 - [Examples](#Examples)
   * [Basic](#Basic)
   * [Advanced](#Advanced)
-- [Other Info](#Other info)
+- [Other&#32;Info](#Other&#32;Info)
 - [Testing](#Testing)
 
 ## Background
