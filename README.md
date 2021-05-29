@@ -2,12 +2,12 @@
 - [Background](#Background)
 - [Usage](#Usage)
   * [Overview](#Overview)
-    + [Builder Details](#Builder%20Details)
-    + [ExcelReader Details](#ExcelReader%20Details)
+    + [Builder_Details](#Builder_Details)
+    + [ExcelReader_Details](#ExcelReader_Details)
 - [Examples](#Examples)
   * [Basic](#Basic)
   * [Advanced](#Advanced)
-- [Other&#32;Info](#Other&#32;Info)
+- [Other_Info](#Other_Info)
 - [Testing](#Testing)
 
 ## Background
@@ -19,7 +19,7 @@ Different cases arose where i wanted to parse data out of an Excel file, but I w
 1. Create a new ExcelReader via builder() method.
 2. Execute desired methods on ExcelReader
 
-### Builder%20Details
+### Builder_Details
 | FIELD         | REQUIRED | DEFAULT | DETAILS                                                                                                                                                                                                                                                                                  |   |
 |---------------|:--------:|:-------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|
 | quoteMode     | NO       | NORMAL  | how aggressive / lenient it should wrap quotes around values<br><br>*ALWAYS*: always put quotes around values<br>*NORMAL*: put quotes around most values that are non-alphanumeric<br>*LENIENT*: only add quotes around values that are needed to be CSV compliant<br>*NEVER*: never add quotes |   |
@@ -27,7 +27,7 @@ Different cases arose where i wanted to parse data out of an Excel file, but I w
 | sheetName     | NO       | (blank) | Name of worksheet to be converted to CSV<br> (if set then 'sheetIndex' is ignored)                                                                                                                                                                                                       |   |
 | skipEmptyRows | NO       | false   | if true, then any 'all blank' rows from the Excel worksheet will be ignored.                                                                                                                                                                                                             |   |
 
-### ExcelReader%20Details
+### ExcelReader_Details
 | METHOD          | INPUTS                       | OUTPUT     | DESCRIPTION                                                                                                                                      |   |
 |-----------------|------------------------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------|---|
 | createCsvText   | Excel File                   | String     | Given Excel file input return a String representing the Worksheet as CSV                                                                         |   |
@@ -80,7 +80,7 @@ ExcelReader excelReader = ExcelReader.builder()
 String[][] csvData = excelReader.createCsvMatrix(excelUrl);
 ```
 
-## Other%20Info
+## Other_Info
 * All rows will have the exact same number of columns, which will be max non-blank column detected.
 * The CSV data should remain the same as the Excel file 
   * i.e. Dates and Numeric values should retain their existing formatting
