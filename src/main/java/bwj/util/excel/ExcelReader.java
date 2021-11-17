@@ -4,6 +4,7 @@
 package bwj.util.excel;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -98,7 +99,7 @@ public class ExcelReader
 
     private Sheet getSheet(Workbook wb) {
         Sheet returnSheet;
-        if (this.sheetName != null && !this.sheetName.isEmpty()) {
+        if (StringUtils.isNotEmpty(this.sheetName)) {
             returnSheet = wb.getSheet(this.sheetName);
             if (returnSheet == null) {
                 throw new IllegalArgumentException(String.format("Unable to find sheet with name: %s", this.sheetName));
@@ -111,10 +112,9 @@ public class ExcelReader
     }
 
 
-
     private InputStream getInputStream(String inputFilePath) throws IOException
     {
-        if (inputFilePath == null || inputFilePath.isEmpty()) {
+        if (StringUtils.isEmpty(inputFilePath)) {
             throw new IllegalArgumentException("Must provide a fully-qualified excel input file path");
         }
         if (inputFilePath.startsWith("http") || inputFilePath.startsWith("ftp")) {
@@ -134,8 +134,7 @@ public class ExcelReader
                 file = new File(inputFilePath);
             }
 
-            FileInputStream fis = new FileInputStream(file);
-            return new BufferedInputStream(fis);
+            return new BufferedInputStream(new FileInputStream(file));
         }
     }
 
@@ -231,7 +230,6 @@ public class ExcelReader
             }
             if (this.quoteMode == null) {
                 throw new IllegalArgumentException("Cannot set quoteMode to null");
-
             }
         }
     }

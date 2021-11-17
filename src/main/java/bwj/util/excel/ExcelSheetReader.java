@@ -41,8 +41,7 @@ class ExcelSheetReader
         return excelListData.toArray(new String[0][0]);
     }
 
-    private boolean isEmptyRow(String[] rowData)
-    {
+    private boolean isEmptyRow(String[] rowData) {
         for (String r : rowData) {
             if (r != null && r.length() > 0) {
                 return false;
@@ -67,11 +66,9 @@ class ExcelSheetReader
         int maxColumn = 0;
 
         // first iterate through the rows to find the max column width
-        for (int i = 0; i < numOfRows; i++)
-        {
+        for (int i = 0; i < numOfRows; i++) {
             Row row = sheet.getRow(i);
-            if (row != null)
-            {
+            if (row != null) {
                 maxColumn = Math.max(maxColumn, row.getLastCellNum());
             }
         }
@@ -84,24 +81,22 @@ class ExcelSheetReader
             String[] rowValues = new String[maxColumn];
 
             Row row = sheet.getRow(i);
-            // must check for null b/c a blank/empty row can return as null.
+            // must check for null b/c a blank/empty row can (sometimes) return as null.
             if (row != null)
             {
                 columnCount = row.getLastCellNum();
                 for (int j = 0; j < columnCount; j++)
                 {
                     String cellValue = getCellValue(row.getCell(j));
-                    // wrap the cellValue inside quotes IFF if configured and necessary
+                    // wrap the cellValue inside quotes IFF configured and necessary
                     cellValue = valueQuoter.applyCsvQuoting(cellValue);
                     rowValues[j] = cellValue;
                 }
             }
 
-            if (columnCount < maxColumn)
-            {
-                for (int j = columnCount; j < maxColumn; j++) {
-                    rowValues[j] = "";
-                }
+            // fill any 'extra' column cells with blank.
+            for (int j = columnCount; j < maxColumn; j++) {
+                rowValues[j] = "";
             }
 
             // ignore empty row if necessary
@@ -116,8 +111,9 @@ class ExcelSheetReader
     }
 
     /**
-     * Gets the string representation of the value in the cell (where "value" is what you physically see in the cell)
-     *  NOTE; dates & numbers should retain their original formatting.
+     * Gets the string representation of the value in the cell
+     *   (where "value" in this case is what you "physically see" in the cell)
+     *  NOTE: dates & numbers should retain their original formatting.
      * @param cell excel cell
      * @return string representation of the cell.
      */
@@ -134,7 +130,7 @@ class ExcelSheetReader
             formattedCellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell);
         }
 
-        // NOTE: maybe not 'officially' accurate, but going to assume that extra leading/trailing space should not be there.
+        // NOTE: maybe not 'officially' accurate, but going to assume that extra leading/trailing space should NOT be there.
         return formattedCellValue.trim();
     }
 
@@ -146,30 +142,18 @@ class ExcelSheetReader
      *  @see org.apache.poi.ss.util.SheetUtil
      */
     private static final FormulaEvaluator formulaEvaluator = new FormulaEvaluator() {
-        @Override
-        public void clearAllCachedResultValues() {}
-        @Override
-        public void notifySetFormula(Cell cell) {}
-        @Override
-        public void notifyDeleteCell(Cell cell) {}
-        @Override
-        public void notifyUpdateCell(Cell cell) {}
-        @Override
-        public CellValue evaluate(Cell cell) { return null; }
-        @Override
-        public Cell evaluateInCell(Cell cell) { return null; }
-        @Override
-        public void setupReferencedWorkbooks(Map<String, FormulaEvaluator> workbooks) {}
-        @Override
-        public void setDebugEvaluationOutputForNextEval(boolean value) {}
-        @Override
-        public void setIgnoreMissingWorkbooks(boolean ignore) {}
-        @Override
-        public void evaluateAll() {}
-        @Override
-        public CellType evaluateFormulaCell(Cell cell) { return cell.getCachedFormulaResultType(); }
+        @Override public void clearAllCachedResultValues() {}
+        @Override public void notifySetFormula(Cell cell) {}
+        @Override public void notifyDeleteCell(Cell cell) {}
+        @Override public void notifyUpdateCell(Cell cell) {}
+        @Override public CellValue evaluate(Cell cell) { return null; }
+        @Override public Cell evaluateInCell(Cell cell) { return null; }
+        @Override public void setupReferencedWorkbooks(Map<String, FormulaEvaluator> workbooks) {}
+        @Override public void setDebugEvaluationOutputForNextEval(boolean value) {}
+        @Override public void setIgnoreMissingWorkbooks(boolean ignore) {}
+        @Override public void evaluateAll() {}
+        @Override public CellType evaluateFormulaCell(Cell cell) { return cell.getCachedFormulaResultType(); }
         @Deprecated
-        @Override
-        public CellType evaluateFormulaCellEnum(Cell cell) { return evaluateFormulaCell(cell); }
+        @Override public CellType evaluateFormulaCellEnum(Cell cell) { return evaluateFormulaCell(cell); }
     };
 }
