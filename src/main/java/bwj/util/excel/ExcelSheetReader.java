@@ -20,7 +20,6 @@ class ExcelSheetReader
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
 
-
     private final boolean skipEmptyRows;
     private final ValueQuoter valueQuoter;
 
@@ -62,12 +61,12 @@ class ExcelSheetReader
         //  (however doesn't seem the need for this when using row.getLastCellNum, which seems odd)
         int numOfRows = sheet.getLastRowNum() + 1;
 
-        // NOTE: avoid using "sheet.iterator" when looping thru rows,
+        // NOTE: avoid using "sheet.iterator" when looping through rows,
         //   b/c it can bail out early when it encounters the first empty line
         //   (even if there is more data rows remaining)
         int maxColumn = 0;
 
-        // first iterate thru the rows to find the max column width
+        // first iterate through the rows to find the max column width
         for (int i = 0; i < numOfRows; i++)
         {
             Row row = sheet.getRow(i);
@@ -143,7 +142,7 @@ class ExcelSheetReader
     /**
      * NOTE: this formulaEvaluator was copied directly from the "dummyEvaluator" in org.apache.poi.ss.util.SheetUtil,
      *  b/c it's private and the need for it is exactly the same.
-     *  Namely "...returns formula string for formula cells. Dummy evaluator makes it to format the cached formula result."
+     *  Namely: "...returns formula string for formula cells. Dummy evaluator makes it to format the cached formula result."
      *  @see org.apache.poi.ss.util.SheetUtil
      */
     private static final FormulaEvaluator formulaEvaluator = new FormulaEvaluator() {

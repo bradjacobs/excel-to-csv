@@ -197,7 +197,7 @@ public class ExcelReader
         }
 
         /**
-         * Whether or not to skip any empty rows.
+         * Whether to skip any empty rows.
          * @param skipEmptyRows (defaults to false)
          */
         public Builder setSkipEmptyRows(boolean skipEmptyRows) {
