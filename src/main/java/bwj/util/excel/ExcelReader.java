@@ -31,19 +31,19 @@ public class ExcelReader
 {
     private static final Set<String> VALID_URL_SCHEMES =
             new HashSet<>(Arrays.asList("http", "https", "ftp", "file"));
-    private static final String NEW_LINE = System.lineSeparator();
     private static final int CONNECTION_TIMEOUT = 20000;
 
     private final int sheetIndex;
     private final String sheetName;
-    private final ValueQuoter valueQuoter;
+    private final MatrixToCsvTextConverter matrixToCsvTextConverter;
     private final ExcelSheetReader excelSheetToCsvConverter;
+
 
     private ExcelReader(Builder builder)
     {
         this.sheetIndex = builder.sheetIndex;
         this.sheetName = builder.sheetName;
-        this.valueQuoter = new ValueQuoter(builder.quoteMode);
+        this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         this.excelSheetToCsvConverter = new ExcelSheetReader(builder.skipEmptyRows);
     }
 
@@ -69,7 +69,7 @@ public class ExcelReader
         return convertToCsvText(getInputStream(intputUrl));
     }
     public String convertToCsvText(InputStream inputStream) throws IOException {
-       return convertMatrixToString( createDataMatrix(inputStream) );
+       return matrixToCsvTextConverter.createCsvText( createDataMatrix(inputStream) );
     }
 
 
@@ -138,32 +138,6 @@ public class ExcelReader
             throw new FileNotFoundException(String.format("Invalid Excel file path: %s", inputFile.getAbsolutePath()));
         }
         return new BufferedInputStream(new FileInputStream(inputFile));
-    }
-
-    /**
-     * Convert the 2-d value matrix into a single CSV string.
-     *   (quotes will be applied on values as needed)
-     * @param dataMatrix string data matrix
-     * @return csv file string
-     */
-    private String convertMatrixToString(String[][] dataMatrix)
-    {
-        StringBuilder sb = new StringBuilder();
-        int columnCount = dataMatrix[0].length;
-        int lastColumnIndex = columnCount - 1;
-
-        for (String[] rowData : dataMatrix) {
-            for (int i = 0; i < columnCount; i++) {
-                sb.append(valueQuoter.applyCsvQuoting(rowData[i]));
-                if (i == lastColumnIndex) {
-                    sb.append(NEW_LINE);
-                }
-                else {
-                    sb.append(',');
-                }
-            }
-        }
-        return sb.toString();
     }
 
 
