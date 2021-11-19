@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Simple class that reads an Excel Worksheet
@@ -37,7 +38,7 @@ public class ExcelReader
     private final String sheetName;
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
     private final ExcelSheetReader excelSheetToCsvConverter;
-
+    private final boolean gzipEnabled;
 
     private ExcelReader(Builder builder)
     {
@@ -45,45 +46,33 @@ public class ExcelReader
         this.sheetName = builder.sheetName;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         this.excelSheetToCsvConverter = new ExcelSheetReader(builder.skipEmptyRows);
+        this.gzipEnabled = builder.gzipEnabled;
     }
 
     public void convertToCsvFile(File inputFile, File outputFile) throws IOException {
-        convertToCsvFile(getInputStream(inputFile), outputFile);
+        writeFile( convertToCsvText(inputFile), outputFile);
     }
     public void convertToCsvFile(URL inputUrl, File outputFile) throws IOException {
-        convertToCsvFile(getInputStream(inputUrl), outputFile);
-    }
-    public void convertToCsvFile(InputStream inputStream, File outputFile) throws IOException {
-        if (outputFile == null) {
-            throw new IllegalArgumentException("Must supply outputFile location to save CSV data.");
-        }
-        String fileText = convertToCsvText(inputStream);
-        FileUtils.writeStringToFile(outputFile, fileText, StandardCharsets.UTF_8);
+        writeFile( convertToCsvText(inputUrl), outputFile);
     }
 
 
-    public String convertToCsvText(File intputFile) throws IOException {
-        return convertToCsvText(getInputStream(intputFile));
+    public String convertToCsvText(File inputFile) throws IOException {
+        return matrixToCsvTextConverter.createCsvText( convertToDataMatrix(inputFile) );
     }
-    public String convertToCsvText(URL intputUrl) throws IOException {
-        return convertToCsvText(getInputStream(intputUrl));
-    }
-    public String convertToCsvText(InputStream inputStream) throws IOException {
-       return matrixToCsvTextConverter.createCsvText( createDataMatrix(inputStream) );
+    public String convertToCsvText(URL inputUrl) throws IOException {
+        return matrixToCsvTextConverter.createCsvText( convertToDataMatrix(inputUrl) );
     }
 
 
-    public String[][] createDataMatrix(File inputFile) throws IOException {
-        return createDataMatrix(getInputStream(inputFile));
+    public String[][] convertToDataMatrix(File inputFile) throws IOException {
+        return convertToDataMatrix(getInputStream(inputFile));
     }
-    public String[][] createDataMatrix(URL inputUrl) throws IOException {
-        return createDataMatrix(getInputStream(inputUrl));
+    public String[][] convertToDataMatrix(URL inputUrl) throws IOException {
+        return convertToDataMatrix(getInputStream(inputUrl));
     }
-    public String[][] createDataMatrix(InputStream inputStream) throws IOException {
-        if (inputStream == null) {
-            throw new IllegalArgumentException("Must provide a valid inputStream.");
-        }
 
+    private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
         try (Workbook wb = WorkbookFactory.create(inputStream)) {
             Sheet sheet = getSheet(wb);
             return excelSheetToCsvConverter.convertToCsvData(sheet);
@@ -108,6 +97,12 @@ public class ExcelReader
         return returnSheet;
     }
 
+    private void writeFile(String csvString, File outputFile) throws IOException {
+        if (outputFile == null) {
+            throw new IllegalArgumentException("Must supply outputFile location to save CSV data.");
+        }
+        FileUtils.writeStringToFile(outputFile, csvString, StandardCharsets.UTF_8);
+    }
 
     private InputStream getInputStream(URL url) throws IOException {
         if (url == null) {
@@ -119,18 +114,27 @@ public class ExcelReader
         }
 
         if (urlProtocol.equalsIgnoreCase("file")) {
-            String filePath = url.toString().substring(5); // lop off the 'file:' prefix
-            return getInputStream(new File(filePath));
+            return getInputStream(new File( url.getPath() ));
         }
 
+        // Might switch to an httpClient in the future.....
         URLConnection connection = url.openConnection();
         connection.setConnectTimeout(CONNECTION_TIMEOUT);
         connection.setReadTimeout(CONNECTION_TIMEOUT);
-        return connection.getInputStream();
+        String encoding = null;
+        if (gzipEnabled) {
+            connection.setRequestProperty("Accept-Encoding","gzip");
+            encoding = connection.getContentEncoding();
+        }
+        if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
+            return new GZIPInputStream(connection.getInputStream());
+        }
+        else {
+            return connection.getInputStream();
+        }
     }
 
-    private InputStream getInputStream(File inputFile) throws IOException
-    {
+    private InputStream getInputStream(File inputFile) throws IOException {
         if (inputFile == null) {
             throw new IllegalArgumentException("Must provide an input file.");
         }
@@ -150,6 +154,7 @@ public class ExcelReader
         private String sheetName = "";  // can optionally provide a specific sheet name
         private boolean skipEmptyRows = false;
         private QuoteMode quoteMode = QuoteMode.NORMAL;
+        private boolean gzipEnabled = true;
 
         private Builder() {}
 
@@ -178,6 +183,11 @@ public class ExcelReader
          */
         public Builder setSkipEmptyRows(boolean skipEmptyRows) {
             this.skipEmptyRows = skipEmptyRows;
+            return this;
+        }
+
+        public Builder setGzipEnabled(boolean gzipEnabled) {
+            this.gzipEnabled = gzipEnabled;
             return this;
         }
 

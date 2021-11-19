@@ -27,7 +27,7 @@ public class ExcelReaderExceptionHandlingTest
     public void testMissingFile() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
         File inputFile = null;
-        String[][] csvData = excelReader.createDataMatrix(inputFile);
+        String[][] csvData = excelReader.convertToDataMatrix(inputFile);
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
@@ -35,52 +35,16 @@ public class ExcelReaderExceptionHandlingTest
     public void testMissingUrl() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
         URL inputUrl = null;
-        String[][] csvData = excelReader.createDataMatrix(inputUrl);
+        String[][] csvData = excelReader.convertToDataMatrix(inputUrl);
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-        expectedExceptionsMessageRegExp = "Must provide a valid inputStream.")
-    public void testEmptyInputStream() throws Exception {
-        ExcelReader excelReader = ExcelReader.builder().build();
-        InputStream inputStream = null;
-        String[][] csvData = excelReader.createDataMatrix(inputStream);
-    }
-
-    // give an InputStream that's already been read.... any exception is fine
-    @Test(expectedExceptions = { Exception.class })
-    public void testInvalidInputStream() throws Exception {
-        ExcelReader excelReader = ExcelReader.builder().build();
-        try (InputStream inputStream = getTestDataInputStream())
-        {
-            byte[] byteArray = IOUtils.toByteArray(inputStream);
-            String csvText = excelReader.convertToCsvText(inputStream);
-        }
-    }
-
-    // give an InputStream that's already closed
-    @Test(expectedExceptions = { IOException.class },
-        expectedExceptionsMessageRegExp = "Stream closed")
-    public void testClosedInputStream() throws Exception {
-        ExcelReader excelReader = ExcelReader.builder().build();
-        InputStream inputStream = getTestDataInputStream();
-        try {
-            byte[] byteArray = IOUtils.toByteArray(inputStream);
-        }
-        finally {
-            inputStream.close();
-        }
-        String csvText = excelReader.convertToCsvText(inputStream);
-    }
-
-    // give an InputStream is _NOT_ an Excel file
+    // give an URL that is _NOT_ an Excel file
     @Test(expectedExceptions = { IOException.class } )
     public void testNotExcelFile() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
         URL url = this.getClass().getClassLoader().getResource("expected_normal.csv");
         assertNotNull(url, "unable to open test file");
-        try (InputStream inputStream = url.openStream()) {
-            String csvText = excelReader.convertToCsvText(inputStream);
-        }
+        String csvText = excelReader.convertToCsvText(url);
     }
 
     @Test(expectedExceptions = { FileNotFoundException.class })
@@ -106,18 +70,16 @@ public class ExcelReaderExceptionHandlingTest
     @Test(expectedExceptions = { IllegalArgumentException.class })
     public void testInvalidSheetIndex() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().setSheetIndex(99).build();
-        try (InputStream inputStream = getTestDataInputStream()) {
-            String csvText = excelReader.convertToCsvText(inputStream);
-        }
+        File inputFile = getTestFileObject();
+        String csvText = excelReader.convertToCsvText(inputFile);
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
         expectedExceptionsMessageRegExp = "Unable to find sheet with name: FAKE_WORKSHEET_NAME")
     public void testInvalidSheetName() throws Exception {
+        File inputFile = getTestFileObject();
         ExcelReader excelReader = ExcelReader.builder().setSheetName("FAKE_WORKSHEET_NAME").build();
-        try (InputStream inputStream = getTestDataInputStream()) {
-            String csvText = excelReader.convertToCsvText(inputStream);
-        }
+        String csvText = excelReader.convertToCsvText(inputFile);
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
@@ -136,26 +98,16 @@ public class ExcelReaderExceptionHandlingTest
             expectedExceptionsMessageRegExp = "Must supply outputFile location to save CSV data.")
     public void testSaveCsvMissingOutputFile() throws Exception {
 
-        InputStream inputStream = getTestDataInputStream();
-        try {
-            ExcelReader excelReader = ExcelReader.builder().build();
-            excelReader.convertToCsvFile(inputStream, null);
-        }
-        finally {
-            inputStream.close();
-        }
+        File inputFile = getTestFileObject();
+        ExcelReader excelReader = ExcelReader.builder().build();
+        excelReader.convertToCsvFile(inputFile, null);
     }
 
 
-    private InputStream getTestDataInputStream()
+    private File getTestFileObject()
     {
-        try {
-            URL resource = this.getClass().getClassLoader().getResource(TEST_DATA_FILE);
-            assertNotNull(resource);
-            return resource.openStream();
-        }
-        catch (Exception e) {
-            throw new RuntimeException(String.format("Unable to read test resource file: %s.  Reason: %s", TEST_DATA_FILE, e.getMessage()), e);
-        }
+        URL resourceUrl = this.getClass().getClassLoader().getResource(TEST_DATA_FILE);
+        assertNotNull(resourceUrl);
+        return new File( resourceUrl.getPath() );
     }
 }
