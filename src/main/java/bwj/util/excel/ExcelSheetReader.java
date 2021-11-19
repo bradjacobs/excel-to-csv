@@ -139,7 +139,6 @@ class ExcelSheetReader
         @Override public void setIgnoreMissingWorkbooks(boolean ignore) {}
         @Override public void evaluateAll() {}
         @Override public CellType evaluateFormulaCell(Cell cell) { return cell.getCachedFormulaResultType(); }
-        @Deprecated
-        @Override public CellType evaluateFormulaCellEnum(Cell cell) { return evaluateFormulaCell(cell); }
+        public CellType evaluateFormulaCellEnum(Cell cell) { return evaluateFormulaCell(cell); }
     };
 }

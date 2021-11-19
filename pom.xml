@@ -10,23 +10,21 @@
 	<description>Tool to convert Excel Worksheet to CSV</description>
 
 	<properties>
-		<!-- minimum required java version -->
-		<java.version>1.8</java.version>
-		<apache.poi.version>4.1.0</apache.poi.version>
+		<java.version>1.8</java.version> <!-- minimum JDK required -->
+		<apache.poi.version>5.1.0</apache.poi.version>
 	</properties>
 
 	<dependencies>
-
 		<!-- file utils -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.9.0</version>
+			<version>2.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.10</version>
+			<version>3.12.0</version>
 		</dependency>
 
 		<!-- for reading Excel file -->
@@ -47,7 +45,6 @@
 			<version>7.0.0</version>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -55,6 +52,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
@@ -62,5 +60,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
