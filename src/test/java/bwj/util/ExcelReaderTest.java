@@ -29,7 +29,6 @@ public class ExcelReaderTest
     private static final String SAMPLE_INTERNET_EXCEL_FILE = "https://download.microsoft.com/download/1/4/E/14EDED28-6C58-4055-A65C-23B4DA81C4DE/Financial%20Sample.xlsx";
 
 
-
     private static final String TEST_DATA_FILE = "test_data.xlsx";
     private static final String TEST_SHEET_NAME = "TEST_SHEET";
 
@@ -45,7 +44,6 @@ public class ExcelReaderTest
     private static final File TEST_OUTPUT_FILE = new File(TEST_OUTPUT_FILE_NAME);
 
 
-
     @DataProvider(name = "quote_variations")
     public Object[][] invalidTimeZoneParams(){
         return new Object[][] {
@@ -57,25 +55,24 @@ public class ExcelReaderTest
     }
 
     @Test(dataProvider = "quote_variations")
-    public void testExpectedQuoteText(QuoteMode quoteMode, String expectedResultFileName) throws Exception {
-
+    public void testExpectedQuoteText(QuoteMode quoteMode, String expectedResultFileName) throws Exception
+    {
         String expectedCsvText = readResourceFile(expectedResultFileName);
-
         ExcelReader excelReader = ExcelReader.builder().setQuoteMode(quoteMode).setSkipEmptyRows(false).build();
         InputStream inputStream = getTestDataInputStream();
 
-        String csvText = excelReader.createCsvText(inputStream);
+        String csvText = excelReader.convertToCsvText(inputStream);
 
         assertEquals(csvText, expectedCsvText, "mismatch of expected csv output");
     }
 
     @Test
-    public void testMatrixOutput() throws Exception {
-
+    public void testMatrixOutput() throws Exception
+    {
         ExcelReader excelReader = ExcelReader.builder().build();
         InputStream inputStream = getTestDataInputStream();
 
-        String[][] csvData = excelReader.createCsvMatrix(inputStream);
+        String[][] csvData = excelReader.createDataMatrix(inputStream);
         assertNotNull(csvData, "expected non-null data");
         assertEquals(csvData.length, EXPECTED_ROW_COUNT, "mismatch expected number of rows");
 
@@ -91,11 +88,11 @@ public class ExcelReaderTest
     {
         ExcelReader excelReader1 = ExcelReader.builder().build();
         InputStream inputStream1 = getTestDataInputStream();
-        String[][] csvDataOriginal = excelReader1.createCsvMatrix(inputStream1);
+        String[][] csvDataOriginal = excelReader1.createDataMatrix(inputStream1);
 
         ExcelReader excelReader2 = ExcelReader.builder().setSkipEmptyRows(true).build();
         InputStream inputStream2 = getTestDataInputStream();
-        String[][] csvDataSkipEmptyRows = excelReader2.createCsvMatrix(inputStream2);
+        String[][] csvDataSkipEmptyRows = excelReader2.createDataMatrix(inputStream2);
 
         // based on the fact we 'know' what the test data file looks like and
         // there are currently 2 empty rows, there should be a row count difference of 2.
@@ -106,15 +103,14 @@ public class ExcelReaderTest
         assertEquals(skipEmptyRowCount, originalRowCount - 2, "mismatch of expected number fo rows when skipping blank rows");
     }
 
-
     @Test
     public void testSaveFile() throws Exception
     {
-        cleanupTestFile();
+        cleanupTestFile(); // first check if residual file still around from a previous test.
 
         ExcelReader excelReader = ExcelReader.builder().build();
         InputStream inputStream = getTestDataInputStream();
-        excelReader.createCsvFile(inputStream, TEST_OUTPUT_FILE);
+        excelReader.convertToCsvFile(inputStream, TEST_OUTPUT_FILE);
 
         assertTrue(TEST_OUTPUT_FILE.exists(), "expected csv file was NOT created");
 
@@ -133,7 +129,7 @@ public class ExcelReaderTest
 
         ExcelReader excelReader = ExcelReader.builder().build();
 
-        String csvText = excelReader.createCsvText(fileUrl.toString());
+        String csvText = excelReader.convertToCsvText(fileUrl);
         String expectedCsvText = readResourceFile(EXPECTED_NORMAL_CSV_FILE);
         assertNotNull(csvText);
         assertEquals(csvText, expectedCsvText, "mismatch of content of saved csv file");
@@ -145,7 +141,7 @@ public class ExcelReaderTest
         ExcelReader excelReader = ExcelReader.builder().setSheetName(TEST_SHEET_NAME).build();
         InputStream inputStream = getTestDataInputStream();
 
-        String csvText = excelReader.createCsvText(inputStream);
+        String csvText = excelReader.convertToCsvText(inputStream);
         String expectedCsvText = readResourceFile(EXPECTED_NORMAL_CSV_FILE);
         assertNotNull(csvText);
         assertEquals(csvText, expectedCsvText, "mismatch of content of saved csv file");
@@ -156,12 +152,10 @@ public class ExcelReaderTest
     public void testDownloadFromInternet() throws Exception
     {
         ExcelReader excelReader = ExcelReader.builder().build();
-
-        String csvText = excelReader.createCsvText(SAMPLE_INTERNET_EXCEL_FILE);
+        String csvText = excelReader.convertToCsvText(new URL(SAMPLE_INTERNET_EXCEL_FILE));
         assertNotNull(csvText);
         assertTrue(csvText.length() > 0);
     }
-
 
 
     @AfterTest
@@ -174,9 +168,7 @@ public class ExcelReaderTest
     }
 
 
-
-    private InputStream getTestDataInputStream()
-    {
+    private InputStream getTestDataInputStream() {
         try {
             URL resource = this.getClass().getClassLoader().getResource(TEST_DATA_FILE);
             assertNotNull(resource);
@@ -187,8 +179,7 @@ public class ExcelReaderTest
         }
     }
 
-    private String readResourceFile(String fileName)
-    {
+    private String readResourceFile(String fileName) {
         try {
             URL resource = this.getClass().getClassLoader().getResource(fileName);
             assertNotNull(resource);
@@ -198,5 +189,4 @@ public class ExcelReaderTest
             throw new RuntimeException(String.format("Unable to read test resource file: %s.  Reason: %s", fileName, e.getMessage()), e);
         }
     }
-
 }

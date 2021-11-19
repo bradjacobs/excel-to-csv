@@ -12,90 +12,87 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Simple class that reads a Worksheet from an Excel file and will produce a CSV-equivalent
- *
+ * Simple class that reads an Excel Worksheet
+ *   and will produce a CSV-equivalent
  */
+// todo: javadocs
 public class ExcelReader
 {
-    private final ExcelSheetReader excelSheetToCsvConverter;
+    private static final Set<String> VALID_URL_SCHEMES =
+            new HashSet<>(Arrays.asList("http", "https", "ftp", "file"));
     private static final String NEW_LINE = System.lineSeparator();
+    private static final int CONNECTION_TIMEOUT = 20000;
 
     private final int sheetIndex;
     private final String sheetName;
+    private final ValueQuoter valueQuoter;
+    private final ExcelSheetReader excelSheetToCsvConverter;
 
     private ExcelReader(Builder builder)
     {
         this.sheetIndex = builder.sheetIndex;
         this.sheetName = builder.sheetName;
-        this.excelSheetToCsvConverter = new ExcelSheetReader(builder.skipEmptyRows, builder.quoteMode);
+        this.valueQuoter = new ValueQuoter(builder.quoteMode);
+        this.excelSheetToCsvConverter = new ExcelSheetReader(builder.skipEmptyRows);
     }
 
-
-    public String[][] createCsvMatrix(String inputFilePath) throws IOException
-    {
-        return createCsvMatrix(getInputStream(inputFilePath));
+    public void convertToCsvFile(File inputFile, File outputFile) throws IOException {
+        convertToCsvFile(getInputStream(inputFile), outputFile);
     }
-    public String[][] createCsvMatrix(InputStream inputStream) throws IOException
-    {
-        return convertToCsvData(inputStream);
+    public void convertToCsvFile(URL inputUrl, File outputFile) throws IOException {
+        convertToCsvFile(getInputStream(inputUrl), outputFile);
     }
-
-    public String createCsvText(String inputFilePath) throws IOException
-    {
-        return createCsvText(getInputStream(inputFilePath));
-    }
-    public String createCsvText(InputStream inputStream) throws IOException
-    {
-        return convertMatrixToString( convertToCsvData(inputStream) );
-    }
-
-
-    // max method signature permutation limit reached...
-
-    public void createCsvFile(String inputFilePath, String outputFilePath) throws IOException
-    {
-        createCsvFile(getInputStream(inputFilePath), new File(outputFilePath));
-    }
-    public void createCsvFile(InputStream inputStream, String outputFilePath) throws IOException
-    {
-        createCsvFile(inputStream, new File(outputFilePath));
-    }
-    public void createCsvFile(String inputFilePath, File outputFile) throws IOException
-    {
-        createCsvFile(getInputStream(inputFilePath), outputFile);
-    }
-    public void createCsvFile(InputStream inputStream, File outputFile) throws IOException
-    {
-        String fileText = createCsvText(inputStream);
+    public void convertToCsvFile(InputStream inputStream, File outputFile) throws IOException {
+        if (outputFile == null) {
+            throw new IllegalArgumentException("Must supply outputFile location to save CSV data.");
+        }
+        String fileText = convertToCsvText(inputStream);
         FileUtils.writeStringToFile(outputFile, fileText, StandardCharsets.UTF_8);
     }
 
 
+    public String convertToCsvText(File intputFile) throws IOException {
+        return convertToCsvText(getInputStream(intputFile));
+    }
+    public String convertToCsvText(URL intputUrl) throws IOException {
+        return convertToCsvText(getInputStream(intputUrl));
+    }
+    public String convertToCsvText(InputStream inputStream) throws IOException {
+       return convertMatrixToString( createDataMatrix(inputStream) );
+    }
 
-    private String[][] convertToCsvData(InputStream inputStream) throws IOException
-    {
+
+    public String[][] createDataMatrix(File inputFile) throws IOException {
+        return createDataMatrix(getInputStream(inputFile));
+    }
+    public String[][] createDataMatrix(URL inputUrl) throws IOException {
+        return createDataMatrix(getInputStream(inputUrl));
+    }
+    public String[][] createDataMatrix(InputStream inputStream) throws IOException {
         if (inputStream == null) {
             throw new IllegalArgumentException("Must provide a valid inputStream.");
         }
 
-        String[][] result;
         try (Workbook wb = WorkbookFactory.create(inputStream)) {
             Sheet sheet = getSheet(wb);
-            result = excelSheetToCsvConverter.convertToCsvData(sheet);
+            return excelSheetToCsvConverter.convertToCsvData(sheet);
         }
         finally {
-            inputStream.close(); // call close on inputStream b/c Workbook / WorkbookFactory might not.
+            // ensure inputStream closed b/c Workbook/WorkbookFactory might not do it.
+            inputStream.close();
         }
-        return result;
     }
-
 
     private Sheet getSheet(Workbook wb) {
         Sheet returnSheet;
@@ -112,44 +109,52 @@ public class ExcelReader
     }
 
 
-    private InputStream getInputStream(String inputFilePath) throws IOException
-    {
-        if (StringUtils.isEmpty(inputFilePath)) {
-            throw new IllegalArgumentException("Must provide a fully-qualified excel input file path");
+    private InputStream getInputStream(URL url) throws IOException {
+        if (url == null) {
+            throw new IllegalArgumentException("Must provide an input url.");
         }
-        if (inputFilePath.startsWith("http") || inputFilePath.startsWith("ftp")) {
-            URL url = new URL(inputFilePath);
-            final URLConnection connection = url.openConnection();
-            connection.setConnectTimeout(20000);
-            connection.setReadTimeout(30000);
-            return connection.getInputStream();
+        String urlProtocol = url.getProtocol();
+        if (! VALID_URL_SCHEMES.contains(urlProtocol)) {
+            throw new IllegalArgumentException(String.format("URL has an unsupported protocol: %s", urlProtocol));
         }
-        else {
-            File file;
-            if (inputFilePath.startsWith("file:")) {
-                URL fileUrl = new URL(inputFilePath);
-                file = new File(fileUrl.getFile());
-            }
-            else {
-                file = new File(inputFilePath);
-            }
 
-            return new BufferedInputStream(new FileInputStream(file));
+        if (urlProtocol.equalsIgnoreCase("file")) {
+            String filePath = url.toString().substring(5); // lop off the 'file:' prefix
+            return getInputStream(new File(filePath));
         }
+
+        URLConnection connection = url.openConnection();
+        connection.setConnectTimeout(CONNECTION_TIMEOUT);
+        connection.setReadTimeout(CONNECTION_TIMEOUT);
+        return connection.getInputStream();
     }
 
+    private InputStream getInputStream(File inputFile) throws IOException
+    {
+        if (inputFile == null) {
+            throw new IllegalArgumentException("Must provide an input file.");
+        }
+        else if (!inputFile.exists()) {
+            throw new FileNotFoundException(String.format("Invalid Excel file path: %s", inputFile.getAbsolutePath()));
+        }
+        return new BufferedInputStream(new FileInputStream(inputFile));
+    }
 
+    /**
+     * Convert the 2-d value matrix into a single CSV string.
+     *   (quotes will be applied on values as needed)
+     * @param dataMatrix string data matrix
+     * @return csv file string
+     */
     private String convertMatrixToString(String[][] dataMatrix)
     {
         StringBuilder sb = new StringBuilder();
-
         int columnCount = dataMatrix[0].length;
         int lastColumnIndex = columnCount - 1;
 
-        for (String[] rowData : dataMatrix)
-        {
+        for (String[] rowData : dataMatrix) {
             for (int i = 0; i < columnCount; i++) {
-                sb.append(rowData[i]);
+                sb.append(valueQuoter.applyCsvQuoting(rowData[i]));
                 if (i == lastColumnIndex) {
                     sb.append(NEW_LINE);
                 }
@@ -160,8 +165,6 @@ public class ExcelReader
         }
         return sb.toString();
     }
-
-
 
 
     public static Builder builder() {
@@ -204,7 +207,6 @@ public class ExcelReader
             return this;
         }
 
-
         /**
          * Set how to handle quote/escaping string values to be CSV-compliant
          * @param quoteMode
@@ -217,7 +219,6 @@ public class ExcelReader
             this.quoteMode = quoteMode;
             return this;
         }
-
 
         public ExcelReader build() {
             validateInputs();

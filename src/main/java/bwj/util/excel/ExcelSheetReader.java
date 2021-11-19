@@ -21,13 +21,9 @@ class ExcelSheetReader
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
 
     private final boolean skipEmptyRows;
-    private final ValueQuoter valueQuoter;
 
-
-    protected ExcelSheetReader(boolean skipEmptyRows, QuoteMode quoteMode)
-    {
+    protected ExcelSheetReader(boolean skipEmptyRows) {
         this.skipEmptyRows = skipEmptyRows;
-        this.valueQuoter = new ValueQuoter(quoteMode);
     }
 
     /**
@@ -49,7 +45,6 @@ class ExcelSheetReader
         }
         return true;
     }
-
 
     public List<String[]> convertToCsvDataList(Sheet sheet) {
         if (sheet == null) {
@@ -75,21 +70,17 @@ class ExcelSheetReader
 
         List<String[]> csvData = new ArrayList<>(numOfRows);
 
-        for (int i = 0; i < numOfRows; i++)
-        {
+        for (int i = 0; i < numOfRows; i++) {
             int columnCount = 0;
             String[] rowValues = new String[maxColumn];
 
             Row row = sheet.getRow(i);
             // must check for null b/c a blank/empty row can (sometimes) return as null.
-            if (row != null)
-            {
+            if (row != null) {
                 columnCount = row.getLastCellNum();
                 for (int j = 0; j < columnCount; j++)
                 {
                     String cellValue = getCellValue(row.getCell(j));
-                    // wrap the cellValue inside quotes IFF configured and necessary
-                    cellValue = valueQuoter.applyCsvQuoting(cellValue);
                     rowValues[j] = cellValue;
                 }
             }
@@ -103,7 +94,6 @@ class ExcelSheetReader
             if (this.skipEmptyRows && isEmptyRow(rowValues)) {
                 continue;
             }
-
             csvData.add(rowValues);
         }
 
@@ -122,18 +112,14 @@ class ExcelSheetReader
             return "";
         }
 
-        String formattedCellValue;
+        FormulaEvaluator evaluator = null;  // always use null for non-formula cells
         if (cell.getCellType() != null && cell.getCellType().equals(CellType.FORMULA)) {
-            formattedCellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, formulaEvaluator);
-        }
-        else {
-            formattedCellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell);
+            evaluator = formulaEvaluator;
         }
 
-        // NOTE: maybe not 'officially' accurate, but going to assume that extra leading/trailing space should NOT be there.
-        return formattedCellValue.trim();
+        // Note: extra leading/trailing spaces also 'trimmed off'
+        return EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator).trim();
     }
-
 
     /**
      * NOTE: this formulaEvaluator was copied directly from the "dummyEvaluator" in org.apache.poi.ss.util.SheetUtil,
