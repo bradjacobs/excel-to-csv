@@ -150,9 +150,9 @@ public class ExcelReader
     }
 
     public static class Builder {
-        private int sheetIndex = 0; // default to the first one.
-        private String sheetName = "";  // can optionally provide a specific sheet name
-        private boolean skipEmptyRows = false;
+        private int sheetIndex = 0;    // default to the first tab
+        private String sheetName = ""; // optionally provide a specific sheet name
+        private boolean skipEmptyRows = true; // default will skip any empty lines
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private boolean gzipEnabled = true;
 

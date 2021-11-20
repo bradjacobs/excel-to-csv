@@ -37,15 +37,6 @@ class ExcelSheetReader
         return excelListData.toArray(new String[0][0]);
     }
 
-    private boolean isEmptyRow(String[] rowData) {
-        for (String r : rowData) {
-            if (r != null && r.length() > 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public List<String[]> convertToCsvDataList(Sheet sheet) {
         if (sheet == null) {
             throw new IllegalArgumentException("Sheet parameter cannot be null.");
@@ -58,9 +49,9 @@ class ExcelSheetReader
         // NOTE: avoid using "sheet.iterator" when looping through rows,
         //   b/c it can bail out early when it encounters the first empty line
         //   (even if there is more data rows remaining)
-        int maxColumn = 0;
 
         // first iterate through the rows to find the max column width
+        int maxColumn = 0;
         for (int i = 0; i < numOfRows; i++) {
             Row row = sheet.getRow(i);
             if (row != null) {
@@ -71,10 +62,11 @@ class ExcelSheetReader
         List<String[]> csvData = new ArrayList<>(numOfRows);
 
         for (int i = 0; i < numOfRows; i++) {
-            int columnCount = 0;
             String[] rowValues = new String[maxColumn];
 
             Row row = sheet.getRow(i);
+            int columnCount = 0;
+
             // must check for null b/c a blank/empty row can (sometimes) return as null.
             if (row != null) {
                 columnCount = row.getLastCellNum();
@@ -98,6 +90,15 @@ class ExcelSheetReader
         }
 
         return csvData;
+    }
+
+    private boolean isEmptyRow(String[] rowData) {
+        for (String r : rowData) {
+            if (r != null && r.length() > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -139,6 +140,6 @@ class ExcelSheetReader
         @Override public void setIgnoreMissingWorkbooks(boolean ignore) {}
         @Override public void evaluateAll() {}
         @Override public CellType evaluateFormulaCell(Cell cell) { return cell.getCachedFormulaResultType(); }
-        public CellType evaluateFormulaCellEnum(Cell cell) { return evaluateFormulaCell(cell); }
+        @Deprecated public CellType evaluateFormulaCellEnum(Cell cell) { return evaluateFormulaCell(cell); }
     };
 }
