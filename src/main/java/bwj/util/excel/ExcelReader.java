@@ -49,27 +49,27 @@ public class ExcelReader
         this.gzipEnabled = builder.gzipEnabled;
     }
 
-    public void convertToCsvFile(File inputFile, File outputFile) throws IOException {
-        writeFile( convertToCsvText(inputFile), outputFile);
+    public void convertToCsvFile(File excelFile, File outputFile) throws IOException {
+        writeCsvToFile( convertToCsvText(excelFile), outputFile);
     }
-    public void convertToCsvFile(URL inputUrl, File outputFile) throws IOException {
-        writeFile( convertToCsvText(inputUrl), outputFile);
-    }
-
-
-    public String convertToCsvText(File inputFile) throws IOException {
-        return matrixToCsvTextConverter.createCsvText( convertToDataMatrix(inputFile) );
-    }
-    public String convertToCsvText(URL inputUrl) throws IOException {
-        return matrixToCsvTextConverter.createCsvText( convertToDataMatrix(inputUrl) );
+    public void convertToCsvFile(URL excelUrl, File outputFile) throws IOException {
+        writeCsvToFile( convertToCsvText(excelUrl), outputFile);
     }
 
 
-    public String[][] convertToDataMatrix(File inputFile) throws IOException {
-        return convertToDataMatrix(getInputStream(inputFile));
+    public String convertToCsvText(File excelFile) throws IOException {
+        return matrixToCsvTextConverter.createCsvText( convertToDataMatrix(excelFile) );
     }
-    public String[][] convertToDataMatrix(URL inputUrl) throws IOException {
-        return convertToDataMatrix(getInputStream(inputUrl));
+    public String convertToCsvText(URL excelUrl) throws IOException {
+        return matrixToCsvTextConverter.createCsvText( convertToDataMatrix(excelUrl) );
+    }
+
+
+    public String[][] convertToDataMatrix(File excelFile) throws IOException {
+        return convertToDataMatrix(getInputStream(excelFile));
+    }
+    public String[][] convertToDataMatrix(URL excelUrl) throws IOException {
+        return convertToDataMatrix(getInputStream(excelUrl));
     }
 
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
@@ -97,7 +97,7 @@ public class ExcelReader
         return returnSheet;
     }
 
-    private void writeFile(String csvString, File outputFile) throws IOException {
+    private void writeCsvToFile(String csvString, File outputFile) throws IOException {
         if (outputFile == null) {
             throw new IllegalArgumentException("Must supply outputFile location to save CSV data.");
         }
