@@ -34,6 +34,11 @@ public class ExcelReader
             new HashSet<>(Arrays.asList("http", "https", "ftp", "file"));
     private static final int CONNECTION_TIMEOUT = 20000;
 
+    // some websites require a userAgent value set.
+    //    side:  seen a case where a userAgent with substring 'java' would fail  (empirical evidence)
+    private static final String USER_AGENT_VALUE = "jclient/" + System.getProperty("java.version");
+
+
     private final int sheetIndex;
     private final String sheetName;
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
@@ -121,6 +126,7 @@ public class ExcelReader
         URLConnection connection = url.openConnection();
         connection.setConnectTimeout(CONNECTION_TIMEOUT);
         connection.setReadTimeout(CONNECTION_TIMEOUT);
+        connection.setRequestProperty("User-Agent", USER_AGENT_VALUE);
         String encoding = null;
         if (gzipEnabled) {
             connection.setRequestProperty("Accept-Encoding","gzip");
