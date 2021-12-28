@@ -14,9 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Simple class that reads an Excel Worksheet
@@ -25,15 +22,6 @@ import java.util.Set;
 // todo: javadocs
 public class ExcelReader
 {
-    private static final Set<String> VALID_URL_SCHEMES =
-            new HashSet<>(Arrays.asList("http", "https", "ftp", "file"));
-    private static final int CONNECTION_TIMEOUT = 20000;
-
-    // some websites require a userAgent value set.
-    //    side:  seen a case where a userAgent with substring 'java' would fail  (empirical evidence)
-    private static final String USER_AGENT_VALUE = "jclient/" + System.getProperty("java.version");
-
-
     private final int sheetIndex;
     private final String sheetName;
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
