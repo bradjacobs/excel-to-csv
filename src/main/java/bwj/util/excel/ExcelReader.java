@@ -9,19 +9,14 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.zip.GZIPInputStream;
 
 /**
  * Simple class that reads an Excel Worksheet
@@ -43,7 +38,8 @@ public class ExcelReader
     private final String sheetName;
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
     private final ExcelSheetReader excelSheetToCsvConverter;
-    private final boolean gzipEnabled;
+
+    private final InputStreamGenerator inputStreamGenerator;
 
     private ExcelReader(Builder builder)
     {
@@ -51,7 +47,9 @@ public class ExcelReader
         this.sheetName = builder.sheetName;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         this.excelSheetToCsvConverter = new ExcelSheetReader(builder.skipEmptyRows);
-        this.gzipEnabled = builder.gzipEnabled;
+
+        this.inputStreamGenerator = new InputStreamGenerator();
+        this.inputStreamGenerator.setUseGzip(builder.gzipEnabled);
     }
 
     public void convertToCsvFile(File excelFile, File outputFile) throws IOException {
@@ -71,10 +69,10 @@ public class ExcelReader
 
 
     public String[][] convertToDataMatrix(File excelFile) throws IOException {
-        return convertToDataMatrix(getInputStream(excelFile));
+        return convertToDataMatrix( inputStreamGenerator.getInputStream(excelFile) );
     }
     public String[][] convertToDataMatrix(URL excelUrl) throws IOException {
-        return convertToDataMatrix(getInputStream(excelUrl));
+        return convertToDataMatrix(  inputStreamGenerator.getInputStream(excelUrl) );
     }
 
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
@@ -107,47 +105,6 @@ public class ExcelReader
             throw new IllegalArgumentException("Must supply outputFile location to save CSV data.");
         }
         FileUtils.writeStringToFile(outputFile, csvString, StandardCharsets.UTF_8);
-    }
-
-    private InputStream getInputStream(URL url) throws IOException {
-        if (url == null) {
-            throw new IllegalArgumentException("Must provide an input url.");
-        }
-        String urlProtocol = url.getProtocol();
-        if (! VALID_URL_SCHEMES.contains(urlProtocol)) {
-            throw new IllegalArgumentException(String.format("URL has an unsupported protocol: %s", urlProtocol));
-        }
-
-        if (urlProtocol.equalsIgnoreCase("file")) {
-            return getInputStream(new File( url.getPath() ));
-        }
-
-        // Might switch to an httpClient in the future.....
-        URLConnection connection = url.openConnection();
-        connection.setConnectTimeout(CONNECTION_TIMEOUT);
-        connection.setReadTimeout(CONNECTION_TIMEOUT);
-        connection.setRequestProperty("User-Agent", USER_AGENT_VALUE);
-        String encoding = null;
-        if (gzipEnabled) {
-            connection.setRequestProperty("Accept-Encoding","gzip");
-            encoding = connection.getContentEncoding();
-        }
-        if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
-            return new GZIPInputStream(connection.getInputStream());
-        }
-        else {
-            return connection.getInputStream();
-        }
-    }
-
-    private InputStream getInputStream(File inputFile) throws IOException {
-        if (inputFile == null) {
-            throw new IllegalArgumentException("Must provide an input file.");
-        }
-        else if (!inputFile.exists()) {
-            throw new FileNotFoundException(String.format("Invalid Excel file path: %s", inputFile.getAbsolutePath()));
-        }
-        return new BufferedInputStream(new FileInputStream(inputFile));
     }
 
 
