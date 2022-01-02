@@ -55,7 +55,20 @@ class ExcelSheetReader
         for (int i = 0; i < numOfRows; i++) {
             Row row = sheet.getRow(i);
             if (row != null) {
-                maxColumn = Math.max(maxColumn, row.getLastCellNum());
+                int currentRowCellCount = row.getLastCellNum();
+                if (currentRowCellCount > maxColumn) {
+                    //  Sometimes a row is detected with more columns, but the 'extra'
+                    //    column values are actually blank.  Therefore double check if this is
+                    //    the case and adjust accordingly.
+                    for (int j = currentRowCellCount - 1; j >= maxColumn; j--) {
+                        String cellValue = getCellValue(row.getCell(j));
+                        if (cellValue.length() > 0) {
+                            break;
+                        }
+                        currentRowCellCount--;
+                    }
+                    maxColumn = Math.max(maxColumn, currentRowCellCount);
+                }
             }
         }
 
@@ -69,7 +82,7 @@ class ExcelSheetReader
 
             // must check for null b/c a blank/empty row can (sometimes) return as null.
             if (row != null) {
-                columnCount = row.getLastCellNum();
+                columnCount = Math.min(row.getLastCellNum(), maxColumn);
                 for (int j = 0; j < columnCount; j++)
                 {
                     String cellValue = getCellValue(row.getCell(j));
