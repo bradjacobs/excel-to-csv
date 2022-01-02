@@ -169,6 +169,18 @@ public class ExcelReaderTest
         assertEquals(csvText, "", "expected empty csv text");
     }
 
+    @Test
+    public void testHandleExtraBlankColumns() throws Exception
+    {
+        // the 9th row (index 8) is detected with extra columns
+        URL resourceUrl = this.getClass().getClassLoader().getResource("digitcodes.xlsx");
+        assertNotNull(resourceUrl);
+
+        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
+        assertEquals(csvMatrix[0].length, 3, "mismatch of expected csv output");
+    }
+
     @AfterTest
     private void cleanupTestFile() {
         if (TEST_OUTPUT_FILE.exists()) {
