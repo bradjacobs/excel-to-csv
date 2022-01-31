@@ -2,12 +2,12 @@
 - [Description](#Description)
 - [Usage](#Usage)
   * [Overview](#Overview)
-    + [Builder Details](#Builder Details)
-    + [ExcelReader Details](#ExcelReader Details)
+    + [BuilderDetails](#BuilderDetails)
+    + [ExcelReaderDetails](#ExcelReaderDetails)
 - [Examples](#Examples)
   * [Basic](#Basic)
   * [Advanced](#Advanced)
-- [Other_Info](#Other Info)
+- [OtherInfo](#OtherInfo)
 - [Testing](#Testing)
 
 ## Description
@@ -18,14 +18,14 @@ Simple tool to convert an Excel worksheet into CSV format.
 1. Create a new ExcelReader via builder() method.
 2. Execute desired methods on ExcelReader
 
-### ExcelReader Details
+### ExcelReaderDetails
 | METHOD              | INPUTS                       | OUTPUT     | DESCRIPTION                                                                                                                                      |
 |---------------------|------------------------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
 | convertToCsvText    | Excel File                   | String     | Given Excel file input return a String representing the Worksheet as CSV                                                                         |
 | convertToDataMatrix | Excel File                   | String[][] | Given Excel file input return a 2-D String array representing the Worksheet as CSV<br> (each array element represents a cell from the worksheet) |
 | convertToCsvFile    | Excel File & Output CSV File | (none)     | Given Excel file input write output directly to a specified destination file.  
 
-### Builder Details
+### BuilderDetails
 | FIELD         | REQUIRED | DEFAULT | DETAILS                                                                                                                                                                                                                                                                                         |
 |---------------|:--------:|:-------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | quoteMode     | NO       | NORMAL  | how aggressive / lenient it should wrap quotes around values<br><br>*ALWAYS*: always put quotes around values<br>*NORMAL*: put quotes around most values that are non-alphanumeric<br>*LENIENT*: only add quotes around values that are needed to be CSV compliant<br>*NEVER*: never add quotes |
@@ -75,7 +75,7 @@ ExcelReader excelReader = ExcelReader.builder().build();
 excelReader.convertToCsvFile(excelFileUrl, outputFile);
 ```
 
-## Other Info
+## OtherInfo
 * All rows in the output CSV will have the exact same number of columns. (which will be max non-blank column detected)
 * The CSV data values should retain same 'formatting' as the original Excel file. the same as the Excel file (i.e. Dates and Numeric values)
 * No _formulas_ are copied.  Only the value as it 'physiccally appears' in a given cell
