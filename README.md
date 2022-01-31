@@ -77,7 +77,7 @@ excelReader.convertToCsvFile(excelFileUrl, outputFile);
 
 ## OtherInfo
 * All rows in the output CSV will have the exact same number of columns. (which will be max non-blank column detected)
-* The CSV data values should retain same 'formatting' as the original Excel file. the same as the Excel file (i.e. Dates and Numeric values)
+* The CSV data values should retain same 'formatting' as the original Excel file. (i.e. Dates and Numeric values)
 * No _formulas_ are copied.  Only the value as it 'physiccally appears' in a given cell
 * Currently no quotes will be added around 'blank' values 
 * Empty cells will be converted to empty string (not 'null')
