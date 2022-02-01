@@ -127,7 +127,7 @@ class ExcelSheetReader
         }
 
         FormulaEvaluator evaluator = null;  // always use null for non-formula cells
-        if (cell.getCellType() != null && cell.getCellType().equals(CellType.FORMULA)) {
+        if (CellType.FORMULA.equals(cell.getCellType())) {
             evaluator = formulaEvaluator;
         }
 
