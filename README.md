@@ -68,7 +68,7 @@ ExcelReader excelReader = ExcelReader.builder()
 excelReader.convertToCsvFile(excelFile, outputFile);
 ```
 ```java
-// fecth Excel file from external URL location and save as a local csv file.
+// fetch Excel file from external URL location and save as a local csv file.
 URL excelFileUrl = new URL("https://some.domain.com/download/1/docs/SampleData.xlsx");
 File outputFile = new File("/different/path/test_data.csv");
 ExcelReader excelReader = ExcelReader.builder().build();
