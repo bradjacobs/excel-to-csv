@@ -1,11 +1,11 @@
-package bwj.util;
+package com.github.bradjacobs.excel;
 
-import bwj.util.excel.ExcelReader;
 import org.testng.annotations.Test;
 
 import java.net.URL;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  *          **** NOTE ****

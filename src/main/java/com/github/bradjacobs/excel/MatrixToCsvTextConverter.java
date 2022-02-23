@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in 'LICENSE' file.
  */
-package bwj.util.excel;
+package com.github.bradjacobs.excel;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,7 +53,6 @@ public class MatrixToCsvTextConverter
 
         for (String[] rowData : dataMatrix) {
             for (int i = 0; i < columnCount; i++) {
-
                 String cellValue = rowData[i];
                 if (shouldQuoteWrap(cellValue)) {
                     // must first escape double quotes
