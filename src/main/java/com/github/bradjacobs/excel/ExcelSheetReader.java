@@ -46,11 +46,52 @@ class ExcelSheetReader
         //  (however doesn't seem the need for this when using row.getLastCellNum, which seems odd)
         int numOfRows = sheet.getLastRowNum() + 1;
 
+        // first scan the rows to find the max column width
+        int maxColumn = getMaxColumn(sheet, numOfRows);
+
+        List<String[]> csvData = new ArrayList<>(numOfRows);
+
         // NOTE: avoid using "sheet.iterator" when looping through rows,
         //   b/c it can bail out early when it encounters the first empty line
         //   (even if there is more data rows remaining)
 
-        // first iterate through the rows to find the max column width
+        for (int i = 0; i < numOfRows; i++) {
+            String[] rowValues = new String[maxColumn];
+
+            Row row = sheet.getRow(i);
+            int columnCount = 0;
+
+            // must check for null b/c a blank/empty row can (sometimes) return as null.
+            if (row != null) {
+                columnCount = Math.min(row.getLastCellNum(), maxColumn);
+                for (int j = 0; j < columnCount; j++) {
+                    String cellValue = getCellValue(row.getCell(j));
+                    rowValues[j] = cellValue;
+                }
+            }
+
+            // fill any 'extra' column cells with blank.
+            for (int j = columnCount; j < maxColumn; j++) {
+                rowValues[j] = "";
+            }
+
+            // ignore empty row if necessary
+            if (this.skipEmptyRows && isEmptyRow(rowValues)) {
+                continue;
+            }
+            csvData.add(rowValues);
+        }
+
+        return csvData;
+    }
+
+    /**
+     * Iterate through the rows to find the max column width
+     * @param sheet sheet
+     * @param numOfRows total Number of Rows
+     * @return max column
+     */
+    private int getMaxColumn(Sheet sheet, int numOfRows) {
         int maxColumn = 0;
         for (int i = 0; i < numOfRows; i++) {
             Row row = sheet.getRow(i);
@@ -71,38 +112,7 @@ class ExcelSheetReader
                 }
             }
         }
-
-        List<String[]> csvData = new ArrayList<>(numOfRows);
-
-        for (int i = 0; i < numOfRows; i++) {
-            String[] rowValues = new String[maxColumn];
-
-            Row row = sheet.getRow(i);
-            int columnCount = 0;
-
-            // must check for null b/c a blank/empty row can (sometimes) return as null.
-            if (row != null) {
-                columnCount = Math.min(row.getLastCellNum(), maxColumn);
-                for (int j = 0; j < columnCount; j++)
-                {
-                    String cellValue = getCellValue(row.getCell(j));
-                    rowValues[j] = cellValue;
-                }
-            }
-
-            // fill any 'extra' column cells with blank.
-            for (int j = columnCount; j < maxColumn; j++) {
-                rowValues[j] = "";
-            }
-
-            // ignore empty row if necessary
-            if (this.skipEmptyRows && isEmptyRow(rowValues)) {
-                continue;
-            }
-            csvData.add(rowValues);
-        }
-
-        return csvData;
+        return maxColumn;
     }
 
     private boolean isEmptyRow(String[] rowData) {
