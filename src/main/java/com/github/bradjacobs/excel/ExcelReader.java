@@ -54,7 +54,6 @@ public class ExcelReader
         return matrixToCsvTextConverter.createCsvText( convertToDataMatrix(excelUrl) );
     }
 
-
     public String[][] convertToDataMatrix(File excelFile) throws IOException {
         return convertToDataMatrix( inputStreamGenerator.getInputStream(excelFile) );
     }

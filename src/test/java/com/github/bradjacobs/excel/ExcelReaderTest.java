@@ -142,7 +142,7 @@ public class ExcelReaderTest
     }
 
     @Test()
-    public void testReadBlannkSheet() throws Exception {
+    public void testReadBlankSheet() throws Exception {
         ExcelReader excelReader = ExcelReader.builder()
                 .setSheetName(TEST_BLANK_SHEET_NAME)
                 .setSkipEmptyRows(false)

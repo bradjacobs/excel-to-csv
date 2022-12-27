@@ -20,16 +20,14 @@ public class ExcelReaderExceptionHandlingTest
             expectedExceptionsMessageRegExp = "Must provide an input file.")
     public void testMissingFile() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
-        File inputFile = null;
-        String[][] csvData = excelReader.convertToDataMatrix(inputFile);
+        String[][] csvData = excelReader.convertToDataMatrix((File)null);
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
             expectedExceptionsMessageRegExp = "Must provide an input url.")
     public void testMissingUrl() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
-        URL inputUrl = null;
-        String[][] csvData = excelReader.convertToDataMatrix(inputUrl);
+        String[][] csvData = excelReader.convertToDataMatrix((URL)null);
     }
 
     // give an URL that is _NOT_ an Excel file
@@ -50,12 +48,12 @@ public class ExcelReaderExceptionHandlingTest
     @Test(expectedExceptions = { java.net.UnknownHostException.class })
     public void testInvalidUrlPath() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
-        String csvText = excelReader.convertToCsvText(new URL("http://www.zxfake12.com/foo/bar.html"));
+        String csvText = excelReader.convertToCsvText(new URL("https://www.zxfake12.com/foo/bar.html"));
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
             expectedExceptionsMessageRegExp = "URL has an unsupported protocol: jar")
-    public void testUnsupportedProtocolUrlh() throws Exception {
+    public void testUnsupportedProtocolUrl() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
         URL invalidUrl = new URL("jar:file:/C:/parser/jar/parser.jar!/test.xml");
         String csvText = excelReader.convertToCsvText(invalidUrl);

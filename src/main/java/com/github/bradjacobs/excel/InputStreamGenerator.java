@@ -64,7 +64,7 @@ public class InputStreamGenerator
             return getInputStream(new File( url.getPath() ));
         }
 
-        // Might switch to an httpClient in the future.....
+        // Could switch to an httpClient in the future.
         URLConnection connection = url.openConnection();
         connection.setConnectTimeout(CONNECTION_TIMEOUT);
         connection.setReadTimeout(CONNECTION_TIMEOUT);
