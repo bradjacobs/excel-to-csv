@@ -22,23 +22,21 @@ public class InputStreamGenerator
             new HashSet<>(Arrays.asList("http", "https", "ftp", "file"));
     private static final int CONNECTION_TIMEOUT = 20000;
     private static final boolean DEFAULT_USE_GZIP = true;
-
     // some websites require a userAgent value set.
     //    side:  seen a case where a userAgent with substring 'java' would fail  (empirical evidence)
     private static final String USER_AGENT_VALUE = "jclient/" + System.getProperty("java.version");
 
-    private boolean useGzip;
+    private final boolean useGzip;
 
     public InputStreamGenerator() {
-        this.useGzip = DEFAULT_USE_GZIP;
+        this(DEFAULT_USE_GZIP);
+    }
+    public InputStreamGenerator(boolean useGzip) {
+        this.useGzip = useGzip;
     }
 
     public boolean isUseGzip() {
         return useGzip;
-    }
-
-    public void setUseGzip(boolean useGzip) {
-        this.useGzip = useGzip;
     }
 
     public InputStream getInputStream(File inputFile) throws IOException {

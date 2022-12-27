@@ -35,9 +35,7 @@ public class ExcelReader
         this.sheetName = builder.sheetName;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         this.excelSheetToCsvConverter = new ExcelSheetReader(builder.skipEmptyRows);
-
-        this.inputStreamGenerator = new InputStreamGenerator();
-        this.inputStreamGenerator.setUseGzip(builder.gzipEnabled);
+        this.inputStreamGenerator = new InputStreamGenerator(builder.gzipEnabled);
     }
 
     public void convertToCsvFile(File excelFile, File outputFile) throws IOException {
