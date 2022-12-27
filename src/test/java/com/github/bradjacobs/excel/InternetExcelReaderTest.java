@@ -21,8 +21,7 @@ public class InternetExcelReaderTest
     private static final String SAMPLE_INTERNET_EXCEL_FILE = "https://download.microsoft.com/download/1/4/E/14EDED28-6C58-4055-A65C-23B4DA81C4DE/Financial%20Sample.xlsx";
 
     @Test(enabled = INTERNET_REQUESTS_ENABLED)
-    public void testDownloadFromInternet() throws Exception
-    {
+    public void testDownloadFromInternet() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
         String csvText = excelReader.convertToCsvText(new URL(SAMPLE_INTERNET_EXCEL_FILE));
         assertNotNull(csvText);

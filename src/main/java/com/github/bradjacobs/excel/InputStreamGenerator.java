@@ -27,7 +27,6 @@ public class InputStreamGenerator
     //    side:  seen a case where a userAgent with substring 'java' would fail  (empirical evidence)
     private static final String USER_AGENT_VALUE = "jclient/" + System.getProperty("java.version");
 
-
     private boolean useGzip;
 
     public InputStreamGenerator() {
@@ -51,7 +50,6 @@ public class InputStreamGenerator
         }
         return new BufferedInputStream(new FileInputStream(inputFile));
     }
-
 
     public InputStream getInputStream(URL url) throws IOException {
         if (url == null) {

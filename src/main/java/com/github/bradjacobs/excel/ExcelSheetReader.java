@@ -19,6 +19,7 @@ class ExcelSheetReader
 {
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
+    private static final String NBSP_STRING = "\u00a0";
 
     private final boolean skipEmptyRows;
 
@@ -54,13 +55,10 @@ class ExcelSheetReader
         // NOTE: avoid using "sheet.iterator" when looping through rows,
         //   b/c it can bail out early when it encounters the first empty line
         //   (even if there is more data rows remaining)
-
         for (int i = 0; i < numOfRows; i++) {
             String[] rowValues = new String[maxColumn];
-
             Row row = sheet.getRow(i);
             int columnCount = 0;
-
             // must check for null b/c a blank/empty row can (sometimes) return as null.
             if (row != null) {
                 columnCount = Math.min(row.getLastCellNum(), maxColumn);
@@ -81,7 +79,6 @@ class ExcelSheetReader
             }
             csvData.add(rowValues);
         }
-
         return csvData;
     }
 
@@ -141,8 +138,10 @@ class ExcelSheetReader
             evaluator = formulaEvaluator;
         }
 
-        // Note: extra leading/trailing spaces also 'trimmed off'
-        return EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator).trim();
+        String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator);
+        // if there are any special "nbsp whitespace characters", replace w/ normal whitespace
+        // then return 'trimmed' value
+        return cellValue.replace(NBSP_STRING," ").trim();
     }
 
     /**

@@ -47,7 +47,6 @@ public class ExcelReader
         writeCsvToFile( convertToCsvText(excelUrl), outputFile);
     }
 
-
     public String convertToCsvText(File excelFile) throws IOException {
         return matrixToCsvTextConverter.createCsvText( convertToDataMatrix(excelFile) );
     }

@@ -12,7 +12,6 @@ import java.net.URL;
 
 import static org.testng.Assert.assertNotNull;
 
-
 public class ExcelReaderExceptionHandlingTest
 {
     private static final String TEST_DATA_FILE = "test_data.xlsx";
@@ -92,15 +91,12 @@ public class ExcelReaderExceptionHandlingTest
     @Test(expectedExceptions = { IllegalArgumentException.class },
             expectedExceptionsMessageRegExp = "Must supply outputFile location to save CSV data.")
     public void testSaveCsvMissingOutputFile() throws Exception {
-
         File inputFile = getTestFileObject();
         ExcelReader excelReader = ExcelReader.builder().build();
         excelReader.convertToCsvFile(inputFile, null);
     }
 
-
-    private File getTestFileObject()
-    {
+    private File getTestFileObject() {
         URL resourceUrl = this.getClass().getClassLoader().getResource(TEST_DATA_FILE);
         assertNotNull(resourceUrl);
         return new File( resourceUrl.getPath() );

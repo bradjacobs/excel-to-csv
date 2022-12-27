@@ -17,7 +17,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
-
 public class ExcelReaderTest
 {
     private static final String TEST_DATA_FILE = "test_data.xlsx";
@@ -35,7 +34,6 @@ public class ExcelReaderTest
     private static final String TEST_OUTPUT_FILE_NAME = "test_output.csv";
     private static final File TEST_OUTPUT_FILE = new File(TEST_OUTPUT_FILE_NAME);
 
-
     @DataProvider(name = "quote_variations")
     public Object[][] invalidTimeZoneParams(){
         return new Object[][] {
@@ -47,8 +45,7 @@ public class ExcelReaderTest
     }
 
     @Test(dataProvider = "quote_variations")
-    public void testExpectedQuoteText(QuoteMode quoteMode, String expectedResultFileName) throws Exception
-    {
+    public void testExpectedQuoteText(QuoteMode quoteMode, String expectedResultFileName) throws Exception {
         String expectedCsvText = readResourceFile(expectedResultFileName);
         File inputFile = getTestFileObject();
 
@@ -59,8 +56,7 @@ public class ExcelReaderTest
     }
 
     @Test
-    public void testLocalFileInputAsUrl() throws Exception
-    {
+    public void testLocalFileInputAsUrl() throws Exception {
         String expectedCsvText = readResourceFile(EXPECTED_NORMAL_CSV_FILE);
 
         URL inputFileUrl = getTestLocalFileUrl();
@@ -70,8 +66,7 @@ public class ExcelReaderTest
     }
 
     @Test
-    public void testMatrixOutput() throws Exception
-    {
+    public void testMatrixOutput() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
         File inputFile = getTestFileObject();
 
@@ -79,16 +74,14 @@ public class ExcelReaderTest
         assertNotNull(csvData, "expected non-null data");
         assertEquals(csvData.length, EXPECTED_ROW_COUNT, "mismatch expected number of rows");
 
-        for (String[] rowData : csvData)
-        {
+        for (String[] rowData : csvData) {
             assertNotNull(rowData, "unexpected null row");
             assertEquals(rowData.length, EXPECTED_COL_COUNT, "mismatch expected columns");
         }
     }
 
     @Test
-    public void testSkipBlankRows() throws Exception
-    {
+    public void testSkipBlankRows() throws Exception {
         File inputFile = getTestFileObject();
 
         ExcelReader excelReader1 = ExcelReader.builder()
@@ -109,14 +102,12 @@ public class ExcelReaderTest
     }
 
     @Test
-    public void testSaveFile() throws Exception
-    {
+    public void testSaveFile() throws Exception {
         cleanupTestFile(); // first check if residual file still around from a previous test.
 
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
         File inputFile = getTestFileObject();
         excelReader.convertToCsvFile(inputFile, TEST_OUTPUT_FILE);
-
         assertTrue(TEST_OUTPUT_FILE.exists(), "expected csv file was NOT created");
 
         String outputFileContent = new String ( Files.readAllBytes( Paths.get(TEST_OUTPUT_FILE.getAbsolutePath()) ) );
@@ -125,13 +116,11 @@ public class ExcelReaderTest
     }
 
     @Test()
-    public void testFilePathAsUrl() throws Exception
-    {
+    public void testFilePathAsUrl() throws Exception {
         URL fileUrl = this.getClass().getClassLoader().getResource(TEST_DATA_FILE);
         assertNotNull(fileUrl);
 
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
-
         String csvText = excelReader.convertToCsvText(fileUrl);
         String expectedCsvText = readResourceFile(EXPECTED_NORMAL_CSV_FILE);
         assertNotNull(csvText);
@@ -139,8 +128,7 @@ public class ExcelReaderTest
     }
 
     @Test()
-    public void testReadSheetByName() throws Exception
-    {
+    public void testReadSheetByName() throws Exception {
         ExcelReader excelReader = ExcelReader.builder()
                 .setSkipEmptyRows(false)
                 .setSheetName(TEST_SHEET_NAME)
@@ -154,8 +142,7 @@ public class ExcelReaderTest
     }
 
     @Test()
-    public void testReadBlannkSheet() throws Exception
-    {
+    public void testReadBlannkSheet() throws Exception {
         ExcelReader excelReader = ExcelReader.builder()
                 .setSheetName(TEST_BLANK_SHEET_NAME)
                 .setSkipEmptyRows(false)
@@ -168,8 +155,7 @@ public class ExcelReaderTest
     }
 
     @Test
-    public void testHandleExtraBlankColumns() throws Exception
-    {
+    public void testHandleExtraBlankColumns() throws Exception {
         // the 9th row (index 8) is detected with extra columns
         URL resourceUrl = this.getClass().getClassLoader().getResource("digitcodes.xlsx");
         assertNotNull(resourceUrl);
@@ -177,6 +163,22 @@ public class ExcelReaderTest
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals(csvMatrix[0].length, 3, "mismatch of expected csv output");
+    }
+
+    // Test that some cells that only contain "whitespace" get trimmed to empty string
+    @Test
+    public void testTrimmingSpaces() throws Exception {
+        URL resourceUrl = this.getClass().getClassLoader().getResource("spaces_data.xlsx");
+        assertNotNull(resourceUrl);
+        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
+
+        // the first row is a header row, but every other row should have
+        //  and empty/blank value is the second cell
+        for (int i = 1; i < csvMatrix.length; i++) {
+            String[] row = csvMatrix[i];
+            assertEquals(row[1], "", String.format("Expected empty string following cell '%s'", row[0]));
+        }
     }
 
     @AfterTest

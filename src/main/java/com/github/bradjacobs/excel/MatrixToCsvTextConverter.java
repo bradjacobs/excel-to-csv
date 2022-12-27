@@ -41,8 +41,7 @@ public class MatrixToCsvTextConverter
      * @param dataMatrix string data matrix
      * @return csv file string
      */
-    public String createCsvText(String[][] dataMatrix)
-    {
+    public String createCsvText(String[][] dataMatrix) {
         if (isEmptyDataMatrix(dataMatrix)) {
             return "";
         }
@@ -103,12 +102,10 @@ public class MatrixToCsvTextConverter
                 }
             }
         }
-
         return false;
     }
 
-    private boolean isEmptyDataMatrix(String[][] dataMatrix)
-    {
+    private boolean isEmptyDataMatrix(String[][] dataMatrix) {
         return (dataMatrix == null || dataMatrix.length == 0 || dataMatrix[0].length == 0);
     }
 }
