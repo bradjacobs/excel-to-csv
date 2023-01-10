@@ -29,8 +29,7 @@ public class ExcelReader
 
     private final InputStreamGenerator inputStreamGenerator;
 
-    private ExcelReader(Builder builder)
-    {
+    private ExcelReader(Builder builder) {
         this.sheetIndex = builder.sheetIndex;
         this.sheetName = builder.sheetName;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
@@ -91,7 +90,6 @@ public class ExcelReader
         FileUtils.writeStringToFile(outputFile, csvString, StandardCharsets.UTF_8);
     }
 
-
     public static Builder builder() {
         return new Builder();
     }
@@ -117,7 +115,7 @@ public class ExcelReader
         /**
          * Optionally can provide a sheet name instead of an index
          *  (if sheetName is set then sheetIndex is ignored)
-         * @param sheetName name of Excel sheet (case-sensitive)
+         * @param sheetName name of Excel sheet
          */
         public Builder setSheetName(String sheetName) {
             this.sheetName = sheetName;

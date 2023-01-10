@@ -131,7 +131,7 @@ public class ExcelReaderTest
     public void testReadSheetByName() throws Exception {
         ExcelReader excelReader = ExcelReader.builder()
                 .setSkipEmptyRows(false)
-                .setSheetName(TEST_SHEET_NAME)
+                .setSheetName(TEST_SHEET_NAME.toLowerCase())  // use lower to confirm match is case-insensitive.
                 .build();
         File inputFile = getTestFileObject();
 

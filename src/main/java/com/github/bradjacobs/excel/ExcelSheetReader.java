@@ -63,8 +63,7 @@ class ExcelSheetReader
             if (row != null) {
                 columnCount = Math.min(row.getLastCellNum(), maxColumn);
                 for (int j = 0; j < columnCount; j++) {
-                    String cellValue = getCellValue(row.getCell(j));
-                    rowValues[j] = cellValue;
+                    rowValues[j] = getCellValue(row.getCell(j));
                 }
             }
 
@@ -123,7 +122,7 @@ class ExcelSheetReader
 
     /**
      * Gets the string representation of the value in the cell
-     *   (where "value" in this case is what you "physically see" in the cell)
+     *   (where the cell value is what you "physically see" in the cell)
      *  NOTE: dates & numbers should retain their original formatting.
      * @param cell excel cell
      * @return string representation of the cell.
