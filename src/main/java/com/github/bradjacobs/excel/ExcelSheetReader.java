@@ -95,7 +95,7 @@ class ExcelSheetReader
                 int currentRowCellCount = row.getLastCellNum();
                 if (currentRowCellCount > maxColumn) {
                     //  Sometimes a row is detected with more columns, but the 'extra'
-                    //    column values are actually blank.  Therefore double check if this is
+                    //    column values are actually blank.  Therefore, double check if this is
                     //    the case and adjust accordingly.
                     for (int j = currentRowCellCount - 1; j >= maxColumn; j--) {
                         String cellValue = getCellValue(row.getCell(j));

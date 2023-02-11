@@ -30,7 +30,7 @@ public class ExcelReaderExceptionHandlingTest
         String[][] csvData = excelReader.convertToDataMatrix((URL)null);
     }
 
-    // give an URL that is _NOT_ an Excel file
+    // give a URL that is _NOT_ an Excel file
     @Test(expectedExceptions = { IOException.class } )
     public void testNotExcelFile() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
@@ -42,13 +42,13 @@ public class ExcelReaderExceptionHandlingTest
     @Test(expectedExceptions = { FileNotFoundException.class })
     public void testInvalidFilePath() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
-        String csvText = excelReader.convertToCsvText(new File("/bogus/path/here/file.xlsx"));
+        excelReader.convertToCsvText(new File("/bogus/path/here/file.xlsx"));
     }
 
     @Test(expectedExceptions = { java.net.UnknownHostException.class })
     public void testInvalidUrlPath() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
-        String csvText = excelReader.convertToCsvText(new URL("https://www.zxfake12.com/foo/bar.html"));
+        excelReader.convertToCsvText(new URL("https://www.zxfake12.com/foo/bar.html"));
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
@@ -56,7 +56,7 @@ public class ExcelReaderExceptionHandlingTest
     public void testUnsupportedProtocolUrl() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
         URL invalidUrl = new URL("jar:file:/C:/parser/jar/parser.jar!/test.xml");
-        String csvText = excelReader.convertToCsvText(invalidUrl);
+        excelReader.convertToCsvText(invalidUrl);
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class })
@@ -76,14 +76,14 @@ public class ExcelReaderExceptionHandlingTest
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
         expectedExceptionsMessageRegExp = "Cannot set quoteMode to null")
-    public void testUnsetQuoteMode() throws Exception {
-        ExcelReader excelReader = ExcelReader.builder().setQuoteMode(null).build();
+    public void testUnsetQuoteMode() {
+        ExcelReader.builder().setQuoteMode(null).build();
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
         expectedExceptionsMessageRegExp = "SheetIndex cannot be negative")
-    public void testNegativeIndex() throws Exception {
-        ExcelReader excelReader = ExcelReader.builder().setSheetIndex(-5).build();
+    public void testNegativeIndex() {
+        ExcelReader.builder().setSheetIndex(-5).build();
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },

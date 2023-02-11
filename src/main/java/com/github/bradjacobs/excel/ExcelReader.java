@@ -105,7 +105,7 @@ public class ExcelReader
 
         /**
          * Set with sheet of Excel file to read (defaults to '0', i.e. the first sheet)
-         * @param sheetIndex (0-based index of which sheet in excel file to convert)
+         * @param sheetIndex (0-based index of which sheet in Excel file to convert)
          */
         public Builder setSheetIndex(int sheetIndex) {
             this.sheetIndex = sheetIndex;
