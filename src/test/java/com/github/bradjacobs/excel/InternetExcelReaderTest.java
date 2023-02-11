@@ -11,11 +11,9 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 /**
- *          **** NOTE ****
+ *   **** NOTE ****
  *   these tests are technically NOT 'unit tests' (which is why they are disabled)
- *
  *   maybe later do the right thing and 'mock' the internet call if/when time allows.
- *
  */
 public class InternetExcelReaderTest
 {
