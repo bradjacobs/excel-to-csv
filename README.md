@@ -9,6 +9,7 @@
   * [Advanced](#Advanced)
 - [OtherInfo](#OtherInfo)
 - [Testing](#Testing)
+- [Misc](#Misc)
 
 ## Description
 Simple tool to convert an Excel worksheet into CSV format. 
@@ -81,12 +82,13 @@ excelReader.convertToCsvFile(excelFileUrl, outputFile);
 * No _formulas_ are copied.  Only the value as it 'physically appears' in a given cell
 * Currently no quotes will be added around 'blank' values 
 * Empty cells will be converted to empty string (not 'null')
+* All cell values are "trimmed" (assuming one usually does NOT want leading/trailing whitespace)
 
 ## Testing
-The project contains unittest for most of the basic functionality.
+The project contains unittests for most of the basic functionality.
 
 However, the following scenarios have **NOT** been tested...
-* _BIG_ Excel files
+* _HUGE_ Excel files
 * Files with FTP urls
 * Older/Newer versions of Excel files.
 * Excel files that were originally generated on Windows
@@ -96,5 +98,10 @@ However, the following scenarios have **NOT** been tested...
 * ".xls" files
 * Unicode / extended characters
 * Worksheets containing nested charts.
+
+## Misc
+* This is still compiling with JDK 8 (at the moment).  The original thought was in case need to use this code with other librries using old JDK.  However... at this point anyone still on JDK 8 seems silly, so i will eventually bump up the JDK version.
+* I don't actively maintain this project, and make occasional tweaks just for fun.
+
 
 This project was originally created in a day, so i'm sure there are other items I've missed.  ;-) 
