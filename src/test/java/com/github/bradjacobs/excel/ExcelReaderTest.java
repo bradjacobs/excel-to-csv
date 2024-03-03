@@ -174,7 +174,7 @@ public class ExcelReaderTest
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
 
         // the first row is a header row, but every other row should have
-        //  and empty/blank value is the second cell
+        //  and empty/blank value in the second cell
         for (int i = 1; i < csvMatrix.length; i++) {
             String[] row = csvMatrix[i];
             assertEquals(row[1], "", String.format("Expected empty string following cell '%s'", row[0]));

@@ -12,14 +12,36 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class ExcelSheetReader
 {
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
-    private static final String NBSP_STRING = "\u00a0";
+
+    // "special" whitespace characters that will be converted
+    //   to a "normal" whitespace character.  (*) means Character.isWhitespace() == false
+    private static final Character[] SPECIAL_WHITESPACE_CHARS = {
+            '\u00a0', // NON_BREAKING SPACE (*),
+            '\u2002', // EN SPACE
+            '\u2003', // EM SPACE
+            '\u2004', // THREE-PER-EM SPACE
+            '\u2005', // FOUR-PER-EM SPACE
+            '\u2006', // SIX-PER-EM SPACE
+            '\u2007', // FIGURE SPACE (*)
+            '\u2008', // PUNCTUATION SPACE
+            '\u2009', // THIN SPACE
+            '\u200a', // HAIR SPACE
+            '\u200b', // ZERO-WIDTH SPACE (*)
+            '\u2800'  // BRAILLE SPACE (*)
+    };
+
+    // note: can fix syntax when upgrade the JDK version
+    private static final Set<Character> SPECIAL_SPACE_CHAR_SET = new HashSet<>(Arrays.asList(SPECIAL_WHITESPACE_CHARS));
 
     private final boolean skipEmptyRows;
 
@@ -44,7 +66,7 @@ class ExcelSheetReader
         }
 
         // NOTE: need to add 1 to the lastRowNum to make sure you don't skip the last row
-        //  (however doesn't seem the need for this when using row.getLastCellNum, which seems odd)
+        //  (however doesn't seem to need for this when using row.getLastCellNum, which seems odd)
         int numOfRows = sheet.getLastRowNum() + 1;
 
         // first scan the rows to find the max column width
@@ -140,7 +162,29 @@ class ExcelSheetReader
         String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator);
         // if there are any special "nbsp whitespace characters", replace w/ normal whitespace
         // then return 'trimmed' value
-        return cellValue.replace(NBSP_STRING," ").trim();
+        String sanitizedCellValue = sanitizeSpecialWhitespaceCharaters(cellValue);
+        return sanitizedCellValue.trim();
+    }
+
+    /**
+     * Replace any "speical/extended" whitespace characters with the
+     *   basic whitespace character 0x20
+     * @param input string to sanitize
+     * @return string with whitespace chars replaces (if any were found)
+     */
+    private String sanitizeSpecialWhitespaceCharaters(String input) {
+        // TODO: probably not the best way to do this!... but works for now.
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            char inputCharacter = input.charAt(i);
+            if (SPECIAL_SPACE_CHAR_SET.contains(inputCharacter)) {
+                sb.append(' ');
+            }
+            else {
+                sb.append(inputCharacter);
+            }
+        }
+        return sb.toString();
     }
 
     /**
