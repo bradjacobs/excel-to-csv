@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import static org.testng.Assert.assertNotNull;
 
@@ -45,7 +46,7 @@ public class ExcelReaderExceptionHandlingTest
         excelReader.convertToCsvText(new File("/bogus/path/here/file.xlsx"));
     }
 
-    @Test(expectedExceptions = { java.net.UnknownHostException.class })
+    @Test(expectedExceptions = { UnknownHostException.class })
     public void testInvalidUrlPath() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
         excelReader.convertToCsvText(new URL("https://www.zxfake12.com/foo/bar.html"));
