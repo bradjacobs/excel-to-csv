@@ -22,6 +22,7 @@ class ExcelSheetReader
 {
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
+    private static final WhitespaceSanitizer WHITESPACE_SANITIZER = new WhitespaceSanitizer();
 
     // "special" space characters that will be converted
     //   to a "normal" space character.  (*) means Character.isWhitespace() == false
@@ -162,29 +163,8 @@ class ExcelSheetReader
         String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator);
         // if there are any special "nbsp whitespace characters", replace w/ normal whitespace
         // then return 'trimmed' value
-        String sanitizedCellValue = sanitizeSpecialSpaceCharaters(cellValue);
+        String sanitizedCellValue = WHITESPACE_SANITIZER.sanitize(cellValue);
         return sanitizedCellValue.trim();
-    }
-
-    /**
-     * Replace any "special/extended" space characters with the
-     *   basic space character 0x20
-     * @param input string to sanitize
-     * @return string with whitespace chars replaces (if any were found)
-     */
-    private String sanitizeSpecialSpaceCharaters(String input) {
-        // TODO: probably not the best way to do this!... but works for now.
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < input.length(); i++) {
-            char inputCharacter = input.charAt(i);
-            if (SPECIAL_SPACE_CHAR_SET.contains(inputCharacter)) {
-                sb.append(' ');
-            }
-            else {
-                sb.append(inputCharacter);
-            }
-        }
-        return sb.toString();
     }
 
     /**
