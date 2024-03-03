@@ -24,26 +24,6 @@ class ExcelSheetReader
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
     private static final WhitespaceSanitizer WHITESPACE_SANITIZER = new WhitespaceSanitizer();
 
-    // "special" space characters that will be converted
-    //   to a "normal" space character.  (*) means Character.isWhitespace() == false
-    private static final Character[] SPECIAL_SPACE_CHARS = {
-            '\u00a0', // NON_BREAKING SPACE (*),
-            '\u2002', // EN SPACE
-            '\u2003', // EM SPACE
-            '\u2004', // THREE-PER-EM SPACE
-            '\u2005', // FOUR-PER-EM SPACE
-            '\u2006', // SIX-PER-EM SPACE
-            '\u2007', // FIGURE SPACE (*)
-            '\u2008', // PUNCTUATION SPACE
-            '\u2009', // THIN SPACE
-            '\u200a', // HAIR SPACE
-            '\u200b', // ZERO-WIDTH SPACE (*)
-            '\u2800'  // BRAILLE SPACE (*)
-    };
-
-    // note: can fix syntax when upgrade the JDK version
-    private static final Set<Character> SPECIAL_SPACE_CHAR_SET = new HashSet<>(Arrays.asList(SPECIAL_SPACE_CHARS));
-
     private final boolean skipEmptyRows;
 
     protected ExcelSheetReader(boolean skipEmptyRows) {
