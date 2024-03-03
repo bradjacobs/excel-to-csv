@@ -115,7 +115,7 @@ public class ExcelReaderTest
         assertEquals(outputFileContent, expectedCsvText, "mismatch of content of saved csv file");
     }
 
-    @Test()
+    @Test
     public void testFilePathAsUrl() throws Exception {
         URL fileUrl = this.getClass().getClassLoader().getResource(TEST_DATA_FILE);
         assertNotNull(fileUrl);
@@ -127,7 +127,7 @@ public class ExcelReaderTest
         assertEquals(csvText, expectedCsvText, "mismatch of content of saved csv file");
     }
 
-    @Test()
+    @Test
     public void testReadSheetByName() throws Exception {
         ExcelReader excelReader = ExcelReader.builder()
                 .setSkipEmptyRows(false)
@@ -141,7 +141,7 @@ public class ExcelReaderTest
         assertEquals(csvText, expectedCsvText, "mismatch of content of saved csv file");
     }
 
-    @Test()
+    @Test
     public void testReadBlankSheet() throws Exception {
         ExcelReader excelReader = ExcelReader.builder()
                 .setSheetName(TEST_BLANK_SHEET_NAME)
