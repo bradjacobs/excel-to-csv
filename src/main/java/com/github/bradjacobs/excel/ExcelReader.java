@@ -55,7 +55,7 @@ public class ExcelReader
         return convertToDataMatrix( inputStreamGenerator.getInputStream(excelFile) );
     }
     public String[][] convertToDataMatrix(URL excelUrl) throws IOException {
-        return convertToDataMatrix(  inputStreamGenerator.getInputStream(excelUrl) );
+        return convertToDataMatrix( inputStreamGenerator.getInputStream(excelUrl) );
     }
 
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
