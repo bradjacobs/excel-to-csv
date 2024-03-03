@@ -23,9 +23,9 @@ class ExcelSheetReader
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
 
-    // "special" whitespace characters that will be converted
-    //   to a "normal" whitespace character.  (*) means Character.isWhitespace() == false
-    private static final Character[] SPECIAL_WHITESPACE_CHARS = {
+    // "special" space characters that will be converted
+    //   to a "normal" space character.  (*) means Character.isWhitespace() == false
+    private static final Character[] SPECIAL_SPACE_CHARS = {
             '\u00a0', // NON_BREAKING SPACE (*),
             '\u2002', // EN SPACE
             '\u2003', // EM SPACE
@@ -41,7 +41,7 @@ class ExcelSheetReader
     };
 
     // note: can fix syntax when upgrade the JDK version
-    private static final Set<Character> SPECIAL_SPACE_CHAR_SET = new HashSet<>(Arrays.asList(SPECIAL_WHITESPACE_CHARS));
+    private static final Set<Character> SPECIAL_SPACE_CHAR_SET = new HashSet<>(Arrays.asList(SPECIAL_SPACE_CHARS));
 
     private final boolean skipEmptyRows;
 
@@ -162,17 +162,17 @@ class ExcelSheetReader
         String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator);
         // if there are any special "nbsp whitespace characters", replace w/ normal whitespace
         // then return 'trimmed' value
-        String sanitizedCellValue = sanitizeSpecialWhitespaceCharaters(cellValue);
+        String sanitizedCellValue = sanitizeSpecialSpaceCharaters(cellValue);
         return sanitizedCellValue.trim();
     }
 
     /**
-     * Replace any "speical/extended" whitespace characters with the
-     *   basic whitespace character 0x20
+     * Replace any "special/extended" space characters with the
+     *   basic space character 0x20
      * @param input string to sanitize
      * @return string with whitespace chars replaces (if any were found)
      */
-    private String sanitizeSpecialWhitespaceCharaters(String input) {
+    private String sanitizeSpecialSpaceCharaters(String input) {
         // TODO: probably not the best way to do this!... but works for now.
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < input.length(); i++) {
