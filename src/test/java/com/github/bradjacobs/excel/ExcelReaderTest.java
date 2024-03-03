@@ -35,7 +35,7 @@ public class ExcelReaderTest
     private static final File TEST_OUTPUT_FILE = new File(TEST_OUTPUT_FILE_NAME);
 
     @DataProvider(name = "quote_variations")
-    public Object[][] invalidTimeZoneParams(){
+    public Object[][] quoteModeDataParams(){
         return new Object[][] {
             {QuoteMode.NORMAL, EXPECTED_NORMAL_CSV_FILE},
             {QuoteMode.ALWAYS, EXPECTED_ALWAYS_CSV_FILE},
@@ -154,17 +154,6 @@ public class ExcelReaderTest
         assertEquals(csvText, "", "expected empty csv text");
     }
 
-    @Test
-    public void testHandleExtraBlankColumns() throws Exception {
-        // the 9th row (index 8) is detected with extra columns
-        URL resourceUrl = this.getClass().getClassLoader().getResource("digitcodes.xlsx");
-        assertNotNull(resourceUrl);
-
-        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
-        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
-        assertEquals(csvMatrix[0].length, 3, "mismatch of expected csv output");
-    }
-
     // Test that some cells that only contain "whitespace" get trimmed to empty string
     @Test
     public void testTrimmingSpaces() throws Exception {
@@ -179,6 +168,18 @@ public class ExcelReaderTest
             String[] row = csvMatrix[i];
             assertEquals(row[1], "", String.format("Expected empty string following cell '%s'", row[0]));
         }
+    }
+
+    // read a worksheet where the last column only has whitespace.
+    //   in this case the column should not be counted.
+    @Test
+    public void testHandleExtraBlankColumns22() throws Exception {
+        URL resourceUrl = this.getClass().getClassLoader().getResource("spaces_data.xlsx");
+        assertNotNull(resourceUrl);
+
+        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).setSheetName("LAST_COL_WHITESPACE").build();
+        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
+        assertEquals(csvMatrix[0].length, 1, "mismatch of expected number of columns in csv output.");
     }
 
     @AfterTest

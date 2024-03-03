@@ -138,10 +138,9 @@ class ExcelSheetReader
         }
 
         String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator);
-        // if there are any special "nbsp whitespace characters", replace w/ normal whitespace
-        // then return 'trimmed' value
-        String sanitizedCellValue = WHITESPACE_SANITIZER.sanitize(cellValue);
-        return sanitizedCellValue.trim();
+        // if there are any special "nbsp whitespace characters",
+        // replace w/ normal whitespace then return 'trimmed' value
+        return WHITESPACE_SANITIZER.sanitize(cellValue);
     }
 
     /**

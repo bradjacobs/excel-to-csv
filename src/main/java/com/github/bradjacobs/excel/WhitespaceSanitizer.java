@@ -26,8 +26,9 @@ public class WhitespaceSanitizer {
     private static final Set<Character> SPECIAL_SPACE_CHAR_SET = new HashSet<>(Arrays.asList(SPECIAL_SPACE_CHARS));
 
     /**
-     * Replace any "special/extended" space characters with the basic space character 0x20
-     * All our the 'normal' whitespace characters ['\r', '\n', '\t', ' '] will remain as-is
+     * Replace any "special/extended" space characters with the basic space character 0x20,
+     * then also do a normal "trim()"
+     * NOTE that all our the 'normal' whitespace characters ['\r', '\n', '\t', ' '] will remain as-is
      * @param input string to sanitize
      * @return string with whitespace chars replaces (if any were found)
      */
@@ -43,6 +44,6 @@ public class WhitespaceSanitizer {
                 sb.append(inputCharacter);
             }
         }
-        return sb.toString();
+        return sb.toString().trim();
     }
 }
