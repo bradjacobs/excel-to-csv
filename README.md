@@ -100,8 +100,8 @@ However, the following scenarios have **NOT** been tested...
 * Worksheets containing nested charts.
 
 ## Misc
-* This is still compiling with JDK 8 (at the moment).  The original thought was in case need to use this code with other librries using old JDK.  However... at this point anyone still on JDK 8 seems silly, so i will eventually bump up the JDK version.
-* Cannot seem to recall why i used testng instead of junit. 
+* This is still compiling with JDK 8 (at the moment).  The original thought was in case need to use this code with other librries using old JDK.  However... at this point anything still on JDK 8 seems silly, so i will eventually bump up the JDK version.
+* Cannot seem to recall why I used testng instead of junit. 
 * I don't actively maintain this project, and make occasional tweaks just for fun.
 
 
