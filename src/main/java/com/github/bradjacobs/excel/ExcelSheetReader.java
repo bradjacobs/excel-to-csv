@@ -132,10 +132,8 @@ class ExcelSheetReader
             return "";
         }
 
-        FormulaEvaluator evaluator = null;  // always use null for non-formula cells
-        if (CellType.FORMULA.equals(cell.getCellType())) {
-            evaluator = formulaEvaluator;
-        }
+        // if cell is a formula then use the special formulaEvaluator
+        FormulaEvaluator evaluator = CellType.FORMULA.equals(cell.getCellType()) ? formulaEvaluator : null;
 
         String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator);
         // if there are any special "nbsp whitespace characters",
