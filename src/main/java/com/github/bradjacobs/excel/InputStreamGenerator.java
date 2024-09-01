@@ -20,23 +20,9 @@ public class InputStreamGenerator {
     private static final Set<String> VALID_URL_SCHEMES =
             new HashSet<>(Arrays.asList("http", "https", "ftp", "file"));
     private static final int CONNECTION_TIMEOUT = 20000;
-    private static final boolean DEFAULT_USE_GZIP = true;
     // some websites require a userAgent value set.
     //    side:  seen a case where a userAgent with substring 'java' would fail  (empirical evidence)
     private static final String USER_AGENT_VALUE = "jclient/" + System.getProperty("java.version");
-
-    private final boolean useGzip;
-
-    public InputStreamGenerator() {
-        this(DEFAULT_USE_GZIP);
-    }
-    public InputStreamGenerator(boolean useGzip) {
-        this.useGzip = useGzip;
-    }
-
-    public boolean isUseGzip() {
-        return useGzip;
-    }
 
     public InputStream getInputStream(File inputFile) throws IOException {
         if (inputFile == null) {
@@ -66,11 +52,8 @@ public class InputStreamGenerator {
         connection.setConnectTimeout(CONNECTION_TIMEOUT);
         connection.setReadTimeout(CONNECTION_TIMEOUT);
         connection.setRequestProperty("User-Agent", USER_AGENT_VALUE);
-        String encoding = null;
-        if (this.useGzip) {
-            connection.setRequestProperty("Accept-Encoding", "gzip");
-            encoding = connection.getContentEncoding();
-        }
+        connection.setRequestProperty("Accept-Encoding", "gzip");
+        String encoding = connection.getContentEncoding();
         if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
             return new GZIPInputStream(connection.getInputStream());
         }

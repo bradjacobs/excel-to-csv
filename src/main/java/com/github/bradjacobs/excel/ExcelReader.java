@@ -35,7 +35,7 @@ public class ExcelReader {
         this.password = builder.password;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         this.excelSheetToCsvConverter = new ExcelSheetReader(builder.skipEmptyRows);
-        this.inputStreamGenerator = new InputStreamGenerator(builder.gzipEnabled);
+        this.inputStreamGenerator = new InputStreamGenerator();
     }
 
     public void convertToCsvFile(File excelFile, File outputFile) throws IOException {
@@ -100,7 +100,6 @@ public class ExcelReader {
         private String sheetName = ""; // optionally provide a specific sheet name
         private boolean skipEmptyRows = true; // default will skip any empty lines
         private QuoteMode quoteMode = QuoteMode.NORMAL;
-        private boolean gzipEnabled = true;
         private String password = null;
 
         private Builder() {}
@@ -130,11 +129,6 @@ public class ExcelReader {
          */
         public Builder setSkipEmptyRows(boolean skipEmptyRows) {
             this.skipEmptyRows = skipEmptyRows;
-            return this;
-        }
-
-        public Builder setGzipEnabled(boolean gzipEnabled) {
-            this.gzipEnabled = gzipEnabled;
             return this;
         }
 
