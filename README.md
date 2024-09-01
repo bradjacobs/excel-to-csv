@@ -42,42 +42,34 @@ Implemented using the [Apache POI](https://poi.apache.org/) libraries
 ### Basic
 ```java
 // get a single string representing the entire worksheet in CSV format
-File excelFile = new File("/some/path/excelfile.xlsx");
 ExcelReader excelReader = ExcelReader.builder().build();
-String csvText = excelReader.convertToCsvText(excelFile);
+String csvText = excelReader.convertToCsvText(new File("input.xlsx"));
 ```
 ```java
 // get 2-D string array the entire worksheet in CSV format (each value represents a 'cell')
-File excelFile = new File("/some/path/excelfile.xlsx");
 ExcelReader excelReader = ExcelReader.builder().build();
-String[][] csvData = excelReader.convertToDataMatrix(excelFile);
+String[][] csvData = excelReader.convertToDataMatrix(new File("input.xlsx"));
 ```
 ```java
 // read excel worksheet and write output to a file
-File excelFile = new File("/some/path/excelfile.xlsx");
-File outputFile = new File("/different/path/test_data.csv");
 ExcelReader excelReader = ExcelReader.builder().build();
-excelReader.convertToCsvFile(excelFile, outputFile);
+excelReader.convertToCsvFile(new File("input.xlsx"), new File("output.csv"));
 ```
 
 ### Advanced
 ```java
 // write csv file w/ specific settings
-File excelFile = new File("/some/path/excelfile.xlsx");
-File outputFile = new File("/different/path/test_data.csv");
 ExcelReader excelReader = ExcelReader.builder()
         .setQuoteMode(QuoteMode.LENIENT) // only quote values if necessary
         .setSheetIndex(1) // grab the 2nd worksheet
         .setSkipEmptyRows(true) // ignore any empty rows from the Excel worksheet
         .build();
-excelReader.convertToCsvFile(excelFile, outputFile);
+excelReader.convertToCsvFile(new File("input.xlsx"), new File("output.csv"));
 ```
 ```java
 // fetch Excel file from external URL location and save as a local csv file.
-URL excelFileUrl = new URL("https://some.domain.com/download/1/docs/SampleData.xlsx");
-File outputFile = new File("/different/path/test_data.csv");
 ExcelReader excelReader = ExcelReader.builder().build();
-excelReader.convertToCsvFile(excelFileUrl, outputFile);
+excelReader.convertToCsvFile(new URL("http://some.domain.com/input.xlsx"), new File("output.csv"));
 ```
 
 ## OtherInfo
