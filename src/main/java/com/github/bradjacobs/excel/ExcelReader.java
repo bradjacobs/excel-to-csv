@@ -131,7 +131,7 @@ public class ExcelReader {
 
         /**
          * Whether to skip any empty rows.
-         * @param skipEmptyRows (defaults to false)
+         * @param skipEmptyRows (defaults to true)
          */
         public Builder setSkipEmptyRows(boolean skipEmptyRows) {
             this.skipEmptyRows = skipEmptyRows;
