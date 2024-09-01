@@ -15,8 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class ExcelSheetReader
-{
+class ExcelSheetReader {
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
     private static final WhitespaceSanitizer WHITESPACE_SANITIZER = new WhitespaceSanitizer();

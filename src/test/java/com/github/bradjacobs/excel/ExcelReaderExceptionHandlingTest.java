@@ -13,9 +13,9 @@ import java.net.UnknownHostException;
 
 import static org.testng.Assert.assertNotNull;
 
-public class ExcelReaderExceptionHandlingTest
-{
+public class ExcelReaderExceptionHandlingTest {
     private static final String TEST_DATA_FILE = "test_data.xlsx";
+    private static final String PSWD_DATA_FILE = "test_data_w_pswd_1234.xlsx";
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
             expectedExceptionsMessageRegExp = "Must provide an input file.")
@@ -95,8 +95,38 @@ public class ExcelReaderExceptionHandlingTest
         excelReader.convertToCsvFile(inputFile, null);
     }
 
+    @Test(expectedExceptions = { Exception.class },
+            expectedExceptionsMessageRegExp = ".*no password was supplied.*")
+    public void testMissingRequiredPassword() throws Exception {
+        File inputFile = getPasswordTestFileObject();
+        ExcelReader excelReader = ExcelReader.builder().build();
+        excelReader.convertToCsvFile(inputFile, new File(""));
+    }
+
+    @Test(expectedExceptions = { Exception.class },
+            expectedExceptionsMessageRegExp = ".*no password was supplied.*")
+    public void testBlankRequiredPassword() throws Exception {
+        File inputFile = getPasswordTestFileObject();
+        ExcelReader excelReader = ExcelReader.builder().setPassword("").build();
+        excelReader.convertToCsvFile(inputFile, new File(""));
+    }
+
+    @Test(expectedExceptions = { Exception.class },
+            expectedExceptionsMessageRegExp = "Password incorrect")
+    public void testInvalidPassword() throws Exception {
+        File inputFile = getPasswordTestFileObject();
+        ExcelReader excelReader = ExcelReader.builder().setPassword("bad_password").build();
+        excelReader.convertToCsvFile(inputFile, new File(""));
+    }
+
     private File getTestFileObject() {
         URL resourceUrl = this.getClass().getClassLoader().getResource(TEST_DATA_FILE);
+        assertNotNull(resourceUrl);
+        return new File( resourceUrl.getPath() );
+    }
+
+    private File getPasswordTestFileObject() {
+        URL resourceUrl = this.getClass().getClassLoader().getResource(PSWD_DATA_FILE);
         assertNotNull(resourceUrl);
         return new File( resourceUrl.getPath() );
     }

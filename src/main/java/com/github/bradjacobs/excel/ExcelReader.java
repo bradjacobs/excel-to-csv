@@ -20,10 +20,10 @@ import java.nio.charset.StandardCharsets;
  *   and will produce a CSV-equivalent
  */
 // todo: javadocs
-public class ExcelReader
-{
+public class ExcelReader {
     private final int sheetIndex;
     private final String sheetName;
+    private final String password; // 'null' == no possword
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
     private final ExcelSheetReader excelSheetToCsvConverter;
 
@@ -32,6 +32,7 @@ public class ExcelReader
     private ExcelReader(Builder builder) {
         this.sheetIndex = builder.sheetIndex;
         this.sheetName = builder.sheetName;
+        this.password = builder.password;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         this.excelSheetToCsvConverter = new ExcelSheetReader(builder.skipEmptyRows);
         this.inputStreamGenerator = new InputStreamGenerator(builder.gzipEnabled);
@@ -59,7 +60,7 @@ public class ExcelReader
     }
 
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
-        try (Workbook wb = WorkbookFactory.create(inputStream)) {
+        try (Workbook wb = WorkbookFactory.create(inputStream, password)) {
             Sheet sheet = getSheet(wb);
             return excelSheetToCsvConverter.convertToCsvData(sheet);
         }
@@ -100,6 +101,7 @@ public class ExcelReader
         private boolean skipEmptyRows = true; // default will skip any empty lines
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private boolean gzipEnabled = true;
+        private String password = null;
 
         private Builder() {}
 
@@ -146,6 +148,11 @@ public class ExcelReader
          */
         public Builder setQuoteMode(QuoteMode quoteMode) {
             this.quoteMode = quoteMode;
+            return this;
+        }
+
+        public Builder setPassword(String password) {
+            this.password = password != null && password.isEmpty() ? null : password;
             return this;
         }
 

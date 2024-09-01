@@ -17,8 +17,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
-public class ExcelReaderTest
-{
+public class ExcelReaderTest {
     private static final String TEST_DATA_FILE = "test_data.xlsx";
     private static final String TEST_SHEET_NAME = "TEST_SHEET";
     private static final String TEST_BLANK_SHEET_NAME = "TEST_BLANK_SHEET";
@@ -46,7 +45,7 @@ public class ExcelReaderTest
 
     @Test(dataProvider = "quote_variations")
     public void testExpectedQuoteText(QuoteMode quoteMode, String expectedResultFileName) throws Exception {
-        String expectedCsvText = readResourceFile(expectedResultFileName);
+        String expectedCsvText = readResourceFileText(expectedResultFileName);
         File inputFile = getTestFileObject();
 
         ExcelReader excelReader = ExcelReader.builder().setQuoteMode(quoteMode).setSkipEmptyRows(false).build();
@@ -57,7 +56,7 @@ public class ExcelReaderTest
 
     @Test
     public void testLocalFileInputAsUrl() throws Exception {
-        String expectedCsvText = readResourceFile(EXPECTED_NORMAL_CSV_FILE);
+        String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
 
         URL inputFileUrl = getTestLocalFileUrl();
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
@@ -111,7 +110,7 @@ public class ExcelReaderTest
         assertTrue(TEST_OUTPUT_FILE.exists(), "expected csv file was NOT created");
 
         String outputFileContent = new String ( Files.readAllBytes( Paths.get(TEST_OUTPUT_FILE.getAbsolutePath()) ) );
-        String expectedCsvText = readResourceFile(EXPECTED_NORMAL_CSV_FILE);
+        String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
         assertEquals(outputFileContent, expectedCsvText, "mismatch of content of saved csv file");
     }
 
@@ -122,7 +121,7 @@ public class ExcelReaderTest
 
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
         String csvText = excelReader.convertToCsvText(fileUrl);
-        String expectedCsvText = readResourceFile(EXPECTED_NORMAL_CSV_FILE);
+        String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
         assertNotNull(csvText);
         assertEquals(csvText, expectedCsvText, "mismatch of content of saved csv file");
     }
@@ -136,7 +135,7 @@ public class ExcelReaderTest
         File inputFile = getTestFileObject();
 
         String csvText = excelReader.convertToCsvText(inputFile);
-        String expectedCsvText = readResourceFile(EXPECTED_NORMAL_CSV_FILE);
+        String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
         assertNotNull(csvText);
         assertEquals(csvText, expectedCsvText, "mismatch of content of saved csv file");
     }
@@ -173,13 +172,25 @@ public class ExcelReaderTest
     // read a worksheet where the last column only has whitespace.
     //   in this case the column should not be counted.
     @Test
-    public void testHandleExtraBlankColumns22() throws Exception {
+    public void testHandleExtraBlankColumns() throws Exception {
         URL resourceUrl = this.getClass().getClassLoader().getResource("spaces_data.xlsx");
         assertNotNull(resourceUrl);
 
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).setSheetName("LAST_COL_WHITESPACE").build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals(csvMatrix[0].length, 1, "mismatch of expected number of columns in csv output.");
+    }
+
+    // Happy Path testcase reading an Excel file that is password protected.
+    @Test
+    public void testReadPasswordProtectedFile() throws Exception {
+        URL resourceUrl = this.getClass().getClassLoader().getResource("test_data_w_pswd_1234.xlsx");
+        assertNotNull(resourceUrl);
+
+        ExcelReader excelReader = ExcelReader.builder().setPassword("1234").build();
+        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
+        assertEquals(csvMatrix[0][0], "aaa");
+        assertEquals(csvMatrix[0][1], "bbb");
     }
 
     @AfterTest
@@ -201,7 +212,7 @@ public class ExcelReaderTest
         return resourceUrl;
     }
 
-    private String readResourceFile(String fileName) {
+    private String readResourceFileText(String fileName) {
         try {
             URL resource = this.getClass().getClassLoader().getResource(fileName);
             assertNotNull(resource);

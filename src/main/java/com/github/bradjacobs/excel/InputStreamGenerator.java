@@ -16,8 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-public class InputStreamGenerator
-{
+public class InputStreamGenerator {
     private static final Set<String> VALID_URL_SCHEMES =
             new HashSet<>(Arrays.asList("http", "https", "ftp", "file"));
     private static final int CONNECTION_TIMEOUT = 20000;

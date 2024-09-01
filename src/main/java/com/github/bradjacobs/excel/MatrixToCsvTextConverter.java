@@ -16,8 +16,7 @@ import java.util.Set;
 //  NOTE: could have just utilized 'com.fasterxml.jackson.dataformat.csv.CsvMapper'
 //    for the quoting logic, but didn't want to have to pull in yet another dependency.
 //      (reserve the right to change decision on this)
-public class MatrixToCsvTextConverter
-{
+public class MatrixToCsvTextConverter {
     // any string that has a character below this ascii value
     //   will be quoted in 'Normal Mode'
     private static final int NORMAL_CRITERIA_MINIMUM = 45;

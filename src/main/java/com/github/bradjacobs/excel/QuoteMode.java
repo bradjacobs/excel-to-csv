@@ -3,8 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
-public enum QuoteMode
-{
+public enum QuoteMode {
     ALWAYS,
     NORMAL,
     LENIENT,
