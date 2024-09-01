@@ -112,6 +112,9 @@ public class ExcelReader {
          * @param sheetIndex (0-based index of which sheet in Excel file to convert)
          */
         public Builder setSheetIndex(int sheetIndex) {
+            if (sheetIndex < 0) {
+                throw new IllegalArgumentException("SheetIndex cannot be negative");
+            }
             this.sheetIndex = sheetIndex;
             return this;
         }
@@ -144,6 +147,9 @@ public class ExcelReader {
          *  NEVER:   never add quotes to any values.
          */
         public Builder setQuoteMode(QuoteMode quoteMode) {
+            if (quoteMode == null) {
+                throw new IllegalArgumentException("Cannot set quoteMode to null");
+            }
             this.quoteMode = quoteMode;
             return this;
         }
@@ -154,17 +160,7 @@ public class ExcelReader {
         }
 
         public ExcelReader build() {
-            validateInputs();
             return new ExcelReader(this);
-        }
-
-        private void validateInputs() {
-            if (this.sheetIndex < 0) {
-                throw new IllegalArgumentException("SheetIndex cannot be negative");
-            }
-            if (this.quoteMode == null) {
-                throw new IllegalArgumentException("Cannot set quoteMode to null");
-            }
         }
     }
 }
