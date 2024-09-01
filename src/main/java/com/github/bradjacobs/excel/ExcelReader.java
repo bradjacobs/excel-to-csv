@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 public class ExcelReader {
     private final int sheetIndex;
     private final String sheetName;
-    private final String password; // 'null' == no possword
+    private final String password; // 'null' == no password
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
     private final ExcelSheetReader excelSheetToCsvConverter;
 
