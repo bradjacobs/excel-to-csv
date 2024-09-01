@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 
 import java.net.URL;
 
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
@@ -25,6 +26,6 @@ public class InternetExcelReaderTest {
         ExcelReader excelReader = ExcelReader.builder().build();
         String csvText = excelReader.convertToCsvText(new URL(SAMPLE_INTERNET_EXCEL_FILE));
         assertNotNull(csvText);
-        assertTrue(csvText.length() > 0);
+        assertFalse(csvText.isEmpty());
     }
 }

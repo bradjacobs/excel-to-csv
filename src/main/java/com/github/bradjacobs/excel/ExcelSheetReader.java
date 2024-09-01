@@ -98,7 +98,7 @@ class ExcelSheetReader {
                     //    the case and adjust accordingly.
                     for (int j = currentRowCellCount - 1; j >= maxColumn; j--) {
                         String cellValue = getCellValue(row.getCell(j));
-                        if (cellValue.length() > 0) {
+                        if (! cellValue.isEmpty()) {
                             break;
                         }
                         currentRowCellCount--;
@@ -112,7 +112,7 @@ class ExcelSheetReader {
 
     private boolean isEmptyRow(String[] rowData) {
         for (String r : rowData) {
-            if (r != null && r.length() > 0) {
+            if (r != null && !r.isEmpty()) {
                 return false;
             }
         }
