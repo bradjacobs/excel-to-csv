@@ -88,6 +88,9 @@ public class ExcelReader {
         if (outputFile == null) {
             throw new IllegalArgumentException("Must supply outputFile location to save CSV data.");
         }
+        else if (outputFile.isDirectory()) {
+            throw new IllegalArgumentException("The outputFile cannot be an existing directory.");
+        }
         FileUtils.writeStringToFile(outputFile, csvString, StandardCharsets.UTF_8);
     }
 

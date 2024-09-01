@@ -95,6 +95,17 @@ public class ExcelReaderExceptionHandlingTest {
         excelReader.convertToCsvFile(inputFile, null);
     }
 
+    @Test(expectedExceptions = { IllegalArgumentException.class },
+            expectedExceptionsMessageRegExp = "The outputFile cannot be an existing directory.")
+    public void testSaveCsvOutputFileIsDirectory() throws Exception {
+        File inputFile = getTestFileObject();
+
+        // create a "File" that is actually pointing to an existing directory
+        File directory = new File(inputFile.getParent());
+        ExcelReader excelReader = ExcelReader.builder().build();
+        excelReader.convertToCsvFile(inputFile, directory);  // directory is invalid parameter
+    }
+
     @Test(expectedExceptions = { Exception.class },
             expectedExceptionsMessageRegExp = ".*no password was supplied.*")
     public void testMissingRequiredPassword() throws Exception {
