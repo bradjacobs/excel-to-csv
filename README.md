@@ -9,10 +9,14 @@
   * [Advanced](#Advanced)
 - [OtherInfo](#OtherInfo)
 - [Testing](#Testing)
-- [Misc](#Misc)
+- [TechNotes](#TechNotes)
+  * [AlternateImplemenation](#AlternateImplemenation)
 
 ## Description
-Simple tool to convert an Excel worksheet into CSV format. 
+Simple tool to convert an Excel worksheet into CSV format.
+
+Implemented using the [Apache POI](https://poi.apache.org/) libraries
+
 
 ## Usage
 ### Overview
@@ -87,22 +91,43 @@ excelReader.convertToCsvFile(excelFileUrl, outputFile);
 ## Testing
 The project contains unittests for most of the basic functionality.
 
-However, the following scenarios have **NOT** been tested...
-* _HUGE_ Excel files
-* Files with FTP urls
+However, the following scenarios have either no testing or very limited testing...
+* HUGE Excel files _(limited testing only)_
 * Older/Newer versions of Excel files.
 * Excel files that were originally generated on Windows
 * Compatibility w/ different JAVA versions.
 * Accessing files that do not have the necessary read/write permissions
-* Any URLs that require special authentication or headers.
-* ".xls" files
 * Unicode / extended characters
 * Worksheets containing nested charts.
+* Use of the URL input in lieu of File input
 
-## Misc
-* This is still compiling with JDK 8 (at the moment).  The original thought was in case need to use this code with other librries using old JDK.  However... at this point anything still on JDK 8 seems silly, so i will eventually bump up the JDK version.
-* Cannot seem to recall why I used testng instead of junit. 
+## TechNotes
 * I don't actively maintain this project, and make occasional tweaks just for fun.
+* This project is still compiling with JDK 8.
+  * The original thought was in case need to use this code with other libraries using old JDK.  _However_... at this point anything still on JDK 8 seems silly, so i will eventually bump up the JDK version.
+* The dependency versions are getting out-of-date.  Will update 'eventually'
+* Cannot seem to recall why I used `testng` instead of `junit`.
+  * I may switch over the tests to be junit at some point.
+
+### AlternateImplemenation
+From a [StackOverflow Post](https://stackoverflow.com/questions/40283179/how-to-convert-xlsx-file-to-csv), [OrangeDog](https://stackoverflow.com/users/476716/orangedog) points out there is an easier way to get CSV text, which would look something ike this:
+```java
+XSSFWorkbook input = new XSSFWorkbook(new File("input.xlsx"));
+try (CSVPrinter output = new CSVPrinter(new FileWriter("output.csv"), CSVFormat.DEFAULT);) {
+    String tsv = new XSSFExcelExtractor(input).getText();
+    BufferedReader reader = new BufferedReader(new StringReader(tsv));
+    reader.lines().map(line -> line.split("\t")).forEach(k -> {
+        try { output.printRecord(Arrays.asList(k)); } catch (IOException e) { /* ignore */ }
+    });
+}
+```
+This appears to work and requires a lot less code.  _BUT_... it seems to expose a few limitations with the POI functionality.
+
+Namely:
+* empty cells could cause data to seemingly 'shift' to a different column
+  * i.e. if no value in Column A, but is a value in Column B, then the Colum B value will show up as the first value in the row.
+* Bigger Excel files (>1MB ?) will throw an exception with message: _"The text would exceed the max allowed overall size of extracted text"_
+* The output csv text might not have the cells quoted the way you want (subjective)
 
 
 This project was originally created in a day, so i'm sure there are other items I've missed.  ;-) 
