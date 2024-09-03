@@ -119,6 +119,7 @@ Namely:
 * empty cells could cause data to seemingly 'shift' to a different column
   * i.e. if no value in Column A, but is a value in Column B, then the Colum B value will show up as the first value in the row.
 * Bigger Excel files (>1MB ?) will throw an exception with message: _"The text would exceed the max allowed overall size of extracted text"_
+* It will give data from all sheets (even if you only want one)
 * The output csv text might not have the cells quoted the way you want (subjective)
 
 
