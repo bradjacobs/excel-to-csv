@@ -10,7 +10,10 @@
 - [OtherInfo](#OtherInfo)
 - [Testing](#Testing)
 - [TechNotes](#TechNotes)
-  * [AlternateImplemenation](#AlternateImplemenation)
+- [TODOs](#TODOs)
+- [AlternateImplementation](#AlternateImplementation)
+- [FinalThoughts](#FinalThoughts)
+
 
 ## Description
 Simple tool to convert an Excel worksheet into CSV format.
@@ -69,7 +72,7 @@ excelReader.convertToCsvFile(new File("input.xlsx"), new File("output.csv"));
 ```java
 // fetch Excel file from external URL location and save as a local csv file.
 ExcelReader excelReader = ExcelReader.builder().build();
-excelReader.convertToCsvFile(new URL("http://some.domain.com/input.xlsx"), new File("output.csv"));
+excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new File("output.csv"));
 ```
 
 ## OtherInfo
@@ -84,11 +87,10 @@ excelReader.convertToCsvFile(new URL("http://some.domain.com/input.xlsx"), new F
 The project contains unittests for most of the basic functionality.
 
 However, the following scenarios have either no testing or very limited testing...
-* HUGE Excel files _(limited testing only)_
 * Older/Newer versions of Excel files.
 * Excel files that were originally generated on Windows
 * Compatibility w/ different JAVA versions.
-* Accessing files that do not have the necessary read/write permissions
+* Attempting to access files that do not have the necessary read permissions
 * Unicode / extended characters
 * Worksheets containing nested charts.
 * Use of the URL input in lieu of File input
@@ -96,12 +98,23 @@ However, the following scenarios have either no testing or very limited testing.
 ## TechNotes
 * I don't actively maintain this project, and make occasional tweaks just for fun.
 * This project is still compiling with JDK 8.
-  * The original thought was in case need to use this code with other libraries using old JDK.  _However_... at this point anything still on JDK 8 seems silly, so i will eventually bump up the JDK version.
-* The dependency versions are getting out-of-date.  Will update 'eventually'
+  * The original thought was in case need to use this code with other libraries using old JDK.  _However_... at this point anything still on JDK 8 seems silly.
+* The dependency versions are getting out-of-date.
 * Cannot seem to recall why I used `testng` instead of `junit`.
-  * I may switch over the tests to be junit at some point.
 
-### AlternateImplemenation
+## TODOs
+A work item list that I will get around to "eventually" (perhaps)
+* Update to most recent dependency version of apache POI
+  * **NOTE**: quick trial with dependency upgrade immediately hit a new size limit of 100_000_000 from [HERE](https://github.com/apache/poi/blob/REL_5_3_0/poi-ooxml/src/main/java/org/apache/poi/openxml4j/util/ZipArchiveFakeEntry.java#L43)
+  * (interesting to have discovered this almost immediately)
+* Switch all the unittests from TestNG to JUnit
+* Update the minimum required version of Java to something newer than 1.8
+* Put a more legitimate project version in the pom.xml
+* Add more JavaDocs
+
+
+
+## AlternateImplementation
 From a [StackOverflow Post](https://stackoverflow.com/questions/40283179/how-to-convert-xlsx-file-to-csv), [OrangeDog](https://stackoverflow.com/users/476716/orangedog) points out there is an easier way to get CSV text, which would look something ike this:
 ```java
 XSSFWorkbook input = new XSSFWorkbook(new File("input.xlsx"));
@@ -113,14 +126,15 @@ try (CSVPrinter output = new CSVPrinter(new FileWriter("output.csv"), CSVFormat.
     });
 }
 ```
-This appears to work and requires a lot less code.  _BUT_... it seems to expose a few limitations with the POI functionality.
+This appears to work with a lot less code.  _**BUT**_... it seems to expose a few limitations with the POI functionality.
 
 Namely:
 * empty cells could cause data to seemingly 'shift' to a different column
-  * i.e. if no value in Column A, but is a value in Column B, then the Colum B value will show up as the first value in the row.
+  * i.e. if no value in Column A, but is a value in Column B, then the Column B value will show up as the first value in the row.
 * Bigger Excel files (>1MB ?) will throw an exception with message: _"The text would exceed the max allowed overall size of extracted text"_
 * It will give data from all sheets (even if you only want one)
 * The output csv text might not have the cells quoted the way you want (subjective)
 
+## FinalThoughts
 
-This project was originally created in a day, so i'm sure there are other items I've missed.  ;-) 
+This project was originally created in a day, so I'm sure there are other items I've missed.  :-) 
