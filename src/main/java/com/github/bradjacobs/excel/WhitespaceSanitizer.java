@@ -33,9 +33,9 @@ public class WhitespaceSanitizer {
      * @return string with whitespace chars replaces (if any were found)
      */
     public String sanitize(String input) {
-        // TODO: probably not the best way to do this!... but works for now.
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < input.length(); i++) {
+        int length = input.length();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
             char inputCharacter = input.charAt(i);
             if (SPECIAL_SPACE_CHAR_SET.contains(inputCharacter)) {
                 sb.append(' ');
