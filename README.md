@@ -9,9 +9,8 @@
   * [Advanced](#Advanced)
 - [OtherInfo](#OtherInfo)
 - [Testing](#Testing)
-- [TechNotes](#TechNotes)
 - [TODOs](#TODOs)
-- [AlternateImplementation](#AlternateImplementation)
+- [AlternateImplementations](#AlternateImplementations)
 - [FinalThoughts](#FinalThoughts)
 
 
@@ -95,26 +94,25 @@ However, the following scenarios have either no testing or very limited testing.
 * Worksheets containing nested charts.
 * Use of the URL input in lieu of File input
 
-## TechNotes
-* I don't actively maintain this project, and make occasional tweaks just for fun.
-* This project is still compiling with JDK 8.
-  * The original thought was in case need to use this code with other libraries using old JDK.  _However_... at this point anything still on JDK 8 seems silly.
-* The dependency versions are getting out-of-date.
-* Cannot seem to recall why I used `testng` instead of `junit`.
-
 ## TODOs
-A work item list that I will get around to "eventually" (perhaps)
-* Update to most recent dependency version of apache POI
-  * **NOTE**: quick trial with dependency upgrade immediately hit a new size limit of 100_000_000 from [HERE](https://github.com/apache/poi/blob/REL_5_3_0/poi-ooxml/src/main/java/org/apache/poi/openxml4j/util/ZipArchiveFakeEntry.java#L43)
-  * (interesting to have discovered this almost immediately)
+A work item list that I might get around to "eventually" (perhaps)
+* Update the minimum required Java version to something newer than JDK 1.8
+  * The original thought was in case need to use this code with other libraries using old JDK.  _However_... at this point anything still on JDK 8 seems silly.
 * Switch all the unittests from TestNG to JUnit
-* Update the minimum required version of Java to something newer than 1.8
+  * Cannot seem to recall why I originally chose `testng` instead of `junit`.
 * Put a more legitimate project version in the pom.xml
+* The output CSV contains values as they 'visually appear' in Excel.  However there are probably cases where this is not desired.  Need to research.
+* Integrate a real logger into the code.
 * Add more JavaDocs
 
 
+## AlternateImplementations
 
-## AlternateImplementation
+Searching on the web can yield alternate solutions that require less code.  Howver they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well
+
+<details>
+  <summary>Example Alternate Implementation... (Click Me)</summary>
+
 From a [StackOverflow Post](https://stackoverflow.com/questions/40283179/how-to-convert-xlsx-file-to-csv), [OrangeDog](https://stackoverflow.com/users/476716/orangedog) points out there is an easier way to get CSV text, which would look something ike this:
 ```java
 XSSFWorkbook input = new XSSFWorkbook(new File("input.xlsx"));
@@ -134,7 +132,9 @@ Namely:
 * Bigger Excel files (>1MB ?) will throw an exception with message: _"The text would exceed the max allowed overall size of extracted text"_
 * It will give data from all sheets (even if you only want one)
 * The output csv text might not have the cells quoted the way you want (subjective)
+</details>
 
 ## FinalThoughts
+I don't actively maintain this project, and make occasional tweaks just for fun.
 
-This project was originally created in a day, so I'm sure there are other items I've missed.  :-) 
+This project was originally created in a day, so I'm sure there are specific cases I've missed.  :-) 
