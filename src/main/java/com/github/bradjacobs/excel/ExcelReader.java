@@ -4,6 +4,7 @@
 package com.github.bradjacobs.excel;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -50,9 +51,11 @@ public class ExcelReader {
     }
 
     public void convertToCsvFile(File excelFile, File outputFile) throws IOException {
+        validateOutputFileParameter(outputFile);
         writeCsvToFile( convertToCsvText(excelFile), outputFile);
     }
     public void convertToCsvFile(URL excelUrl, File outputFile) throws IOException {
+        validateOutputFileParameter(outputFile);
         writeCsvToFile( convertToCsvText(excelUrl), outputFile);
     }
 
@@ -103,13 +106,42 @@ public class ExcelReader {
         return returnSheet;
     }
 
-    private void writeCsvToFile(String csvString, File outputFile) throws IOException {
+    /**
+     * Some sanity checks on the outputFile parameter prior to doing the actual conversion
+     *   (not exhaustive on all possible checks one could do)
+     * @param outputFile the destination CSV output file.
+     * @throws IllegalArgumentException if a problem was detected with the File object.
+     */
+    private void validateOutputFileParameter(File outputFile) throws IllegalArgumentException {
         if (outputFile == null) {
             throw new IllegalArgumentException("Must supply outputFile location to save CSV data.");
         }
         else if (outputFile.isDirectory()) {
             throw new IllegalArgumentException("The outputFile cannot be an existing directory.");
         }
+        else if (outputFile.getAbsolutePath().indexOf('\u0000') >= 0) {
+            throw new IllegalArgumentException("The outputFile path contains an illegal 'null' character.");
+        }
+
+        String ext = FilenameUtils.getExtension(outputFile.getAbsolutePath());
+        if (!ext.equalsIgnoreCase("csv") && !ext.isEmpty()) {
+            throw new IllegalArgumentException(
+                    String.format("Illegal outputFile extension '%s'.  Must be either 'csv' or blank", ext));
+        }
+
+        File fullPathOutputFile = new File(outputFile.getAbsolutePath());
+        File parentDirectory = fullPathOutputFile.getParentFile();
+        if (! parentDirectory.isDirectory()) {
+            throw new IllegalArgumentException("Attempted to save CSV output file in a non-existent directory: " + outputFile.getAbsolutePath());
+        }
+    }
+
+    /**
+     * Write the CSV data string out to a file.
+     * @param csvString CSV data
+     * @param outputFile destination file.
+     */
+    private void writeCsvToFile(String csvString, File outputFile) throws IOException {
         FileUtils.writeStringToFile(outputFile, csvString, StandardCharsets.UTF_8);
     }
 

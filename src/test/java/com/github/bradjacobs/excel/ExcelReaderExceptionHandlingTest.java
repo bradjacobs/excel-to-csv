@@ -106,6 +106,33 @@ public class ExcelReaderExceptionHandlingTest {
         excelReader.convertToCsvFile(inputFile, directory);  // directory is invalid parameter
     }
 
+    @Test(expectedExceptions = { IllegalArgumentException.class },
+            expectedExceptionsMessageRegExp = "Illegal outputFile extension.*")
+    public void testSaveCsvOutputFileInvalidExtension() throws Exception {
+        File inputFile = getTestFileObject();
+        File outFile = new File("outfile.exe");
+        ExcelReader excelReader = ExcelReader.builder().build();
+        excelReader.convertToCsvFile(inputFile, outFile);
+    }
+
+    @Test(expectedExceptions = { IllegalArgumentException.class },
+            expectedExceptionsMessageRegExp = ".*outputFile path contains an illegal 'null' character.*")
+    public void testSaveCsvOutputFileIllegalNullCharInPath() throws Exception {
+        File inputFile = getTestFileObject();
+        File outFile = new File("aaaa_||._\u0000_bbb.csv");
+        ExcelReader excelReader = ExcelReader.builder().build();
+        excelReader.convertToCsvFile(inputFile, outFile);
+    }
+
+    @Test(expectedExceptions = { IllegalArgumentException.class },
+            expectedExceptionsMessageRegExp = "Attempted to save CSV output file in a non-existent directory.*")
+    public void testSaveCsvInvalidDirectory() throws Exception {
+        File inputFile = getTestFileObject();
+       File outFile = new File("/fakedirectory/myOutputFile.csv");
+        ExcelReader excelReader = ExcelReader.builder().build();
+        excelReader.convertToCsvFile(inputFile, outFile);
+    }
+
     @Test(expectedExceptions = { Exception.class },
             expectedExceptionsMessageRegExp = ".*no password was supplied.*")
     public void testMissingRequiredPassword() throws Exception {
