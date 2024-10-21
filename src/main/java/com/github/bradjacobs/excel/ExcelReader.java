@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 
 /**
  * Simple class that reads an Excel Worksheet
@@ -107,6 +109,15 @@ public class ExcelReader {
     }
 
     /**
+     * Write the CSV data string out to a file.
+     * @param csvString CSV data
+     * @param outputFile destination file.
+     */
+    private void writeCsvToFile(String csvString, File outputFile) throws IOException {
+        FileUtils.writeStringToFile(outputFile, csvString, StandardCharsets.UTF_8);
+    }
+
+    /**
      * Some sanity checks on the outputFile parameter prior to doing the actual conversion
      *   (not exhaustive on all possible checks one could do)
      * @param outputFile the destination CSV output file.
@@ -119,14 +130,24 @@ public class ExcelReader {
         else if (outputFile.isDirectory()) {
             throw new IllegalArgumentException("The outputFile cannot be an existing directory.");
         }
-        else if (outputFile.getAbsolutePath().indexOf('\u0000') >= 0) {
-            throw new IllegalArgumentException("The outputFile path contains an illegal 'null' character.");
-        }
 
+        // confirm output file has an allowed file extension
         String ext = FilenameUtils.getExtension(outputFile.getAbsolutePath());
-        if (!ext.equalsIgnoreCase("csv") && !ext.isEmpty()) {
+        if (!ext.equalsIgnoreCase("csv") &&
+                !ext.equalsIgnoreCase("txt") &&
+                !ext.isEmpty()) {
             throw new IllegalArgumentException(
                     String.format("Illegal outputFile extension '%s'.  Must be either 'csv' or blank", ext));
+        }
+
+        // confirm output file doesn't have any invalid characters.
+        try {
+            Paths.get(outputFile.getAbsolutePath());
+            // path is ok
+        }
+        catch (InvalidPathException ex) {
+            throw new IllegalArgumentException("The outputFile path contains an illegal character: "
+                    + outputFile.getAbsolutePath());
         }
 
         File fullPathOutputFile = new File(outputFile.getAbsolutePath());
@@ -134,15 +155,6 @@ public class ExcelReader {
         if (! parentDirectory.isDirectory()) {
             throw new IllegalArgumentException("Attempted to save CSV output file in a non-existent directory: " + outputFile.getAbsolutePath());
         }
-    }
-
-    /**
-     * Write the CSV data string out to a file.
-     * @param csvString CSV data
-     * @param outputFile destination file.
-     */
-    private void writeCsvToFile(String csvString, File outputFile) throws IOException {
-        FileUtils.writeStringToFile(outputFile, csvString, StandardCharsets.UTF_8);
     }
 
     public static Builder builder() {

@@ -116,7 +116,7 @@ public class ExcelReaderExceptionHandlingTest {
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
-            expectedExceptionsMessageRegExp = ".*outputFile path contains an illegal 'null' character.*")
+            expectedExceptionsMessageRegExp = ".*outputFile path contains an illegal character.*")
     public void testSaveCsvOutputFileIllegalNullCharInPath() throws Exception {
         File inputFile = getTestFileObject();
         File outFile = new File("aaaa_||._\u0000_bbb.csv");
