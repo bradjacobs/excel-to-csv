@@ -21,14 +21,14 @@ public class ExcelReaderExceptionHandlingTest {
             expectedExceptionsMessageRegExp = "Must provide an input file.")
     public void testMissingFile() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
-        String[][] csvData = excelReader.convertToDataMatrix((File)null);
+        excelReader.convertToDataMatrix((File)null);
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
             expectedExceptionsMessageRegExp = "Must provide an input url.")
     public void testMissingUrl() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
-        String[][] csvData = excelReader.convertToDataMatrix((URL)null);
+        excelReader.convertToDataMatrix((URL)null);
     }
 
     // give a URL that is _NOT_ an Excel file
@@ -37,7 +37,7 @@ public class ExcelReaderExceptionHandlingTest {
         ExcelReader excelReader = ExcelReader.builder().build();
         URL url = this.getClass().getClassLoader().getResource("expected_normal.csv");
         assertNotNull(url, "unable to open test file");
-        String csvText = excelReader.convertToCsvText(url);
+        excelReader.convertToCsvText(url);
     }
 
     @Test(expectedExceptions = { FileNotFoundException.class })
@@ -64,7 +64,7 @@ public class ExcelReaderExceptionHandlingTest {
     public void testInvalidSheetIndex() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().setSheetIndex(99).build();
         File inputFile = getTestFileObject();
-        String csvText = excelReader.convertToCsvText(inputFile);
+        excelReader.convertToCsvText(inputFile);
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
@@ -72,7 +72,7 @@ public class ExcelReaderExceptionHandlingTest {
     public void testInvalidSheetName() throws Exception {
         File inputFile = getTestFileObject();
         ExcelReader excelReader = ExcelReader.builder().setSheetName("FAKE_WORKSHEET_NAME").build();
-        String csvText = excelReader.convertToCsvText(inputFile);
+        excelReader.convertToCsvText(inputFile);
     }
 
     @Test(expectedExceptions = { IllegalArgumentException.class },
@@ -128,7 +128,7 @@ public class ExcelReaderExceptionHandlingTest {
             expectedExceptionsMessageRegExp = "Attempted to save CSV output file in a non-existent directory.*")
     public void testSaveCsvInvalidDirectory() throws Exception {
         File inputFile = getTestFileObject();
-       File outFile = new File("/fakedirectory/myOutputFile.csv");
+        File outFile = new File("/fakedirectory/myOutputFile.csv");
         ExcelReader excelReader = ExcelReader.builder().build();
         excelReader.convertToCsvFile(inputFile, outFile);
     }
@@ -138,7 +138,7 @@ public class ExcelReaderExceptionHandlingTest {
     public void testMissingRequiredPassword() throws Exception {
         File inputFile = getPasswordTestFileObject();
         ExcelReader excelReader = ExcelReader.builder().build();
-        excelReader.convertToCsvFile(inputFile, new File(""));
+        excelReader.convertToCsvText(inputFile);
     }
 
     @Test(expectedExceptions = { Exception.class },
@@ -146,7 +146,7 @@ public class ExcelReaderExceptionHandlingTest {
     public void testBlankRequiredPassword() throws Exception {
         File inputFile = getPasswordTestFileObject();
         ExcelReader excelReader = ExcelReader.builder().setPassword("").build();
-        excelReader.convertToCsvFile(inputFile, new File(""));
+        excelReader.convertToCsvText(inputFile);
     }
 
     @Test(expectedExceptions = { Exception.class },
@@ -154,7 +154,7 @@ public class ExcelReaderExceptionHandlingTest {
     public void testInvalidPassword() throws Exception {
         File inputFile = getPasswordTestFileObject();
         ExcelReader excelReader = ExcelReader.builder().setPassword("bad_password").build();
-        excelReader.convertToCsvFile(inputFile, new File(""));
+        excelReader.convertToCsvText(inputFile);
     }
 
     private File getTestFileObject() {
