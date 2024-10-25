@@ -19,6 +19,9 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Simple class that reads an Excel Worksheet
@@ -32,6 +35,8 @@ public class ExcelReader {
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
     private final ExcelSheetReader excelSheetToCsvConverter;
     private final boolean streamLargeFiles;
+
+    private static final Set<String> ALLOWED_OUTPUT_FILE_EXTENSIONS = new HashSet<>(Arrays.asList("csv", "txt", ""));
 
     // arbitrary value to classify as a "large file" to use streaming optimization
     private static final int BIG_FILE_THRESHOLD = 2_000_000;
@@ -88,7 +93,7 @@ public class ExcelReader {
         }
         finally {
             wb.close();
-            // it seems it's not guaranteed that the workbook will always close the stream(?),
+            // it seems it's not always guaranteed that the workbook will always close the stream(?),
             //   therefore also call close on the inputStream to ensure the stream is also closed.
             inputStream.close();
         }
@@ -133,9 +138,7 @@ public class ExcelReader {
 
         // confirm output file has an allowed file extension
         String ext = FilenameUtils.getExtension(outputFile.getAbsolutePath());
-        if (!ext.equalsIgnoreCase("csv") &&
-                !ext.equalsIgnoreCase("txt") &&
-                !ext.isEmpty()) {
+        if (! ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase())) {
             throw new IllegalArgumentException(
                     String.format("Illegal outputFile extension '%s'.  Must be either 'csv' or blank", ext));
         }
@@ -143,7 +146,6 @@ public class ExcelReader {
         // confirm output file doesn't have any invalid characters.
         try {
             Paths.get(outputFile.getAbsolutePath());
-            // path is ok
         }
         catch (InvalidPathException ex) {
             throw new IllegalArgumentException("The outputFile path contains an illegal character: "
