@@ -87,7 +87,6 @@ The project contains unittests for most of the basic functionality.
 
 However, the following scenarios have either no testing or very limited testing...
 * Older/Newer versions of Excel files.
-* Excel files that were originally generated on Windows
 * Compatibility w/ different JAVA versions.
 * Attempting to access files that do not have the necessary read permissions
 * Unicode / extended characters
