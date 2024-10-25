@@ -60,7 +60,7 @@ class ExcelSheetReader {
             int columnCount = 0;
             // must check for null b/c a blank/empty row can (sometimes) return as null.
             if (row != null) {
-                columnCount = Math.min(row.getLastCellNum(), maxColumn);
+                columnCount = Math.min( Math.max(row.getLastCellNum(), 0), maxColumn );
                 for (int j = 0; j < columnCount; j++) {
                     rowValues[j] = getCellValue(row.getCell(j));
                 }
