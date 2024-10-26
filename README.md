@@ -87,18 +87,14 @@ The project contains unittests for most of the basic functionality.
 
 However, the following scenarios have either no testing or very limited testing...
 * Older/Newer versions of Excel files.
-* Compatibility w/ different JAVA versions.
-* Attempting to access files that do not have the necessary read permissions
 * Unicode / extended characters
-* Worksheets containing nested charts.
+* Worksheets containing nested pictures, charts, attachments, etc.
 * Use of the URL input in lieu of File input
 
 ## TODOs
 A work item list that I might get around to "eventually" (perhaps)
 * Update the minimum required Java version to something newer than JDK 1.8
   * The original thought was in case need to use this code with other libraries using old JDK.  _However_... at this point anything still on JDK 8 seems silly.
-* Switch all the unittests from TestNG to JUnit
-  * Cannot seem to recall why I originally chose `testng` instead of `junit`.
 * Put a more legitimate project version in the pom.xml
 * The output CSV contains values as they 'visually appear' in Excel.  However there are probably cases where this is not desired.  Need to research.
 * Integrate a real logger into the code.

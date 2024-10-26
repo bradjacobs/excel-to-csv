@@ -3,50 +3,54 @@
  */
 package com.github.bradjacobs.excel;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.FieldSource;
 
-import static org.testng.Assert.assertEquals;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Named.named;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class WhitespaceSanitizerTest {
     // NOTE:  (*) means Character.isWhitespace() == false
-    @DataProvider(name = "space_chars")
-    public Object[][] spaceCharDataParams(){
-        return new Object[][] {
-                {"\u00a0"},// NON_BREAKING SPACE (*)
-                {"\u2002"}, //EN SPACE
-                {"\u2003"}, //EM SPACE
-                {"\u2004"}, // THREE-PER-EM SPACE
-                {"\u2005"}, // FOUR-PER-EM SPACE
-                {"\u2006"}, // SIX-PER-EM SPACE
-                {"\u2007"}, // FIGURE SPACE (*)
-                {"\u2008"}, // PUNCTUATION SPACE
-                {"\u2009"}, // THIN SPACE
-                {"\u200a"}, // HAIR SPACE
-                {"\u200b"}, // ZERO-WIDTH SPACE (*)
-                {"\u2800"}, // BRAILLE SPACE (*)
-        };
-    }
+    private static final List<Arguments> spaceChars = Arrays.asList(
+            arguments(named("NON_BREAKING SPACE", "\u00a0")), // (*)
+            arguments(named("EN SPACE", "\u2002")),
+            arguments(named("EM SPACE", "\u2003")),
+            arguments(named("THREE-PER-EM SPACE", "\u2004")),
+            arguments(named("FOUR-PER-EM SPACE", "\u2005")),
+            arguments(named("SIX-PER-EM SPACE", "\u2006")),
+            arguments(named("FIGURE SPACE", "\u2007")), // (*)
+            arguments(named("PUNCTUATION SPACE", "\u2008")),
+            arguments(named("THIN SPACE", "\u2009")),
+            arguments(named("HAIR SPACE", "\u200a")),
+            arguments(named("ZERO-WIDTH SPACE", "\u200b")), // (*)
+            arguments(named("BRAILLE SPACE", "\u2800")) // (*)
+    );
 
     // Test that a string with a "special" space character
     //   becomes a "normal" space character
-    @Test(dataProvider = "space_chars")
-    public void testConvertToNormalSpace(String spaceChar) throws Exception {
+    @ParameterizedTest
+    @FieldSource("spaceChars")
+    public void testConvertToNormalSpace(String spaceChar) {
         String inputString = "a" + spaceChar + "b";
         String expectedResult = "a b";
 
         String result = new WhitespaceSanitizer().sanitize(inputString);
-        assertEquals(result, expectedResult, "mismatch result of whitespace char substitution");
+        assertEquals(expectedResult, result, "mismatch result of whitespace char substitution");
     }
 
     // Test that a string will get 'trimmed' correctly with any "special" space characters
-    //
-    @Test(dataProvider = "space_chars")
-    public void testTrimSpecialSpace(String spaceChar) throws Exception {
+    @ParameterizedTest
+    @FieldSource("spaceChars")
+    public void testTrimSpecialSpace(String spaceChar) {
         String inputString = "a" + spaceChar;
         String expectedResult = "a";
 
         String result = new WhitespaceSanitizer().sanitize(inputString);
-        assertEquals(result, expectedResult, "mismatch result of whitespace char trim");
+        assertEquals(expectedResult, result, "mismatch result of whitespace char trim");
     }
 }

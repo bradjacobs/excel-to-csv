@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,161 +11,217 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
-import static org.testng.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class ExcelReaderExceptionHandlingTest {
     private static final String TEST_DATA_FILE = "test_data.xlsx";
     private static final String PSWD_DATA_FILE = "test_data_w_pswd_1234.xlsx";
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-            expectedExceptionsMessageRegExp = "Must provide an input file.")
-    public void testMissingFile() throws Exception {
+    @Test
+    public void testMissingFile() {
         ExcelReader excelReader = ExcelReader.builder().build();
-        excelReader.convertToDataMatrix((File)null);
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            excelReader.convertToDataMatrix((File) null);
+        });
+        assertEquals("Must provide an input file.", exception.getMessage());
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-            expectedExceptionsMessageRegExp = "Must provide an input url.")
-    public void testMissingUrl() throws Exception {
+    @Test
+    public void testMissingUrl() {
         ExcelReader excelReader = ExcelReader.builder().build();
-        excelReader.convertToDataMatrix((URL)null);
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            excelReader.convertToDataMatrix((URL) null);
+        });
+        assertEquals("Must provide an input url.", exception.getMessage());
     }
 
     // give a URL that is _NOT_ an Excel file
-    @Test(expectedExceptions = { IOException.class } )
-    public void testNotExcelFile() throws Exception {
+    @Test
+    public void testNotExcelFile() {
         ExcelReader excelReader = ExcelReader.builder().build();
         URL url = this.getClass().getClassLoader().getResource("expected_normal.csv");
         assertNotNull(url, "unable to open test file");
-        excelReader.convertToCsvText(url);
+        assertThrows(IOException.class, () -> {
+            excelReader.convertToCsvText(url);
+        });
     }
 
-    @Test(expectedExceptions = { FileNotFoundException.class })
-    public void testInvalidFilePath() throws Exception {
+    @Test
+    public void testInvalidFilePath() {
         ExcelReader excelReader = ExcelReader.builder().build();
-        excelReader.convertToCsvText(new File("/bogus/path/here/file.xlsx"));
+        assertThrows(FileNotFoundException.class, () -> {
+            excelReader.convertToCsvText(new File("/bogus/path/here/file.xlsx"));
+        });
     }
 
-    @Test(expectedExceptions = { UnknownHostException.class })
-    public void testInvalidUrlPath() throws Exception {
+    @Test
+    public void testInvalidUrlPath() {
         ExcelReader excelReader = ExcelReader.builder().build();
-        excelReader.convertToCsvText(new URL("https://www.zxfake12.com/foo/bar.html"));
+        assertThrows(UnknownHostException.class, () -> {
+            excelReader.convertToCsvText(new URL("https://www.zxfake12.com/foo/bar.html"));
+        });
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-            expectedExceptionsMessageRegExp = "URL has an unsupported protocol: jar")
+    @Test
     public void testUnsupportedProtocolUrl() throws Exception {
         ExcelReader excelReader = ExcelReader.builder().build();
         URL invalidUrl = new URL("jar:file:/C:/parser/jar/parser.jar!/test.xml");
-        excelReader.convertToCsvText(invalidUrl);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            excelReader.convertToCsvText(invalidUrl);
+        });
+        assertEquals("URL has an unsupported protocol: jar", exception.getMessage());
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class })
-    public void testInvalidSheetIndex() throws Exception {
+    @Test
+    public void testInvalidSheetIndex() {
         ExcelReader excelReader = ExcelReader.builder().setSheetIndex(99).build();
         File inputFile = getTestFileObject();
-        excelReader.convertToCsvText(inputFile);
+        assertThrows(IllegalArgumentException.class, () -> {
+            excelReader.convertToCsvText(inputFile);
+        });
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-        expectedExceptionsMessageRegExp = "Unable to find sheet with name: FAKE_WORKSHEET_NAME")
-    public void testInvalidSheetName() throws Exception {
+    @Test
+    public void testInvalidSheetName() {
         File inputFile = getTestFileObject();
         ExcelReader excelReader = ExcelReader.builder().setSheetName("FAKE_WORKSHEET_NAME").build();
-        excelReader.convertToCsvText(inputFile);
+        assertThrows(IllegalArgumentException.class, () -> {
+            excelReader.convertToCsvText(inputFile);
+        });
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-        expectedExceptionsMessageRegExp = "Cannot set quoteMode to null")
+    @Test
     public void testUnsetQuoteMode() {
-        ExcelReader.builder().setQuoteMode(null).build();
+        assertThrows(IllegalArgumentException.class, () -> {
+            ExcelReader.builder().setQuoteMode(null).build();
+        });
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-        expectedExceptionsMessageRegExp = "SheetIndex cannot be negative")
+    @Test
     public void testNegativeIndex() {
-        ExcelReader.builder().setSheetIndex(-5).build();
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            ExcelReader.builder().setSheetIndex(-5).build();
+        });
+        assertEquals("SheetIndex cannot be negative", exception.getMessage());
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-            expectedExceptionsMessageRegExp = "Must supply outputFile location to save CSV data.")
-    public void testSaveCsvMissingOutputFile() throws Exception {
+    @Test
+    public void testSaveCsvMissingOutputFile() {
         File inputFile = getTestFileObject();
         ExcelReader excelReader = ExcelReader.builder().build();
-        excelReader.convertToCsvFile(inputFile, null);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            excelReader.convertToCsvFile(inputFile, null);
+        });
+        assertEquals("Must supply outputFile location to save CSV data.", exception.getMessage());
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-            expectedExceptionsMessageRegExp = "The outputFile cannot be an existing directory.")
-    public void testSaveCsvOutputFileIsDirectory() throws Exception {
+    @Test
+    public void testSaveCsvOutputFileIsDirectory() {
         File inputFile = getTestFileObject();
 
         // create a "File" that is actually pointing to an existing directory
         File directory = new File(inputFile.getParent());
         ExcelReader excelReader = ExcelReader.builder().build();
-        excelReader.convertToCsvFile(inputFile, directory);  // directory is invalid parameter
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            excelReader.convertToCsvFile(inputFile, directory);  // directory is invalid parameter
+        });
+        assertEquals("The outputFile cannot be an existing directory.", exception.getMessage());
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-            expectedExceptionsMessageRegExp = "Illegal outputFile extension.*")
-    public void testSaveCsvOutputFileInvalidExtension() throws Exception {
+    @Test
+    public void testSaveCsvOutputFileInvalidExtension() {
         File inputFile = getTestFileObject();
         File outFile = new File("outfile.exe");
         ExcelReader excelReader = ExcelReader.builder().build();
-        excelReader.convertToCsvFile(inputFile, outFile);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            excelReader.convertToCsvFile(inputFile, outFile);
+        });
+        assertContains("Illegal outputFile extension", exception.getMessage());
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-            expectedExceptionsMessageRegExp = ".*outputFile path contains an illegal character.*")
-    public void testSaveCsvOutputFileIllegalNullCharInPath() throws Exception {
+    @Test
+    public void testSaveCsvOutputFileIllegalNullCharInPath() {
         File inputFile = getTestFileObject();
         File outFile = new File("aaaa_||._\u0000_bbb.csv");
         ExcelReader excelReader = ExcelReader.builder().build();
-        excelReader.convertToCsvFile(inputFile, outFile);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            excelReader.convertToCsvFile(inputFile, outFile);
+        });
+        assertContains(
+                "outputFile path contains an illegal character",
+                exception.getMessage());
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class },
-            expectedExceptionsMessageRegExp = "Attempted to save CSV output file in a non-existent directory.*")
-    public void testSaveCsvInvalidDirectory() throws Exception {
+    @Test
+    public void testSaveCsvInvalidDirectory() {
         File inputFile = getTestFileObject();
         File outFile = new File("/fakedirectory/myOutputFile.csv");
         ExcelReader excelReader = ExcelReader.builder().build();
-        excelReader.convertToCsvFile(inputFile, outFile);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            excelReader.convertToCsvFile(inputFile, outFile);
+        });
+        assertContains(
+                "Attempted to save CSV output file in a non-existent directory",
+                exception.getMessage());
     }
 
-    @Test(expectedExceptions = { Exception.class },
-            expectedExceptionsMessageRegExp = ".*no password was supplied.*")
-    public void testMissingRequiredPassword() throws Exception {
+    @Test
+    public void testMissingRequiredPassword() {
         File inputFile = getPasswordTestFileObject();
         ExcelReader excelReader = ExcelReader.builder().build();
-        excelReader.convertToCsvText(inputFile);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            excelReader.convertToCsvText(inputFile);
+        });
+        assertContains("no password was supplied", exception.getMessage());
     }
 
-    @Test(expectedExceptions = { Exception.class },
-            expectedExceptionsMessageRegExp = ".*no password was supplied.*")
-    public void testBlankRequiredPassword() throws Exception {
+    @Test
+    public void testBlankRequiredPassword() {
         File inputFile = getPasswordTestFileObject();
         ExcelReader excelReader = ExcelReader.builder().setPassword("").build();
-        excelReader.convertToCsvText(inputFile);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            excelReader.convertToCsvText(inputFile);
+        });
+        assertContains("no password was supplied", exception.getMessage());
     }
 
-    @Test(expectedExceptions = { Exception.class },
-            expectedExceptionsMessageRegExp = "Password incorrect")
-    public void testInvalidPassword() throws Exception {
+    @Test
+    public void testInvalidPassword() {
         File inputFile = getPasswordTestFileObject();
         ExcelReader excelReader = ExcelReader.builder().setPassword("bad_password").build();
-        excelReader.convertToCsvText(inputFile);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            excelReader.convertToCsvText(inputFile);
+        });
+        assertEquals("Password incorrect", exception.getMessage());
+    }
+
+    private void assertContains(String subString, String mainString) {
+        assertTrue(mainString.contains(subString),
+                String.format("Expected to find substring '%s' in string '%s'.", subString, mainString));
     }
 
     private File getTestFileObject() {
         URL resourceUrl = this.getClass().getClassLoader().getResource(TEST_DATA_FILE);
         assertNotNull(resourceUrl);
-        return new File( resourceUrl.getPath() );
+        return new File(resourceUrl.getPath());
     }
 
     private File getPasswordTestFileObject() {
         URL resourceUrl = this.getClass().getClassLoader().getResource(PSWD_DATA_FILE);
         assertNotNull(resourceUrl);
-        return new File( resourceUrl.getPath() );
+        return new File(resourceUrl.getPath());
     }
 }

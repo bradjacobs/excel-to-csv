@@ -3,19 +3,22 @@
  */
 package com.github.bradjacobs.excel;
 
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.stream.Stream;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExcelReaderTest {
     private static final String TEST_DATA_FILE = "test_data.xlsx";
@@ -33,25 +36,25 @@ public class ExcelReaderTest {
     private static final String TEST_OUTPUT_FILE_NAME = "test_output.csv";
     private static final File TEST_OUTPUT_FILE = new File(TEST_OUTPUT_FILE_NAME);
 
-    @DataProvider(name = "quote_variations")
-    public Object[][] quoteModeDataParams(){
-        return new Object[][] {
-            {QuoteMode.NORMAL, EXPECTED_NORMAL_CSV_FILE},
-            {QuoteMode.ALWAYS, EXPECTED_ALWAYS_CSV_FILE},
-            {QuoteMode.LENIENT, EXPECTED_LENIENT_CSV_FILE},
-            {QuoteMode.NEVER, EXPECTED_NEVER_CSV_FILE},
-        };
+    private static Stream<Arguments> quoteVariations() {
+        return Stream.of(
+                Arguments.of(QuoteMode.NORMAL, EXPECTED_NORMAL_CSV_FILE),
+                Arguments.of(QuoteMode.ALWAYS, EXPECTED_ALWAYS_CSV_FILE),
+                Arguments.of(QuoteMode.LENIENT, EXPECTED_LENIENT_CSV_FILE),
+                Arguments.of(QuoteMode.NEVER, EXPECTED_NEVER_CSV_FILE)
+        );
     }
 
-    @Test(dataProvider = "quote_variations")
-    public void testExpectedQuoteText(QuoteMode quoteMode, String expectedResultFileName) throws Exception {
+    @ParameterizedTest
+    @MethodSource("quoteVariations")
+    void toUpperCase_ShouldGenerateTheExpectedUppercaseValue(QuoteMode quoteMode, String expectedResultFileName) throws Exception {
         String expectedCsvText = readResourceFileText(expectedResultFileName);
         File inputFile = getTestFileObject();
 
         ExcelReader excelReader = ExcelReader.builder().setQuoteMode(quoteMode).setSkipEmptyRows(false).build();
         String csvText = excelReader.convertToCsvText(inputFile);
 
-        assertEquals(csvText, expectedCsvText, "mismatch of expected csv output");
+        assertEquals(expectedCsvText, csvText, "mismatch of expected csv output");
     }
 
     @Test
@@ -71,11 +74,11 @@ public class ExcelReaderTest {
 
         String[][] csvData = excelReader.convertToDataMatrix(inputFile);
         assertNotNull(csvData, "expected non-null data");
-        assertEquals(csvData.length, EXPECTED_ROW_COUNT, "mismatch expected number of rows");
+        assertEquals(EXPECTED_ROW_COUNT, csvData.length,"mismatch expected number of rows");
 
         for (String[] rowData : csvData) {
             assertNotNull(rowData, "unexpected null row");
-            assertEquals(rowData.length, EXPECTED_COL_COUNT, "mismatch expected columns");
+            assertEquals(EXPECTED_COL_COUNT, rowData.length,"mismatch expected columns");
         }
     }
 
@@ -97,7 +100,7 @@ public class ExcelReaderTest {
         // there are currently 2 empty rows, there should be a row count difference of 2.
         int hasEmptyRowCount = csvDataHasEmptyRows.length;
         int noEmptyRowCount = csvDataNoEmptyRows.length;
-        assertEquals(hasEmptyRowCount-2, noEmptyRowCount, "mismatch of expected number fo rows when skipping blank rows");
+        assertEquals(noEmptyRowCount,hasEmptyRowCount-2, "mismatch of expected number fo rows when skipping blank rows");
     }
 
     @Test
@@ -111,7 +114,7 @@ public class ExcelReaderTest {
 
         String outputFileContent = new String ( Files.readAllBytes( Paths.get(TEST_OUTPUT_FILE.getAbsolutePath()) ) );
         String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
-        assertEquals(outputFileContent, expectedCsvText, "mismatch of content of saved csv file");
+        assertEquals(expectedCsvText, outputFileContent, "mismatch of content of saved csv file");
     }
 
     @Test
@@ -123,7 +126,7 @@ public class ExcelReaderTest {
         String csvText = excelReader.convertToCsvText(fileUrl);
         String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
         assertNotNull(csvText);
-        assertEquals(csvText, expectedCsvText, "mismatch of content of saved csv file");
+        assertEquals(expectedCsvText, csvText, "mismatch of content of saved csv file");
     }
 
     @Test
@@ -137,7 +140,7 @@ public class ExcelReaderTest {
         String csvText = excelReader.convertToCsvText(inputFile);
         String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
         assertNotNull(csvText);
-        assertEquals(csvText, expectedCsvText, "mismatch of content of saved csv file");
+        assertEquals(expectedCsvText, csvText, "mismatch of content of saved csv file");
     }
 
     @Test
@@ -150,7 +153,7 @@ public class ExcelReaderTest {
 
         String csvText = excelReader.convertToCsvText(inputFile);
         assertNotNull(csvText);
-        assertEquals(csvText, "", "expected empty csv text");
+        assertEquals("", csvText, "expected empty csv text");
     }
 
     // Test that some cells that only contain "whitespace" get trimmed to empty string
@@ -165,7 +168,7 @@ public class ExcelReaderTest {
         //  and empty/blank value in the second cell
         for (int i = 1; i < csvMatrix.length; i++) {
             String[] row = csvMatrix[i];
-            assertEquals(row[1], "", String.format("Expected empty string following cell '%s'", row[0]));
+            assertEquals("", row[1], String.format("Expected empty string following cell '%s'", row[0]));
         }
     }
 
@@ -178,7 +181,7 @@ public class ExcelReaderTest {
 
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).setSheetName("LAST_COL_WHITESPACE").build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
-        assertEquals(csvMatrix[0].length, 1, "mismatch of expected number of columns in csv output.");
+        assertEquals(1, csvMatrix[0].length, "mismatch of expected number of columns in csv output.");
     }
 
     // Happy Path testcase reading an Excel file that is password protected.
@@ -189,11 +192,11 @@ public class ExcelReaderTest {
 
         ExcelReader excelReader = ExcelReader.builder().setPassword("1234").build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
-        assertEquals(csvMatrix[0][0], "aaa");
-        assertEquals(csvMatrix[0][1], "bbb");
+        assertEquals("aaa", csvMatrix[0][0]);
+        assertEquals("bbb", csvMatrix[0][1]);
     }
 
-    @AfterTest
+    @AfterEach
     private void cleanupTestFile() {
         if (TEST_OUTPUT_FILE.exists()) {
             boolean wasDeleted = TEST_OUTPUT_FILE.delete();
