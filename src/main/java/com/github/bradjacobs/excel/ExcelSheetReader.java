@@ -26,7 +26,12 @@ class ExcelSheetReader {
                                boolean sanitizeUnicodeWhitespace,
                                boolean sanitizeUnicodeQuotes) {
         this.skipEmptyRows = skipEmptyRows;
-        this.specialCharSanitizer = new SpecialCharacterSanitizer(sanitizeUnicodeWhitespace, sanitizeUnicodeQuotes);
+        if (sanitizeUnicodeWhitespace || sanitizeUnicodeQuotes) {
+            this.specialCharSanitizer = new SpecialCharacterSanitizer(sanitizeUnicodeWhitespace, sanitizeUnicodeQuotes);
+        }
+        else {
+            this.specialCharSanitizer = null;
+        }
     }
 
     /**
@@ -138,9 +143,14 @@ class ExcelSheetReader {
         FormulaEvaluator evaluator = CellType.FORMULA.equals(cell.getCellType()) ? formulaEvaluator : null;
 
         String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator);
-        // if there are any special "nbsp whitespace characters",
+
+        // if there are any certain special unicode characters (like nbsp or smart quotes),
         // replace w/ normal whitespace then return 'trimmed' value
-        return specialCharSanitizer.sanitize(cellValue);
+        if (specialCharSanitizer != null) {
+            cellValue = specialCharSanitizer.sanitize(cellValue);
+        }
+
+        return cellValue;
     }
 
     /**
