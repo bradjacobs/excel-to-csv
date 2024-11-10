@@ -47,7 +47,7 @@ public class ExcelReaderTest {
 
     @ParameterizedTest
     @MethodSource("quoteVariations")
-    void toUpperCase_ShouldGenerateTheExpectedUppercaseValue(QuoteMode quoteMode, String expectedResultFileName) throws Exception {
+    void testExpectedQuoteText(QuoteMode quoteMode, String expectedResultFileName) throws Exception {
         String expectedCsvText = readResourceFileText(expectedResultFileName);
         File inputFile = getTestFileObject();
 

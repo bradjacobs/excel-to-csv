@@ -50,8 +50,12 @@ public class MatrixToCsvTextConverter {
         int lastColumnIndex = columnCount - 1;
 
         for (String[] rowData : dataMatrix) {
+            if (sb.length() != 0) {
+                sb.append(NEW_LINE);
+            }
             for (int i = 0; i < columnCount; i++) {
                 String cellValue = rowData[i];
+
                 if (shouldQuoteWrap(cellValue)) {
                     // must first escape double quotes
                     if (cellValue.contains("\"")) {
@@ -63,14 +67,12 @@ public class MatrixToCsvTextConverter {
                     sb.append(cellValue);
                 }
 
-                if (i == lastColumnIndex) {
-                    sb.append(NEW_LINE);
-                }
-                else {
+                if (i != lastColumnIndex) {
                     sb.append(',');
                 }
             }
         }
+
         return sb.toString();
     }
 

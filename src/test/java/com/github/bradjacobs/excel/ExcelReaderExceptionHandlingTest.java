@@ -150,7 +150,7 @@ public class ExcelReaderExceptionHandlingTest {
     @Test
     public void testSaveCsvOutputFileIllegalNullCharInPath() {
         File inputFile = getTestFileObject();
-        File outFile = new File("aaaa_||._\u0000_bbb.csv");
+        File outFile = new File("aa().?aa_||._\u0000_bbb.csv");
         ExcelReader excelReader = ExcelReader.builder().build();
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {

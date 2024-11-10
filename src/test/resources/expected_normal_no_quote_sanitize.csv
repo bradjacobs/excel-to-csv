@@ -1,12 +1,12 @@
 col1,col_2,COL3,Col4,Col5
-Text,Space Text,$_() ' extra chars,"92""82_cell_w_quote",extra
+Text,"Space Text","$_() ' extra chars","92""82_cell_w_quote",extra
 11,22,33,66,row_contains_formulas
 with_dates_row,9/8/20,9/9/20,1999-07-04,
 sparse_column_row,,,val,
 ,11:33,11:33,,
 ,,,,
 ,,,,
-misc_string-row,value     with     spaces,"funky""quote","value	with	tabs",
+misc_string-row,"value     with     spaces",funky“quote,"value	with	tabs",
 misc_number_row,-1,4.765400,1.23,
-invalid_formula_row,#VALUE!,#VALUE!,#NAME?,i
+invalid_formula_row,"#VALUE!","#VALUE!","#NAME?",i
 numeric_row,1.888888889,3.14,-0.57,1.1

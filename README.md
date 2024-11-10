@@ -93,8 +93,6 @@ However, the following scenarios have either no testing or very limited testing.
 
 ## TODOs
 A work item list that I might get around to "eventually" (perhaps)
-* Update the minimum required Java version to something newer than JDK 1.8
-  * The original thought was in case need to use this code with other libraries using old JDK.  _However_... at this point anything still on JDK 8 seems silly.
 * Put a more legitimate project version in the pom.xml
 * The output CSV contains values as they 'visually appear' in Excel.  However there are probably cases where this is not desired.  Need to research.
 * Integrate a real logger into the code.

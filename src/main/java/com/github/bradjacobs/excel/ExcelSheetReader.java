@@ -18,12 +18,15 @@ import java.util.Map;
 class ExcelSheetReader {
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
-    private static final WhitespaceSanitizer WHITESPACE_SANITIZER = new WhitespaceSanitizer();
 
     private final boolean skipEmptyRows;
+    private final SpecialCharacterSanitizer specialCharSanitizer;
 
-    protected ExcelSheetReader(boolean skipEmptyRows) {
+    protected ExcelSheetReader(boolean skipEmptyRows,
+                               boolean sanitizeUnicodeWhitespace,
+                               boolean sanitizeUnicodeQuotes) {
         this.skipEmptyRows = skipEmptyRows;
+        this.specialCharSanitizer = new SpecialCharacterSanitizer(sanitizeUnicodeWhitespace, sanitizeUnicodeQuotes);
     }
 
     /**
@@ -137,7 +140,7 @@ class ExcelSheetReader {
         String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator);
         // if there are any special "nbsp whitespace characters",
         // replace w/ normal whitespace then return 'trimmed' value
-        return WHITESPACE_SANITIZER.sanitize(cellValue);
+        return specialCharSanitizer.sanitize(cellValue);
     }
 
     /**

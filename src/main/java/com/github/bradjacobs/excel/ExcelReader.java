@@ -48,7 +48,8 @@ public class ExcelReader {
         this.sheetName = builder.sheetName;
         this.password = builder.password;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
-        this.excelSheetToCsvConverter = new ExcelSheetReader(builder.skipEmptyRows);
+        this.excelSheetToCsvConverter = new ExcelSheetReader(
+                builder.skipEmptyRows, builder.sanitizeUnicodeSpaces, builder.sanitizeUnicodeQuotes);
         this.inputStreamGenerator = new InputStreamGenerator();
         this.streamLargeFiles = builder.streamLargeFiles;
 
@@ -169,6 +170,8 @@ public class ExcelReader {
         private boolean skipEmptyRows = true; // default will skip any empty lines
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
+        private boolean sanitizeUnicodeSpaces = true;
+        private boolean sanitizeUnicodeQuotes = true;
         // flag to allow streaming for large Excel files.
         //   There might be cases where the stream option doesn't always work,
         //   therefore the builder leaves the option to turn it off.
@@ -230,6 +233,16 @@ public class ExcelReader {
         public Builder setPassword(String password) {
             // if user tries to set blank/emptying string, then save as 'null'
             this.password = password != null && password.isEmpty() ? null : password;
+            return this;
+        }
+
+        public Builder setSanitizeUnicodeSpaces(boolean sanitizeUnicodeSpaces) {
+            this.sanitizeUnicodeSpaces = sanitizeUnicodeSpaces;
+            return this;
+        }
+
+        public Builder setSanitizeUnicodeQuotes(boolean sanitizeUnicodeQuotes) {
+            this.sanitizeUnicodeQuotes = sanitizeUnicodeQuotes;
             return this;
         }
 
