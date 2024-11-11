@@ -45,17 +45,6 @@ public class SpecialCharacterSanitizerTest {
         assertEquals(expectedResult, result, "mismatch result of whitespace char substitution");
     }
 
-    // Test that a string will get 'trimmed' correctly with any "special" space characters
-    @ParameterizedTest
-    @FieldSource("spaceChars")
-    public void testTrimSpecialSpace(String spaceChar) {
-        String inputString = "a" + spaceChar;
-        String expectedResult = "a";
-
-        String result = new SpecialCharacterSanitizer().sanitize(inputString);
-        assertEquals(expectedResult, result, "mismatch result of whitespace char trim");
-    }
-
     @Test
     public void testSanitizeDoubleCurlyQuotes() {
         String inputCurlyDoubleQuotes = "she said “hi” to my dog";

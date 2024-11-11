@@ -141,7 +141,7 @@ public class ExcelReader {
         String ext = FilenameUtils.getExtension(outputFile.getAbsolutePath());
         if (! ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase())) {
             throw new IllegalArgumentException(
-                    String.format("Illegal outputFile extension '%s'.  Must be either 'csv' or blank", ext));
+                    String.format("Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext));
         }
 
         // confirm output file doesn't have any invalid characters.
@@ -170,8 +170,8 @@ public class ExcelReader {
         private boolean skipEmptyRows = true; // default will skip any empty lines
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
-        private boolean sanitizeUnicodeSpaces = true;
-        private boolean sanitizeUnicodeQuotes = true;
+        private boolean sanitizeUnicodeSpaces = true; // default sanitize unicode whitespace
+        private boolean sanitizeUnicodeQuotes = true; // default sanitize unicode quotes & smart quotes
         // flag to allow streaming for large Excel files.
         //   There might be cases where the stream option doesn't always work,
         //   therefore the builder leaves the option to turn it off.
@@ -231,7 +231,7 @@ public class ExcelReader {
          * @param password excel file password
          */
         public Builder setPassword(String password) {
-            // if user tries to set blank/emptying string, then save as 'null'
+            // if user tries to set blank/empty string, then save as 'null'
             this.password = password != null && password.isEmpty() ? null : password;
             return this;
         }

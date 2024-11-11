@@ -6,6 +6,11 @@ package com.github.bradjacobs.excel;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Used to convert some special unicode characters into basic equivalent.
+ * Namely, converts 'smart quotes' into normal quotes  (e.g. “” --> "")
+ *   and convert special space characters (i.e. NBSP characters) to normal spaces.
+ */
 public class SpecialCharacterSanitizer {
     private final Map<Character,Character> replacementMap;
 
@@ -13,6 +18,11 @@ public class SpecialCharacterSanitizer {
         this(true, true);
     }
 
+    /**
+     * Constructor
+     * @param sanitizeWhiteSpace flag to convert unicode space characters
+     * @param sanitizeQuotes flag to convert unicode quote characters
+     */
     public SpecialCharacterSanitizer(boolean sanitizeWhiteSpace, boolean sanitizeQuotes) {
         if (sanitizeWhiteSpace && sanitizeQuotes) {
             replacementMap = COMBINED_REPLACEMENT_MAP;
@@ -31,8 +41,7 @@ public class SpecialCharacterSanitizer {
     /**
      * Replace any "special/extended" space characters with the basic space character 0x20.
      * Additionally replace any 'curly quotes' with normal quote (both single and double)
-     * Finally finish with normal "trim()"
-     * NOTE that all our the 'normal' whitespace characters ['\r', '\n', '\t', ' '] will remain as-is
+     * NOTE that all our 'normal' whitespace characters ['\r', '\n', '\t', ' '] will remain as-is
      * @param input string to sanitize
      * @return string with whitespace and quote chars replaced (if any were found)
      */
@@ -48,7 +57,7 @@ public class SpecialCharacterSanitizer {
                 sb.append(inputCharacter);
             }
         }
-        return sb.toString().trim();
+        return sb.toString();
     }
 
     // "special" space characters that will be converted

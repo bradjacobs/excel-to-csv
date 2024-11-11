@@ -219,7 +219,7 @@ public class ExcelReaderTest {
         try {
             URL resource = this.getClass().getClassLoader().getResource(fileName);
             assertNotNull(resource);
-            return new String ( Files.readAllBytes( Paths.get(resource.getPath()) ) );
+            return new String( Files.readAllBytes( Paths.get(resource.getPath()) ) );
         }
         catch (Exception e) {
             throw new RuntimeException(String.format("Unable to read test resource file: %s.  Reason: %s", fileName, e.getMessage()), e);

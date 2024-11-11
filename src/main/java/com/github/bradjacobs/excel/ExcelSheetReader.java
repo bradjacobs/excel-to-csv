@@ -145,12 +145,12 @@ class ExcelSheetReader {
         String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator);
 
         // if there are any certain special unicode characters (like nbsp or smart quotes),
-        // replace w/ normal whitespace then return 'trimmed' value
+        // replace w/ normal character equivalent
         if (specialCharSanitizer != null) {
             cellValue = specialCharSanitizer.sanitize(cellValue);
         }
 
-        return cellValue;
+        return cellValue.trim();
     }
 
     /**
