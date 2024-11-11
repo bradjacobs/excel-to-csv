@@ -8,7 +8,6 @@
   * [Basic](#Basic)
   * [Advanced](#Advanced)
 - [OtherInfo](#OtherInfo)
-- [Testing](#Testing)
 - [TODOs](#TODOs)
 - [AlternateImplementations](#AlternateImplementations)
 - [FinalThoughts](#FinalThoughts)
@@ -33,29 +32,32 @@ Implemented using the [Apache POI](https://poi.apache.org/) libraries
 | convertToCsvFile    | Excel File & Output CSV File | (none)     | Given Excel file input write output directly to a specified destination file.  
 
 ### BuilderDetails
-| FIELD         | REQUIRED | DEFAULT | DETAILS                                                                                                                                                                                                                                                                                         |
-|---------------|:--------:|:-------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| quoteMode     | NO       | NORMAL  | how aggressive / lenient it should wrap quotes around values<br><br>*ALWAYS*: always put quotes around values<br>*NORMAL*: put quotes around most values that are non-alphanumeric<br>*LENIENT*: only add quotes around values that are needed to be CSV compliant<br>*NEVER*: never add quotes |
-| sheetIndex    | NO       | 0       | 0-based index of which worksheet to convert to CSV                                                                                                                                                                                                                                              |
-| sheetName     | NO       | (blank) | Name of the worksheet tab to be converted to CSV<br> (if set then 'sheetIndex' is ignored)                                                                                                                                                                                                      |
-| skipEmptyRows | NO       | true    | if true, then any 'all blank' rows from the Excel worksheet will be ignored.                                                                                                                                                                                                                    |
+| FIELD                 | REQUIRED | DEFAULT | DETAILS                                                                                                                                                                                                                                                                                         |
+|-----------------------|:--------:|:-------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| quoteMode             | NO       | NORMAL  | how aggressive / lenient it should wrap quotes around values<br><br>*ALWAYS*: always put quotes around values<br>*NORMAL*: put quotes around most values that are non-alphanumeric<br>*LENIENT*: only add quotes around values that are needed to be CSV compliant<br>*NEVER*: never add quotes |
+| sheetIndex            | NO       | 0       | 0-based index of which worksheet to convert to CSV                                                                                                                                                                                                                                              |
+| sheetName             | NO       | (blank) | Name of the worksheet tab to be converted to CSV<br> (if set then 'sheetIndex' is ignored)                                                                                                                                                                                                      |
+| skipEmptyRows         | NO       | true    | filter out all 'blank' rows from the Excel worksheet                                                                                                                                                                                                                                            |
+| sanitizeUnicodeSpaces | NO       | true    | convert any unicode spaces (like NBSP) into normal space character 0x20                                                                                                                                                                                                                         |
+| sanitizeUnicodeQuotes | NO       | true    | convert any unicode quotes (such as “smart quotes”) into a basic quote character                                                                                                                                                                                                                |
 
 ## Examples
 ### Basic
+```java
+// read excel worksheet and write output to a file
+ExcelReader excelReader = ExcelReader.builder().build();
+excelReader.convertToCsvFile(new File("input.xlsx"), new File("output.csv"));
+```
+
 ```java
 // get a single string representing the entire worksheet in CSV format
 ExcelReader excelReader = ExcelReader.builder().build();
 String csvText = excelReader.convertToCsvText(new File("input.xlsx"));
 ```
 ```java
-// get 2-D string array the entire worksheet in CSV format (each value represents a 'cell')
+// get 2-D string array representing the entire worksheet (each value represents a 'cell')
 ExcelReader excelReader = ExcelReader.builder().build();
 String[][] csvData = excelReader.convertToDataMatrix(new File("input.xlsx"));
-```
-```java
-// read excel worksheet and write output to a file
-ExcelReader excelReader = ExcelReader.builder().build();
-excelReader.convertToCsvFile(new File("input.xlsx"), new File("output.csv"));
 ```
 
 ### Advanced
@@ -81,15 +83,6 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 * Currently no quotes will be added around 'blank' values 
 * Empty cells will be converted to empty string (not 'null')
 * All cell values are "trimmed" (assuming one usually does NOT want leading/trailing whitespace)
-
-## Testing
-The project contains unittests for most of the basic functionality.
-
-However, the following scenarios have either no testing or very limited testing...
-* Older/Newer versions of Excel files.
-* Unicode / extended characters
-* Worksheets containing nested pictures, charts, attachments, etc.
-* Use of the URL input in lieu of File input
 
 ## TODOs
 A work item list that I might get around to "eventually" (perhaps)
