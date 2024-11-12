@@ -85,9 +85,10 @@ public class ExcelReader {
         int estimateLength = inputStream.available(); // must get value _before_ creating base workbook
 
         Workbook wb = WorkbookFactory.create(inputStream, password);
-        if (streamLargeFiles && wb instanceof XSSFWorkbook && estimateLength > BIG_FILE_THRESHOLD) {
-            wb = new SXSSFWorkbook((XSSFWorkbook) wb);
-        }
+        // TODO - temp disable the stream option.  (need to determine how this was working before)
+//        if (streamLargeFiles && wb instanceof XSSFWorkbook && estimateLength > BIG_FILE_THRESHOLD) {
+//            wb = new SXSSFWorkbook((XSSFWorkbook) wb);
+//        }
         try {
             Sheet sheet = getSheet(wb);
             return excelSheetToCsvConverter.convertToCsvData(sheet);
