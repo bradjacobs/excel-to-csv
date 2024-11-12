@@ -34,12 +34,8 @@ public class ExcelReader {
     private final String password; // 'null' == no password
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
     private final ExcelSheetReader excelSheetToCsvConverter;
-    private final boolean streamLargeFiles;
 
     private static final Set<String> ALLOWED_OUTPUT_FILE_EXTENSIONS = new HashSet<>(Arrays.asList("csv", "txt", ""));
-
-    // arbitrary value to classify as a "large file" to use streaming optimization
-    private static final int BIG_FILE_THRESHOLD = 2_000_000;
 
     private final InputStreamGenerator inputStreamGenerator;
 
@@ -51,7 +47,6 @@ public class ExcelReader {
         this.excelSheetToCsvConverter = new ExcelSheetReader(
                 builder.skipEmptyRows, builder.sanitizeUnicodeSpaces, builder.sanitizeUnicodeQuotes);
         this.inputStreamGenerator = new InputStreamGenerator();
-        this.streamLargeFiles = builder.streamLargeFiles;
 
         // override the internal POI utils size limit to allow for 'bigger Excel files'
         //   (as of POI version 5.2.0 the default value is 100_000_000)
@@ -82,22 +77,9 @@ public class ExcelReader {
     }
 
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
-        int estimateLength = inputStream.available(); // must get value _before_ creating base workbook
-
-        Workbook wb = WorkbookFactory.create(inputStream, password);
-        // TODO - temp disable the stream option.  (need to determine how this was working before)
-//        if (streamLargeFiles && wb instanceof XSSFWorkbook && estimateLength > BIG_FILE_THRESHOLD) {
-//            wb = new SXSSFWorkbook((XSSFWorkbook) wb);
-//        }
-        try {
+        try (inputStream; Workbook wb = WorkbookFactory.create(inputStream, password)) {
             Sheet sheet = getSheet(wb);
             return excelSheetToCsvConverter.convertToCsvData(sheet);
-        }
-        finally {
-            wb.close();
-            // it seems it's not always guaranteed that the workbook will always close the stream(?),
-            //   therefore also call close on the inputStream to ensure the stream is also closed.
-            inputStream.close();
         }
     }
 
@@ -173,10 +155,6 @@ public class ExcelReader {
         private String password = null;
         private boolean sanitizeUnicodeSpaces = true; // default sanitize unicode whitespace
         private boolean sanitizeUnicodeQuotes = true; // default sanitize unicode quotes & smart quotes
-        // flag to allow streaming for large Excel files.
-        //   There might be cases where the stream option doesn't always work,
-        //   therefore the builder leaves the option to turn it off.
-        private boolean streamLargeFiles = true;
 
         private Builder() {}
 
@@ -244,15 +222,6 @@ public class ExcelReader {
 
         public Builder setSanitizeUnicodeQuotes(boolean sanitizeUnicodeQuotes) {
             this.sanitizeUnicodeQuotes = sanitizeUnicodeQuotes;
-            return this;
-        }
-
-        /**
-         * Flag to allow for streaming performance optimization on large Excel files.
-         * @param streamLargeFiles should stream large files.
-         */
-        public Builder setStreamLargeFiles(boolean streamLargeFiles) {
-            this.streamLargeFiles = streamLargeFiles;
             return this;
         }
 
