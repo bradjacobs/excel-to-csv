@@ -9,8 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,10 +30,12 @@ public class ExcelReader {
     private final int sheetIndex;
     private final String sheetName;
     private final String password; // 'null' == no password
+    private final boolean saveUnicodeFileWithBom;
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
     private final ExcelSheetReader excelSheetToCsvConverter;
 
     private static final Set<String> ALLOWED_OUTPUT_FILE_EXTENSIONS = new HashSet<>(Arrays.asList("csv", "txt", ""));
+    private static final String BOM = "\uFEFF";
 
     private final InputStreamGenerator inputStreamGenerator;
 
@@ -43,6 +43,7 @@ public class ExcelReader {
         this.sheetIndex = builder.sheetIndex;
         this.sheetName = builder.sheetName;
         this.password = builder.password;
+        this.saveUnicodeFileWithBom = builder.saveUnicodeFileWithBom;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         this.excelSheetToCsvConverter = new ExcelSheetReader(
                 builder.skipEmptyRows, builder.sanitizeUnicodeSpaces, builder.sanitizeUnicodeQuotes);
@@ -103,6 +104,10 @@ public class ExcelReader {
      * @param outputFile destination file.
      */
     private void writeCsvToFile(String csvString, File outputFile) throws IOException {
+        // prepend the 'bom' so that unicode characters will be render correctly
+        if (this.saveUnicodeFileWithBom && containsUnicode(csvString)) {
+            csvString = BOM + csvString;
+        }
         FileUtils.writeStringToFile(outputFile, csvString, StandardCharsets.UTF_8);
     }
 
@@ -143,6 +148,17 @@ public class ExcelReader {
         }
     }
 
+    private boolean containsUnicode(String input) {
+        int inputLength = input.length();
+        for (int i = 0; i < inputLength; i++) {
+            int codePoint = input.codePointAt(i);
+            if (codePoint > 127) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -153,6 +169,7 @@ public class ExcelReader {
         private boolean skipEmptyRows = true; // default will skip any empty lines
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
+        private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains unicode.
         private boolean sanitizeUnicodeSpaces = true; // default sanitize unicode whitespace
         private boolean sanitizeUnicodeQuotes = true; // default sanitize unicode quotes & smart quotes
 
@@ -222,6 +239,15 @@ public class ExcelReader {
 
         public Builder setSanitizeUnicodeQuotes(boolean sanitizeUnicodeQuotes) {
             this.sanitizeUnicodeQuotes = sanitizeUnicodeQuotes;
+            return this;
+        }
+
+        /**
+         * Use a BOM when writing output file if data contains 'unicode characters'
+         * @param saveUnicodeFileWithBom (defaults to true)
+         */
+        public Builder setSaveUnicodeFileWithBom(boolean saveUnicodeFileWithBom) {
+            this.saveUnicodeFileWithBom = saveUnicodeFileWithBom;
             return this;
         }
 

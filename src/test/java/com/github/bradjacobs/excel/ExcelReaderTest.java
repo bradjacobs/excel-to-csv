@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
@@ -112,7 +113,8 @@ public class ExcelReaderTest {
         excelReader.convertToCsvFile(inputFile, TEST_OUTPUT_FILE);
         assertTrue(TEST_OUTPUT_FILE.exists(), "expected csv file was NOT created");
 
-        String outputFileContent = new String ( Files.readAllBytes( Paths.get(TEST_OUTPUT_FILE.getAbsolutePath()) ) );
+        String outputFileContent =
+                Files.readString(Paths.get(TEST_OUTPUT_FILE.getAbsolutePath()), StandardCharsets.UTF_8);
         String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
         assertEquals(expectedCsvText, outputFileContent, "mismatch of content of saved csv file");
     }
