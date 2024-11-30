@@ -87,7 +87,7 @@ public class SpecialCharacterSanitizer {
     }
 
     // note: intentionally _not_ considering ascent marks as single quotes.
-    public static final Character[] SINGLE_QUOTE_CHARS = {
+    private static final Character[] SINGLE_QUOTE_CHARS = {
             '\u2018', // Single Curved Quote - Left
             '\u2019', // Single Curved Quote - Right
             '\u201A', // Low Single Curved Quote - Left
@@ -99,7 +99,7 @@ public class SpecialCharacterSanitizer {
             '\uFF07', // Misc
     };
 
-    public static final Character[] DOUBLE_QUOTE_CHARS = {
+    private static final Character[] DOUBLE_QUOTE_CHARS = {
             '\u201C', // "Smart" Double Curved Quote - Left
             '\u201D', // "Smart" Double Curved Quote - Right
             '\u201E', // Low Double Curved Quote - Left
@@ -134,10 +134,10 @@ public class SpecialCharacterSanitizer {
             {'\u01B5', 'Z'}, {'\u01B6', 'z'}, // 'Ƶ','ƶ': capital/lowercase Z with Stroke
     };
 
-    public static final Map<Character,Character> SPACE_ONLY_REPLACEMENT_MAP;
-    public static final Map<Character,Character> QUOTE_ONLY_REPLACEMENT_MAP;
-    public static final Map<Character,Character> DIACRITICS_CHAR_REPLACEMENT_MAP;
-    public static final Map<Character,Character> EXTENTED_DIACRITICS_CHAR_REPLACEMENT_MAP;
+    private static final Map<Character,Character> SPACE_ONLY_REPLACEMENT_MAP;
+    private static final Map<Character,Character> QUOTE_ONLY_REPLACEMENT_MAP;
+    private static final Map<Character,Character> DIACRITICS_CHAR_REPLACEMENT_MAP;
+    private static final Map<Character,Character> EXTENTED_DIACRITICS_CHAR_REPLACEMENT_MAP;
 
     static {
         SPACE_ONLY_REPLACEMENT_MAP = generateSpaceReplacementMap();
@@ -146,7 +146,7 @@ public class SpecialCharacterSanitizer {
         EXTENTED_DIACRITICS_CHAR_REPLACEMENT_MAP = generateExtendedDiacriticsCharReplacementMap();
     }
 
-    public static Map<Character,Character> generateSpaceReplacementMap() {
+    private static Map<Character,Character> generateSpaceReplacementMap() {
         Map<Character, Character> replacementMap = new LinkedHashMap<>();
         for (char c = 0; c < Character.MAX_VALUE; c++) {
             if (Character.isSpaceChar(c) && c != SPACE_CHAR) {
