@@ -46,7 +46,7 @@ public class ExcelReader {
         this.saveUnicodeFileWithBom = builder.saveUnicodeFileWithBom;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         this.excelSheetToCsvConverter = new ExcelSheetReader(
-                builder.skipEmptyRows, builder.sanitizeUnicodeSpaces, builder.sanitizeUnicodeQuotes);
+                builder.skipEmptyRows, builder.charSanitizeFlags);
         this.inputStreamGenerator = new InputStreamGenerator();
 
         // override the internal POI utils size limit to allow for 'bigger Excel files'
@@ -170,8 +170,7 @@ public class ExcelReader {
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
         private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains unicode.
-        private boolean sanitizeUnicodeSpaces = true; // default sanitize unicode whitespace
-        private boolean sanitizeUnicodeQuotes = true; // default sanitize unicode quotes & smart quotes
+        private Set<CharSanitizeFlags> charSanitizeFlags = Set.of(CharSanitizeFlags.SPACES, CharSanitizeFlags.QUOTES);
 
         private Builder() {}
 
@@ -232,13 +231,11 @@ public class ExcelReader {
             return this;
         }
 
-        public Builder setSanitizeUnicodeSpaces(boolean sanitizeUnicodeSpaces) {
-            this.sanitizeUnicodeSpaces = sanitizeUnicodeSpaces;
-            return this;
-        }
-
-        public Builder setSanitizeUnicodeQuotes(boolean sanitizeUnicodeQuotes) {
-            this.sanitizeUnicodeQuotes = sanitizeUnicodeQuotes;
+        public Builder setCharSanitizeFlags(CharSanitizeFlags... charSanitizeFlags) {
+            if (charSanitizeFlags == null) {
+                throw new IllegalArgumentException("Cannot set charSanitizeFlags to null");
+            }
+            this.charSanitizeFlags = new HashSet<>(Arrays.asList(charSanitizeFlags));
             return this;
         }
 

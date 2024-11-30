@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class ExcelSheetReader {
     private static final boolean EMULATE_CSV = true;
@@ -23,15 +24,9 @@ class ExcelSheetReader {
     private final SpecialCharacterSanitizer specialCharSanitizer;
 
     protected ExcelSheetReader(boolean skipEmptyRows,
-                               boolean sanitizeUnicodeWhitespace,
-                               boolean sanitizeUnicodeQuotes) {
+                               Set<CharSanitizeFlags> charSanitizeFlags) {
         this.skipEmptyRows = skipEmptyRows;
-        if (sanitizeUnicodeWhitespace || sanitizeUnicodeQuotes) {
-            this.specialCharSanitizer = new SpecialCharacterSanitizer(sanitizeUnicodeWhitespace, sanitizeUnicodeQuotes);
-        }
-        else {
-            this.specialCharSanitizer = null;
-        }
+        this.specialCharSanitizer = new SpecialCharacterSanitizer(charSanitizeFlags);
     }
 
     /**
@@ -146,9 +141,7 @@ class ExcelSheetReader {
 
         // if there are any certain special unicode characters (like nbsp or smart quotes),
         // replace w/ normal character equivalent
-        if (specialCharSanitizer != null) {
-            cellValue = specialCharSanitizer.sanitize(cellValue);
-        }
+        cellValue = specialCharSanitizer.sanitize(cellValue);
 
         return cellValue.trim();
     }

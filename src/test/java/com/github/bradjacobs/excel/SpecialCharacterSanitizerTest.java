@@ -9,7 +9,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.FieldSource;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,20 +19,19 @@ import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class SpecialCharacterSanitizerTest {
-    // NOTE:  (*) means Character.isWhitespace() == false
     private static final List<Arguments> spaceChars = Arrays.asList(
-            arguments(named("NON_BREAKING SPACE", "\u00a0")), // (*)
+            arguments(named("NON_BREAKING SPACE", "\u00a0")),
             arguments(named("EN SPACE", "\u2002")),
             arguments(named("EM SPACE", "\u2003")),
             arguments(named("THREE-PER-EM SPACE", "\u2004")),
             arguments(named("FOUR-PER-EM SPACE", "\u2005")),
             arguments(named("SIX-PER-EM SPACE", "\u2006")),
-            arguments(named("FIGURE SPACE", "\u2007")), // (*)
+            arguments(named("FIGURE SPACE", "\u2007")),
             arguments(named("PUNCTUATION SPACE", "\u2008")),
             arguments(named("THIN SPACE", "\u2009")),
             arguments(named("HAIR SPACE", "\u200a")),
-            arguments(named("ZERO-WIDTH SPACE", "\u200b")), // (*)
-            arguments(named("BRAILLE SPACE", "\u2800")) // (*)
+            arguments(named("ZERO-WIDTH SPACE", "\u200b")),
+            arguments(named("BRAILLE SPACE", "\u2800"))
     );
 
     // Test that a string with a "special" space character
@@ -40,8 +41,7 @@ public class SpecialCharacterSanitizerTest {
     public void testConvertToNormalSpace(String spaceChar) {
         String inputString = "a" + spaceChar + "b";
         String expectedResult = "a b";
-
-        String result = new SpecialCharacterSanitizer().sanitize(inputString);
+        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.SPACES).sanitize(inputString);
         assertEquals(expectedResult, result, "mismatch result of whitespace char substitution");
     }
 
@@ -49,8 +49,7 @@ public class SpecialCharacterSanitizerTest {
     public void testSanitizeDoubleCurlyQuotes() {
         String inputCurlyDoubleQuotes = "she said “hi” to my dog";
         String expectedResult = "she said \"hi\" to my dog";
-
-        String result = new SpecialCharacterSanitizer().sanitize(inputCurlyDoubleQuotes);
+        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.QUOTES).sanitize(inputCurlyDoubleQuotes);
         assertEquals(expectedResult, result, "mismatch result of quote character replacement");
     }
 
@@ -58,54 +57,58 @@ public class SpecialCharacterSanitizerTest {
     public void testSanitizeSingleCurlyQuotes() {
         String inputCurlySingleQuotes = "she said ‘hi’ to my dog";
         String expectedResult = "she said 'hi' to my dog";
-
-        String result = new SpecialCharacterSanitizer().sanitize(inputCurlySingleQuotes);
+        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.QUOTES).sanitize(inputCurlySingleQuotes);
         assertEquals(expectedResult, result, "mismatch result of quote character replacement");
     }
 
     @Test
-    public void testDontSanitizeWhitespaceIfDisabled() {
+    public void testDontSanitizeWhitespaceIfNotConfigured() {
         String inputString = "has \u00a0 special space";
-        String result = new SpecialCharacterSanitizer(false, true).sanitize(inputString);
+        String result = new SpecialCharacterSanitizer(new HashSet<>()).sanitize(inputString);
         assertEquals(inputString, result, "expected input string to remain unchanged.");
     }
 
     @Test
-    public void testDontSanitizeQuotesIfDisabled() {
+    public void testDontSanitizeQuotesIfNotConfigured() {
         String inputString = "has special \u201C quote";
-        String result = new SpecialCharacterSanitizer(true, false).sanitize(inputString);
+        String result = new SpecialCharacterSanitizer(new HashSet<>()).sanitize(inputString);
         assertEquals(inputString, result, "expected input string to remain unchanged.");
     }
 
     @Test
-    public void testExceptionWithBadConstructorParams() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new SpecialCharacterSanitizer(false, false);
-        });
-        assertEquals("Must specify the type of characters to sanitize.", exception.getMessage());
+    public void testDefaultConfigurations() {
+        String inputString = "\u2018 ab \u201C cd \u00a0 ef";
+        String expectedString = "' ab \" cd   ef";
+        String result = new SpecialCharacterSanitizer().sanitize(inputString);
+        assertEquals(expectedString, result, "mismatch expected Sanitized String.");
     }
 
-    private static final Character[] SINGLE_QUOTE_CHARS = {
-        '\u2018', // Single Curved Quote - Left
-        '\u2019', // Single Curved Quote - Right
-        '\u201A', // Low Single Curved Quote - Left
-        '\u201B', // Single High-Reversed
-        '\u2039', // Single Guillemet Angle Quote - Left
-        '\u203A', // Single Guillemet Angle Quote - Right
-        '\u275B', // Heavy Single Turned Comma Quotation Mark (ornament)
-        '\u275C', // Heavy Single Comma Quotation Mark (ornament)
-    };
+    @Test
+    public void testBasicDiacritics() {
+        String inputString = "_é_cat_Ç_";
+        String expectedString = "_e_cat_C_";
+        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.BASIC_DIACRITICS).sanitize(inputString);
+        assertEquals(expectedString, result, "mismatch expected Sanitized String.");
+    }
 
-    private static final Character[] DOUBLE_QUOTE_CHARS = {
-        '\u201C', // "Smart" Double Curved Quote - Left
-        '\u201D', // "Smart" Double Curved Quote - Right
-        '\u201E', // Low Double Curved Quote - Left
-        '\u201E', // Double High-Reversed
-        '\u00AB', // Double Guillemet Angle Quote - Left
-        '\u00BB', // Double Guillemet Angle Quote - Right
-        '\u275D', // Heavy Double Turned Comma Quotation Mark (ornament)
-        '\u275E', // Heavy Single Comma Quotation Mark (ornament)
-        '\u2826', // Braille Double Closing Quotation Mark
-        '\u2834', // Braille Double Opening Quotation Mark
-    };
+    @Test
+    public void testExtendedDiacritics() {
+        String inputString = "_é_cat_Ç_\u211A_\u0193";
+        String expectedString = "_e_cat_C_Q_G";
+        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.EXTENTED_DIACRITICS).sanitize(inputString);
+        assertEquals(expectedString, result, "mismatch expected Sanitized String.");
+    }
+
+    @Test
+    public void testInvalidNullParameter() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new SpecialCharacterSanitizer((Set<CharSanitizeFlags>) null);
+        });
+        assertEquals("Must provide non-null charSanitizeFlags.", exception.getMessage());
+
+        Exception exception2 = assertThrows(IllegalArgumentException.class, () -> {
+            new SpecialCharacterSanitizer((CharSanitizeFlags[]) null);
+        });
+        assertEquals("Must provide non-null charSanitizeFlags.", exception2.getMessage());
+    }
 }
