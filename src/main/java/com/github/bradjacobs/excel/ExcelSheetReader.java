@@ -134,10 +134,7 @@ class ExcelSheetReader {
             return "";
         }
 
-        // if cell is a formula then use the special formulaEvaluator
-        FormulaEvaluator evaluator = CellType.FORMULA.equals(cell.getCellType()) ? formulaEvaluator : null;
-
-        String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, evaluator);
+        String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, formulaEvaluator);
 
         // if there are any certain special unicode characters (like nbsp or smart quotes),
         // replace w/ normal character equivalent
