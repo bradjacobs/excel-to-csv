@@ -104,7 +104,7 @@ public class ExcelReader {
      * @param outputFile destination file.
      */
     private void writeCsvToFile(String csvString, File outputFile) throws IOException {
-        // prepend the 'bom' so that unicode characters will be render correctly
+        // prepend the 'bom' so that unicode characters will render correctly
         if (this.saveUnicodeFileWithBom && containsUnicode(csvString)) {
             csvString = BOM + csvString;
         }

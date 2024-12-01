@@ -95,7 +95,7 @@ public class SpecialCharacterSanitizerTest {
     public void testExtendedDiacritics() {
         String inputString = "_é_cat_Ç_\u211A_\u0193";
         String expectedString = "_e_cat_C_Q_G";
-        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.EXTENTED_DIACRITICS).sanitize(inputString);
+        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.EXTENDED_DIACRITICS).sanitize(inputString);
         assertEquals(expectedString, result, "mismatch expected Sanitized String.");
     }
 

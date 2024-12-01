@@ -1,12 +1,12 @@
 # Excel-To-Csv
 - [Description](#Description)
+- [Examples](#Examples)
+  * [Basic](#Basic)
+  * [Advanced](#Advanced)
 - [Usage](#Usage)
   * [Overview](#Overview)
     + [ExcelReaderDetails](#ExcelReaderDetails)
     + [BuilderDetails](#BuilderDetails)
-- [Examples](#Examples)
-  * [Basic](#Basic)
-  * [Advanced](#Advanced)
 - [OtherInfo](#OtherInfo)
 - [TODOs](#TODOs)
 - [AlternateImplementations](#AlternateImplementations)
@@ -17,29 +17,6 @@
 Simple tool to convert an Excel worksheet into CSV format.
 
 Implemented using the [Apache POI](https://poi.apache.org/) libraries
-
-
-## Usage
-### Overview
-1. Create a new ExcelReader via builder() method.
-2. Execute desired methods on ExcelReader
-
-### ExcelReaderDetails
-| METHOD              | INPUTS                       | OUTPUT     | DESCRIPTION                                                                                                                                      |
-|---------------------|------------------------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| convertToCsvText    | Excel File                   | String     | Given Excel file input return a String representing the Worksheet as CSV                                                                         |
-| convertToDataMatrix | Excel File                   | String[][] | Given Excel file input return a 2-D String array representing the Worksheet as CSV<br> (each array element represents a cell from the worksheet) |
-| convertToCsvFile    | Excel File & Output CSV File | (none)     | Given Excel file input write output directly to a specified destination file.  
-
-### BuilderDetails
-| FIELD                 | REQUIRED | DEFAULT | DETAILS                                                                                                                                                                                                                                                                                         |
-|-----------------------|:--------:|:-------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| quoteMode             | NO       | NORMAL  | how aggressive / lenient it should wrap quotes around values<br><br>*ALWAYS*: always put quotes around values<br>*NORMAL*: put quotes around most values that are non-alphanumeric<br>*LENIENT*: only add quotes around values that are needed to be CSV compliant<br>*NEVER*: never add quotes |
-| sheetIndex            | NO       | 0       | 0-based index of which worksheet to convert to CSV                                                                                                                                                                                                                                              |
-| sheetName             | NO       | (blank) | Name of the worksheet tab to be converted to CSV<br> (if set then 'sheetIndex' is ignored)                                                                                                                                                                                                      |
-| skipEmptyRows         | NO       | true    | filter out all 'blank' rows from the Excel worksheet                                                                                                                                                                                                                                            |
-| sanitizeUnicodeSpaces | NO       | true    | convert any unicode spaces (like NBSP) into normal space character 0x20                                                                                                                                                                                                                         |
-| sanitizeUnicodeQuotes | NO       | true    | convert any unicode quotes (such as “smart quotes”) into a basic quote character                                                                                                                                                                                                                |
 
 ## Examples
 ### Basic
@@ -54,6 +31,7 @@ excelReader.convertToCsvFile(new File("input.xlsx"), new File("output.csv"));
 ExcelReader excelReader = ExcelReader.builder().build();
 String csvText = excelReader.convertToCsvText(new File("input.xlsx"));
 ```
+
 ```java
 // get 2-D string array representing the entire worksheet (each value represents a 'cell')
 ExcelReader excelReader = ExcelReader.builder().build();
@@ -76,8 +54,30 @@ ExcelReader excelReader = ExcelReader.builder().build();
 excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new File("output.csv"));
 ```
 
+## Usage
+### Overview
+1. Create a new ExcelReader via builder() method.
+2. Execute desired methods on ExcelReader
+
+### ExcelReaderDetails
+| METHOD              | INPUTS                       | OUTPUT     | DESCRIPTION                                                                                                                                      |
+|---------------------|------------------------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| convertToCsvText    | Excel File                   | String     | Given Excel file input return a String representing the Worksheet as CSV                                                                         |
+| convertToDataMatrix | Excel File                   | String[][] | Given Excel file input return a 2-D String array representing the Worksheet as CSV<br> (each array element represents a cell from the worksheet) |
+| convertToCsvFile    | Excel File & Output CSV File | (none)     | Given Excel file input write output directly to a specified destination file.  
+
+### BuilderDetails
+| FIELD                  | REQUIRED | DEFAULT         | DETAILS                                                                                                                                                                                                                                                                                                                                                                                                                     |
+|------------------------|----------|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| quoteMode              | NO       | NORMAL          | how aggressive to wrap quotes around values<br><br>*ALWAYS*: always put quotes around values<br>*NORMAL*: put quotes around most values that are non-alphanumeric<br>*LENIENT*: only add quotes around values that are needed to be CSV compliant<br>*NEVER*: never add quotes                                                                                                                                              |
+| sheetIndex             | NO       | 0               | 0-based index of which worksheet to convert to CSV                                                                                                                                                                                                                                                                                                                                                                          |
+| sheetName              | NO       | (blank)         | Name of the worksheet tab to be converted to CSV<br> (if set then 'sheetIndex' is ignored)                                                                                                                                                                                                                                                                                                                                  |
+| skipEmptyRows          | NO       | true            | filter out all 'blank' rows from the Excel worksheet                                                                                                                                                                                                                                                                                                                                                                        |
+| saveUnicodeFileWithBom | NO       | true            | prepend 'BOM' to output CSV file if unicode characters were detected.                                                                                                                                                                                                                                                                                                                                                       |
+| charSanitizeFlags      | NO       | (SPACES,QUOTES) | optional character sanitization<br><br>*SPACES*: replace any unicode or abnormal space character with a normal space (i.e. nbsp)<br>*QUOTES*: replace any special single/double quotes with normal quotes (i.e. smart quotes)<br>*BASIC_DIACRITICS*: replace any diacritic characters with its basic counterpart (i.e. 'é' -> 'e', 'Ç' -> 'C')<br>*EXTENDED_DIACRITICS*: all basic diacritic replacements + additional ones |
+
 ## OtherInfo
-* All rows in the output CSV will have the exact same number of columns. (which will be max non-blank column detected)
+* All rows in the output CSV will have the exact same number of columns. (which will be maximum non-blank column detected)
 * The CSV data values should retain same 'formatting' as the original Excel file. (i.e. Dates and Numeric values)
 * No _formulas_ are copied.  Only the value as it 'physically appears' in a given cell
 * Currently no quotes will be added around 'blank' values 
@@ -87,14 +87,13 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 ## TODOs
 A work item list that I might get around to "eventually" (perhaps)
 * Put a more legitimate project version in the pom.xml
-* The output CSV contains values as they 'visually appear' in Excel.  However there are probably cases where this is not desired.  Need to research.
 * Integrate a real logger into the code.
 * Add more JavaDocs
 
 
 ## AlternateImplementations
 
-Searching on the web can yield alternate solutions that require less code.  Howver they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well
+Searching on the web can yield alternate solutions that require less code.  However they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well
 
 <details>
   <summary>Example Alternate Implementation... (Click Me)</summary>
@@ -115,7 +114,7 @@ This appears to work with a lot less code.  _**BUT**_... it seems to expose a fe
 Namely:
 * empty cells could cause data to seemingly 'shift' to a different column
   * i.e. if no value in Column A, but is a value in Column B, then the Column B value will show up as the first value in the row.
-* Bigger Excel files (>1MB ?) will throw an exception with message: _"The text would exceed the max allowed overall size of extracted text"_
+* Bigger Excel files (> 1MB ?) will throw an exception with message: _"The text would exceed the max allowed overall size of extracted text"_
 * It will give data from all sheets (even if you only want one)
 * The output csv text might not have the cells quoted the way you want (subjective)
 </details>

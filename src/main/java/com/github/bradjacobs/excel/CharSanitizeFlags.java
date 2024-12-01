@@ -7,5 +7,5 @@ public enum CharSanitizeFlags {
     SPACES,
     QUOTES,
     BASIC_DIACRITICS,
-    EXTENTED_DIACRITICS
+    EXTENDED_DIACRITICS
 }

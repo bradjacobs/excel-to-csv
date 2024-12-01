@@ -45,8 +45,8 @@ public class SpecialCharacterSanitizer {
         if (charSanitizeFlags.contains(CharSanitizeFlags.QUOTES)) {
             this.replacementMap.putAll(QUOTE_ONLY_REPLACEMENT_MAP);
         }
-        if (charSanitizeFlags.contains(CharSanitizeFlags.EXTENTED_DIACRITICS)) {
-            this.replacementMap.putAll(EXTENTED_DIACRITICS_CHAR_REPLACEMENT_MAP);
+        if (charSanitizeFlags.contains(CharSanitizeFlags.EXTENDED_DIACRITICS)) {
+            this.replacementMap.putAll(EXTENDED_DIACRITICS_CHAR_REPLACEMENT_MAP);
         }
         else if (charSanitizeFlags.contains(CharSanitizeFlags.BASIC_DIACRITICS)) {
             this.replacementMap.putAll(DIACRITICS_CHAR_REPLACEMENT_MAP);
@@ -113,7 +113,7 @@ public class SpecialCharacterSanitizer {
             '\uFF02', // Misc
     };
 
-    // a list of "extra" character replacements that aren't convered by
+    // a list of "extra" character replacements that aren't covered by
     // the Diacritic regex function.  This is _not_ meant to be an exhaustive list.
     private static final char[][] EXTRA_CHAR_REPLACEMENTS = new char[][] {
             {'\u0181', 'B'}, {'\u0253', 'b'}, // 'Ɓ','ɓ': capital/lowercase B with Hook
@@ -137,13 +137,13 @@ public class SpecialCharacterSanitizer {
     private static final Map<Character,Character> SPACE_ONLY_REPLACEMENT_MAP;
     private static final Map<Character,Character> QUOTE_ONLY_REPLACEMENT_MAP;
     private static final Map<Character,Character> DIACRITICS_CHAR_REPLACEMENT_MAP;
-    private static final Map<Character,Character> EXTENTED_DIACRITICS_CHAR_REPLACEMENT_MAP;
+    private static final Map<Character,Character> EXTENDED_DIACRITICS_CHAR_REPLACEMENT_MAP;
 
     static {
         SPACE_ONLY_REPLACEMENT_MAP = generateSpaceReplacementMap();
         QUOTE_ONLY_REPLACEMENT_MAP = generateQuoteReplacementMap();
         DIACRITICS_CHAR_REPLACEMENT_MAP = generateDiacriticsCharReplacementMap();
-        EXTENTED_DIACRITICS_CHAR_REPLACEMENT_MAP = generateExtendedDiacriticsCharReplacementMap();
+        EXTENDED_DIACRITICS_CHAR_REPLACEMENT_MAP = generateExtendedDiacriticsCharReplacementMap();
     }
 
     private static Map<Character,Character> generateSpaceReplacementMap() {
@@ -160,12 +160,12 @@ public class SpecialCharacterSanitizer {
 
     private static Map<Character,Character> generateQuoteReplacementMap() {
         return new LinkedHashMap<>(){{
-            putAll(generateRelacementMap(SINGLE_QUOTE_CHARS, '\''));
-            putAll(generateRelacementMap(DOUBLE_QUOTE_CHARS, '"'));
+            putAll(generateReplacementMap(SINGLE_QUOTE_CHARS, '\''));
+            putAll(generateReplacementMap(DOUBLE_QUOTE_CHARS, '"'));
         }};
     }
 
-    private static Map<Character,Character> generateRelacementMap(Character[] inputCharList, Character replacementChar) {
+    private static Map<Character,Character> generateReplacementMap(Character[] inputCharList, Character replacementChar) {
         return Arrays.stream(inputCharList).collect(
                 toMap(c -> c, c -> replacementChar));
     }
@@ -174,7 +174,7 @@ public class SpecialCharacterSanitizer {
      * Creates a lookup replacement map for characters with accents
      * to the 'normal looking' counterpart.
      *   Examples:  'é' -> 'e', 'Ç' -> 'C', 'ö' -> 'o'
-     * NOTE: this only consideres replacement characters that are in
+     * NOTE: this only considers replacement characters that are in
      *  the basic ascii range < 255
      * @return Map of diacritics character to its replacement value
      */
