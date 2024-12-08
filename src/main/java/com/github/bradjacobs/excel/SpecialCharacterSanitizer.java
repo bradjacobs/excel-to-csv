@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.SPACES;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -20,16 +23,12 @@ import static java.util.stream.Collectors.toMap;
  *   and/or convert special space characters (i.e. NBSP characters) to normal spaces.
  */
 public class SpecialCharacterSanitizer {
-
-    public enum CharSanitizeFlags {
-        SPACES,
-        QUOTES,
-        BASIC_DIACRITICS
-    };
+    // enums to define the types of sanitizations to perform
+    public enum CharSanitizeFlags { SPACES, QUOTES, BASIC_DIACRITICS };
 
     private static final Character SPACE_CHAR = ' ';
     private static final Set<CharSanitizeFlags> DEFAULT_FLAGS =
-            Set.of(CharSanitizeFlags.SPACES, CharSanitizeFlags.QUOTES);
+            Set.of(SPACES, QUOTES);
 
     private final Map<Character,Character> replacementMap;
 
@@ -46,13 +45,13 @@ public class SpecialCharacterSanitizer {
             throw new IllegalArgumentException("Must provide non-null charSanitizeFlags.");
         }
         this.replacementMap = new HashMap<>();
-        if (charSanitizeFlags.contains(CharSanitizeFlags.SPACES)) {
+        if (charSanitizeFlags.contains(SPACES)) {
             this.replacementMap.putAll(SPACE_ONLY_REPLACEMENT_MAP);
         }
-        if (charSanitizeFlags.contains(CharSanitizeFlags.QUOTES)) {
+        if (charSanitizeFlags.contains(QUOTES)) {
             this.replacementMap.putAll(QUOTE_ONLY_REPLACEMENT_MAP);
         }
-        if (charSanitizeFlags.contains(CharSanitizeFlags.BASIC_DIACRITICS)) {
+        if (charSanitizeFlags.contains(BASIC_DIACRITICS)) {
             this.replacementMap.putAll(DIACRITICS_CHAR_REPLACEMENT_MAP);
         }
     }
@@ -98,9 +97,13 @@ public class SpecialCharacterSanitizer {
             '\u201B', // Single High-Reversed
             '\u2039', // Single Guillemet Angle Quote - Left
             '\u203A', // Single Guillemet Angle Quote - Right
+            '\u2358', // Apl Functional Symbol Quote Underbar
+            '\u235E', // Apl Functional Symbol Quote Quad
             '\u275B', // Heavy Single Turned Comma Quotation Mark (ornament)
             '\u275C', // Heavy Single Comma Quotation Mark (ornament)
-            '\uFF07', // Misc
+            '\u276E', // Heavy Left-Pointing Angle Quotation Mark (ornament)
+            '\u276F', // Heavy Right-Pointing Angle Quotation Mark (ornament)
+            '\uFF07', // Fullwidth Apostrophe
     };
 
     private static final Character[] DOUBLE_QUOTE_CHARS = {
@@ -111,12 +114,14 @@ public class SpecialCharacterSanitizer {
             '\u00AB', // Double Guillemet Angle Quote - Left
             '\u00BB', // Double Guillemet Angle Quote - Right
             '\u275D', // Heavy Double Turned Comma Quotation Mark (ornament)
-            '\u275E', // Heavy Single Comma Quotation Mark (ornament)
+            '\u275E', // Heavy Double Comma Quotation Mark (ornament)
             '\u2826', // Braille Double Closing Quotation Mark
             '\u2834', // Braille Double Opening Quotation Mark
-            '\uFF02', // Misc
+            '\u301D', // Reversed Double Prime Quotation Mark
+            '\u301E', // Double Prime Quotation Mark
+            '\u301F', // Low Double Prime Quotation Mark
+            '\uFF02', // Fullwidth Quotation Mark
     };
-
 
     private static final Map<Character,Character> SPACE_ONLY_REPLACEMENT_MAP;
     private static final Map<Character,Character> QUOTE_ONLY_REPLACEMENT_MAP;
