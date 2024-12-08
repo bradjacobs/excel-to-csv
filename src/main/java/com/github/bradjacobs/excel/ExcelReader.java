@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
+import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +21,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.SPACES;
 
 /**
  * Simple class that reads an Excel Worksheet
@@ -170,7 +174,7 @@ public class ExcelReader {
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
         private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains unicode.
-        private Set<CharSanitizeFlags> charSanitizeFlags = Set.of(CharSanitizeFlags.SPACES, CharSanitizeFlags.QUOTES);
+        private Set<CharSanitizeFlags> charSanitizeFlags = Set.of(SPACES, QUOTES);
 
         private Builder() {}
 

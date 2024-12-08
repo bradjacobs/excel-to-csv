@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
+import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,6 +14,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.SPACES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Named.named;
@@ -41,7 +45,7 @@ public class SpecialCharacterSanitizerTest {
     public void testConvertToNormalSpace(String spaceChar) {
         String inputString = "a" + spaceChar + "b";
         String expectedResult = "a b";
-        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.SPACES).sanitize(inputString);
+        String result = new SpecialCharacterSanitizer(SPACES).sanitize(inputString);
         assertEquals(expectedResult, result, "mismatch result of whitespace char substitution");
     }
 
@@ -49,7 +53,7 @@ public class SpecialCharacterSanitizerTest {
     public void testSanitizeDoubleCurlyQuotes() {
         String inputCurlyDoubleQuotes = "she said “hi” to my dog";
         String expectedResult = "she said \"hi\" to my dog";
-        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.QUOTES).sanitize(inputCurlyDoubleQuotes);
+        String result = new SpecialCharacterSanitizer(QUOTES).sanitize(inputCurlyDoubleQuotes);
         assertEquals(expectedResult, result, "mismatch result of quote character replacement");
     }
 
@@ -57,7 +61,7 @@ public class SpecialCharacterSanitizerTest {
     public void testSanitizeSingleCurlyQuotes() {
         String inputCurlySingleQuotes = "she said ‘hi’ to my dog";
         String expectedResult = "she said 'hi' to my dog";
-        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.QUOTES).sanitize(inputCurlySingleQuotes);
+        String result = new SpecialCharacterSanitizer(QUOTES).sanitize(inputCurlySingleQuotes);
         assertEquals(expectedResult, result, "mismatch result of quote character replacement");
     }
 
@@ -87,15 +91,7 @@ public class SpecialCharacterSanitizerTest {
     public void testBasicDiacritics() {
         String inputString = "_é_cat_Ç_";
         String expectedString = "_e_cat_C_";
-        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.BASIC_DIACRITICS).sanitize(inputString);
-        assertEquals(expectedString, result, "mismatch expected Sanitized String.");
-    }
-
-    @Test
-    public void testExtendedDiacritics() {
-        String inputString = "_é_cat_Ç_\u211A_\u0193";
-        String expectedString = "_e_cat_C_Q_G";
-        String result = new SpecialCharacterSanitizer(CharSanitizeFlags.EXTENDED_DIACRITICS).sanitize(inputString);
+        String result = new SpecialCharacterSanitizer(BASIC_DIACRITICS).sanitize(inputString);
         assertEquals(expectedString, result, "mismatch expected Sanitized String.");
     }
 

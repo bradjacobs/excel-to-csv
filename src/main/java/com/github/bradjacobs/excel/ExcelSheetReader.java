@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags;
+
 class ExcelSheetReader {
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
