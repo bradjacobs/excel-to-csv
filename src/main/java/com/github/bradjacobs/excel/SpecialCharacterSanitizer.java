@@ -19,16 +19,21 @@ import static java.util.stream.Collectors.toMap;
 
 /**
  * Used to convert some special unicode characters into basic equivalent.
- * example: converts 'smart quotes' into normal quotes  (e.g. “” --> "")
- *   and/or convert special space characters (i.e. NBSP characters) to normal spaces.
+ * examples: convert 'smart quotes' into normal quotes  (e.g. “” --> "")
+ *   or convert special space characters (i.e. NBSP characters) to normal spaces.
  */
 public class SpecialCharacterSanitizer {
-    // enums to define the types of sanitizations to perform
-    public enum CharSanitizeFlags { SPACES, QUOTES, BASIC_DIACRITICS };
 
+    // enums to define the types of sanitizations to perform
+    public enum CharSanitizeFlags {
+        SPACES, // replace special space characters with normal space 0x20 (note '\n','\r','\t' are _NOT_ considered)
+        QUOTES, // replace special quotes (like smart quotes) with normal single/double quote character
+        BASIC_DIACRITICS // replace basic diacritics (e.g. 'é' -> 'e').  Not every possibility is considered
+    }
+
+    // by default, handle spaces and quotes
+    private static final Set<CharSanitizeFlags> DEFAULT_FLAGS = Set.of(SPACES, QUOTES);
     private static final Character SPACE_CHAR = ' ';
-    private static final Set<CharSanitizeFlags> DEFAULT_FLAGS =
-            Set.of(SPACES, QUOTES);
 
     private final Map<Character,Character> replacementMap;
 
@@ -57,10 +62,8 @@ public class SpecialCharacterSanitizer {
     }
 
     /**
-     * TODO - fix description
-     * Replace any "special/extended" space characters with the basic space character 0x20.
-     * Additionally replace any 'curly quotes' with normal quote (both single and double)
-     * NOTE that all 'normal' whitespace characters ['\r', '\n', '\t', ' '] will remain as-is
+     * Replaces 'special characters' with the basic ascii counterpart
+     * Works with spaces, quotes, and/or diacritic characters (i.e. 'é' -> 'e')
      * @param input string to sanitize
      * @return sanitized version of the input string
      */
@@ -95,8 +98,8 @@ public class SpecialCharacterSanitizer {
             '\u2019', // Single Curved Quote - Right
             '\u201A', // Low Single Curved Quote - Left
             '\u201B', // Single High-Reversed
-            '\u2039', // Single Guillemet Angle Quote - Left
-            '\u203A', // Single Guillemet Angle Quote - Right
+            '\u2039', // Single Angle Quote (Guillemet) - Left
+            '\u203A', // Single Angle Quote (Guillemet) - Right
             '\u2358', // Apl Functional Symbol Quote Underbar
             '\u235E', // Apl Functional Symbol Quote Quad
             '\u275B', // Heavy Single Turned Comma Quotation Mark (ornament)
@@ -107,12 +110,12 @@ public class SpecialCharacterSanitizer {
     };
 
     private static final Character[] DOUBLE_QUOTE_CHARS = {
+            '\u00AB', // Double Angle Quote (Guillemet) - Left
+            '\u00BB', // Double Angle Quote (Guillemet) - Right
             '\u201C', // "Smart" Double Curved Quote - Left
             '\u201D', // "Smart" Double Curved Quote - Right
             '\u201E', // Low Double Curved Quote - Left
             '\u201F', // Double High-Reversed
-            '\u00AB', // Double Guillemet Angle Quote - Left
-            '\u00BB', // Double Guillemet Angle Quote - Right
             '\u275D', // Heavy Double Turned Comma Quotation Mark (ornament)
             '\u275E', // Heavy Double Comma Quotation Mark (ornament)
             '\u2826', // Braille Double Closing Quotation Mark
@@ -161,8 +164,9 @@ public class SpecialCharacterSanitizer {
      * Creates a lookup replacement map for characters with accents
      * to the 'normal looking' counterpart.
      *   Examples:  'é' -> 'e', 'Ç' -> 'C', 'ö' -> 'o'
-     * NOTE: this only considers replacement characters that are in
+     * NOTE1: this only considers replacement characters that are in
      *  the basic ascii range < 255
+     * NOTE2: this does not replace most characters that have have 'hooks' or 'slashes'
      * @return Map of diacritics character to its replacement value
      */
     private static Map<Character,Character> generateBasicDiacriticsCharReplacementMap() {
@@ -182,7 +186,7 @@ public class SpecialCharacterSanitizer {
             }
         }
 
-        // want to avoid converting a "not equals" to an "equals", etc
+        // avoid converting a "not equals" to an "equals", etc
         replacementMap.remove('\u2260'); // remove "not equals"
         replacementMap.remove('\u226E'); // remove "not less than"
         replacementMap.remove('\u226F'); // remove "not greater than"
