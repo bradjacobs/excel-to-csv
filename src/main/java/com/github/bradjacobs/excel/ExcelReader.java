@@ -36,7 +36,7 @@ public class ExcelReader {
     private final String password; // 'null' == no password
     private final boolean saveUnicodeFileWithBom;
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
-    private final ExcelSheetReader excelSheetToCsvConverter;
+    private final ExcelSheetReader excelSheetReader;
 
     private static final Set<String> ALLOWED_OUTPUT_FILE_EXTENSIONS = new HashSet<>(Arrays.asList("csv", "txt", ""));
     private static final String BOM = "\uFEFF";
@@ -49,7 +49,7 @@ public class ExcelReader {
         this.password = builder.password;
         this.saveUnicodeFileWithBom = builder.saveUnicodeFileWithBom;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
-        this.excelSheetToCsvConverter = new ExcelSheetReader(
+        this.excelSheetReader = new ExcelSheetReader(
                 builder.skipEmptyRows, builder.charSanitizeFlags);
         this.inputStreamGenerator = new InputStreamGenerator();
 
@@ -84,7 +84,7 @@ public class ExcelReader {
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
         try (inputStream; Workbook wb = WorkbookFactory.create(inputStream, password)) {
             Sheet sheet = getSheet(wb);
-            return excelSheetToCsvConverter.convertToCsvData(sheet);
+            return excelSheetReader.convertToCsvData(sheet);
         }
     }
 
