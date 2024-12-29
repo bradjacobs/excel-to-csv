@@ -166,7 +166,7 @@ public class SpecialCharacterSanitizer {
      *   Examples:  'é' -> 'e', 'Ç' -> 'C', 'ö' -> 'o'
      * NOTE1: this only considers replacement characters that are in
      *  the basic ascii range < 255
-     * NOTE2: this does not replace most characters that have have 'hooks' or 'slashes'
+     * NOTE2: this does not replace most characters that have 'hooks' or 'slashes'
      * @return Map of diacritics character to its replacement value
      */
     private static Map<Character,Character> generateBasicDiacriticsCharReplacementMap() {

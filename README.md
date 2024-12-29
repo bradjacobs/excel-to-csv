@@ -93,7 +93,7 @@ A work item list that I might get around to "eventually" (perhaps)
 
 ## AlternateImplementations
 
-Searching on the web can yield alternate solutions that require less code.  However they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well
+Searching on the web can yield alternate solutions that require less code.  However, they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well
 
 <details>
   <summary>Example Alternate Implementation... (Click Me)</summary>
@@ -120,6 +120,6 @@ Namely:
 </details>
 
 ## FinalThoughts
-I don't actively maintain this project, and make occasional tweaks just for fun.
+I don't actively work on this project much and only make occasional tweaks just for fun.
 
 This project was originally created in a day, so I'm sure there are specific cases I've missed.  :-) 

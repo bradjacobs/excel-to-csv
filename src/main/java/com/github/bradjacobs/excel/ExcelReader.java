@@ -136,8 +136,8 @@ public class ExcelReader {
                     String.format("Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext));
         }
 
-        // confirm output file doesn't have any invalid characters.
         try {
+            // confirm output file path doesn't have any invalid characters.
             Paths.get(outputFile.getAbsolutePath());
         }
         catch (InvalidPathException ex) {
