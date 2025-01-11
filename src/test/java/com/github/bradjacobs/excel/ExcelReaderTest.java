@@ -13,6 +13,7 @@ import java.io.File;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
@@ -48,9 +49,21 @@ public class ExcelReaderTest {
 
     @ParameterizedTest
     @MethodSource("quoteVariations")
-    void testExpectedQuoteText(QuoteMode quoteMode, String expectedResultFileName) throws Exception {
+    void testExpectedQuoteTextFileParam(QuoteMode quoteMode, String expectedResultFileName) throws Exception {
         String expectedCsvText = readResourceFileText(expectedResultFileName);
         File inputFile = getTestFileObject();
+
+        ExcelReader excelReader = ExcelReader.builder().setQuoteMode(quoteMode).setSkipEmptyRows(false).build();
+        String csvText = excelReader.convertToCsvText(inputFile);
+
+        assertEquals(expectedCsvText, csvText, "mismatch of expected csv output");
+    }
+
+    @ParameterizedTest
+    @MethodSource("quoteVariations")
+    void testExpectedQuoteTextPathParam(QuoteMode quoteMode, String expectedResultFileName) throws Exception {
+        String expectedCsvText = readResourceFileText(expectedResultFileName);
+        Path inputFile = getTestFileObject().toPath();
 
         ExcelReader excelReader = ExcelReader.builder().setQuoteMode(quoteMode).setSkipEmptyRows(false).build();
         String csvText = excelReader.convertToCsvText(inputFile);

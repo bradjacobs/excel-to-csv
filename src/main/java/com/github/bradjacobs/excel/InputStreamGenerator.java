@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,14 +27,14 @@ public class InputStreamGenerator {
     //    side:  seen a case where a userAgent with substring 'java' would fail  (empirical evidence)
     private static final String USER_AGENT_VALUE = "jclient/" + System.getProperty("java.version");
 
-    public InputStream getInputStream(File inputFile) throws IOException {
+    public InputStream getInputStream(Path inputFile) throws IOException {
         if (inputFile == null) {
             throw new IllegalArgumentException("Must provide an input file.");
         }
-        else if (!inputFile.exists()) {
-            throw new FileNotFoundException(String.format("Invalid Excel file path: %s", inputFile.getAbsolutePath()));
+        else if (!Files.exists(inputFile)) {
+            throw new FileNotFoundException(String.format("Invalid Excel file path: %s", inputFile.toAbsolutePath()));
         }
-        return new BufferedInputStream(new FileInputStream(inputFile));
+        return new BufferedInputStream( Files.newInputStream(inputFile) );
     }
 
     public InputStream getInputStream(URL url) throws IOException {
@@ -44,7 +47,7 @@ public class InputStreamGenerator {
         }
 
         if (urlProtocol.equalsIgnoreCase("file")) {
-            return getInputStream(new File( url.getPath() ));
+            return getInputStream( Paths.get(url.getPath()) );
         }
 
         // Could switch to an httpClient in the future.

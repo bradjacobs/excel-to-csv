@@ -4,7 +4,6 @@
 package com.github.bradjacobs.excel;
 
 import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -16,7 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -58,24 +59,36 @@ public class ExcelReader {
         org.apache.poi.util.IOUtils.setByteArrayMaxOverride(Integer.MAX_VALUE);
     }
 
-    public void convertToCsvFile(File excelFile, File outputFile) throws IOException {
+    public void convertToCsvFile(Path excelFile, Path outputFile) throws IOException {
         validateOutputFileParameter(outputFile);
         writeCsvToFile( convertToCsvText(excelFile), outputFile);
     }
-    public void convertToCsvFile(URL excelUrl, File outputFile) throws IOException {
+    public void convertToCsvFile(File excelFile, File outputFile) throws IOException {
+        convertToCsvFile(fileToPath(excelFile), fileToPath(outputFile));
+    }
+    public void convertToCsvFile(URL excelUrl, Path outputFile) throws IOException {
         validateOutputFileParameter(outputFile);
         writeCsvToFile( convertToCsvText(excelUrl), outputFile);
     }
+    public void convertToCsvFile(URL excelUrl, File outputFile) throws IOException {
+        convertToCsvFile(excelUrl, fileToPath(outputFile));
+    }
 
-    public String convertToCsvText(File excelFile) throws IOException {
+    public String convertToCsvText(Path excelFile) throws IOException {
         return matrixToCsvTextConverter.createCsvText( convertToDataMatrix(excelFile) );
+    }
+    public String convertToCsvText(File excelFile) throws IOException {
+        return convertToCsvText(fileToPath(excelFile));
     }
     public String convertToCsvText(URL excelUrl) throws IOException {
         return matrixToCsvTextConverter.createCsvText( convertToDataMatrix(excelUrl) );
     }
 
-    public String[][] convertToDataMatrix(File excelFile) throws IOException {
+    public String[][] convertToDataMatrix(Path excelFile) throws IOException {
         return convertToDataMatrix( inputStreamGenerator.getInputStream(excelFile) );
+    }
+    public String[][] convertToDataMatrix(File excelFile) throws IOException {
+        return convertToDataMatrix(fileToPath(excelFile));
     }
     public String[][] convertToDataMatrix(URL excelUrl) throws IOException {
         return convertToDataMatrix( inputStreamGenerator.getInputStream(excelUrl) );
@@ -107,12 +120,12 @@ public class ExcelReader {
      * @param csvString CSV data
      * @param outputFile destination file.
      */
-    private void writeCsvToFile(String csvString, File outputFile) throws IOException {
+    private void writeCsvToFile(String csvString, Path outputFile) throws IOException {
         // prepend the 'bom' so that unicode characters will render correctly
         if (this.saveUnicodeFileWithBom && containsUnicode(csvString)) {
             csvString = BOM + csvString;
         }
-        FileUtils.writeStringToFile(outputFile, csvString, StandardCharsets.UTF_8);
+        Files.writeString(outputFile, csvString, StandardCharsets.UTF_8);
     }
 
     /**
@@ -121,34 +134,40 @@ public class ExcelReader {
      * @param outputFile the destination CSV output file.
      * @throws IllegalArgumentException if a problem was detected with the File object.
      */
-    private void validateOutputFileParameter(File outputFile) throws IllegalArgumentException {
+    private void validateOutputFileParameter(Path outputFile) throws IllegalArgumentException {
         if (outputFile == null) {
             throw new IllegalArgumentException("Must supply outputFile location to save CSV data.");
         }
-        else if (outputFile.isDirectory()) {
+        else if (Files.isDirectory(outputFile)) {
             throw new IllegalArgumentException("The outputFile cannot be an existing directory.");
         }
 
+        // convert to absolute path and continue checks...
+        outputFile = outputFile.toAbsolutePath();
+
         // confirm output file has an allowed file extension
-        String ext = FilenameUtils.getExtension(outputFile.getAbsolutePath());
+        String ext = FilenameUtils.getExtension(outputFile.toString());
         if (! ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase())) {
             throw new IllegalArgumentException(
                     String.format("Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext));
         }
 
+        Path parentDirectory = outputFile.getParent();
+        if (parentDirectory == null || !Files.isDirectory(parentDirectory)) {
+            throw new IllegalArgumentException("Attempted to save CSV output file in a non-existent directory: " + outputFile);
+        }
+    }
+
+    private Path fileToPath(File file) {
+        if (file == null) {
+            return null;
+        }
         try {
-            // confirm output file path doesn't have any invalid characters.
-            Paths.get(outputFile.getAbsolutePath());
+            return Paths.get(file.getAbsolutePath());
         }
         catch (InvalidPathException ex) {
-            throw new IllegalArgumentException("The outputFile path contains an illegal character: "
-                    + outputFile.getAbsolutePath());
-        }
-
-        File fullPathOutputFile = new File(outputFile.getAbsolutePath());
-        File parentDirectory = fullPathOutputFile.getParentFile();
-        if (! parentDirectory.isDirectory()) {
-            throw new IllegalArgumentException("Attempted to save CSV output file in a non-existent directory: " + outputFile.getAbsolutePath());
+            throw new IllegalArgumentException("The file path contains an illegal character: "
+                    + file.getAbsolutePath());
         }
     }
 

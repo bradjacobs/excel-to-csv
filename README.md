@@ -19,6 +19,9 @@ Simple tool to convert an Excel worksheet into CSV format.
 Implemented using the [Apache POI](https://poi.apache.org/) libraries
 
 ## Examples
+
+_SIDE NOTE_: for all examples below can alternatively use the `Path` object instead of `File` object.
+
 ### Basic
 ```java
 // read excel worksheet and write output to a file
@@ -86,7 +89,6 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 
 ## TODOs
 A work item list that I might get around to "eventually" (perhaps)
-* Update methods to allow for `Path` in lieu of `File`
 * Put a more legitimate project version in the pom.xml
 * Integrate a real logger into the code.
 * Add more JavaDocs
