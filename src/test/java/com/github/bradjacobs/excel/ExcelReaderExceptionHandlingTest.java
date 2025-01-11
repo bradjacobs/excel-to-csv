@@ -284,13 +284,15 @@ public class ExcelReaderExceptionHandlingTest {
     }
 
     private File getTestFileObject() {
-        URL resourceUrl = this.getClass().getClassLoader().getResource(TEST_DATA_FILE);
-        assertNotNull(resourceUrl);
-        return new File(resourceUrl.getPath());
+        return getResourceFileObject(TEST_DATA_FILE);
     }
 
     private File getPasswordTestFileObject() {
-        URL resourceUrl = this.getClass().getClassLoader().getResource(PSWD_DATA_FILE);
+        return getResourceFileObject(PSWD_DATA_FILE);
+    }
+
+    private File getResourceFileObject(String fileName) {
+        URL resourceUrl = this.getClass().getClassLoader().getResource(fileName);
         assertNotNull(resourceUrl);
         return new File(resourceUrl.getPath());
     }
