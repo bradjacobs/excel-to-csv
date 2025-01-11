@@ -198,6 +198,21 @@ public class ExcelReaderTest {
         assertEquals("bbb", csvMatrix[0][1]);
     }
 
+    // Test special case where a row without cells could
+    //   cause an ArrayIndexOutOfBoundsException
+    @Test
+    public void testBadRowRepro() throws Exception {
+        URL resourceUrl = this.getClass().getClassLoader().getResource("repro.xlsx");
+        assertNotNull(resourceUrl);
+
+        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
+        assertEquals("aaa", csvMatrix[0][0]);
+        assertEquals("bbb", csvMatrix[0][1]);
+        assertEquals("ccc", csvMatrix[2][0]);
+        assertEquals("ddd", csvMatrix[2][1]);
+    }
+
     @AfterEach
     private void cleanupTestFile() {
         if (TEST_OUTPUT_FILE.exists()) {
