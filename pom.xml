@@ -11,7 +11,7 @@
 
 	<properties>
 		<java.version>11</java.version> <!-- minimum JDK required -->
-		<apache.poi.version>5.3.0</apache.poi.version>
+		<apache.poi.version>5.4.0</apache.poi.version>
 		<junit.version>5.11.4</junit.version>
 	</properties>
 
@@ -52,7 +52,6 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>
