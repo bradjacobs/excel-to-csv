@@ -20,24 +20,28 @@ Implemented using the [Apache POI](https://poi.apache.org/) libraries
 
 ## Examples
 
-_SIDE NOTE_: for all examples below can alternatively use the `Path` object instead of `File` object.
-
 ### Basic
 ```java
 // read excel worksheet and write output to a file
 ExcelReader excelReader = ExcelReader.builder().build();
+excelReader.convertToCsvFile(Paths.get("input.xlsx"), Paths.get("output.csv"));
+// or
 excelReader.convertToCsvFile(new File("input.xlsx"), new File("output.csv"));
 ```
 
 ```java
 // get a single string representing the entire worksheet in CSV format
 ExcelReader excelReader = ExcelReader.builder().build();
+String csvText = excelReader.convertToCsvText(Paths.get("input.xlsx"));
+// or
 String csvText = excelReader.convertToCsvText(new File("input.xlsx"));
 ```
 
 ```java
 // get 2-D string array representing the entire worksheet (each value represents a 'cell')
 ExcelReader excelReader = ExcelReader.builder().build();
+String[][] csvData = excelReader.convertToDataMatrix(Paths.get("input.xlsx"));
+// or
 String[][] csvData = excelReader.convertToDataMatrix(new File("input.xlsx"));
 ```
 
@@ -90,8 +94,10 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 ## TODOs
 A work item list that I might get around to "eventually" (perhaps)
 * Put a more legitimate project version in the pom.xml
+* Consider making a 'release version' or something that can be referenced via maven dependency
 * Integrate a real logger into the code.
 * Add more JavaDocs
+* More Unittest cleanup
 
 
 ## AlternateImplementations
