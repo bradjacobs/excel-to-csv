@@ -22,14 +22,14 @@ public class MatrixToCsvTextConverterTest {
             = new MatrixToCsvTextConverter(QuoteMode.NORMAL);
 
     @Test
-    public void testEmptyInput() {
+    public void emptyMatrixToEmptyString() {
         assertEquals("", normalConverter.createCsvText(null), "Expected empty string");
         assertEquals("", normalConverter.createCsvText(new String[0][0]), "Expected empty string");
         assertEquals("", normalConverter.createCsvText(new String[1][0]), "Expected empty string");
     }
 
     @Test
-    public void testSimpleMatrix() {
+    public void simpleMatrixToString() {
         String[][] matrix = {
                 {"dog", "cow"},
                 {"frog", "cat"}
@@ -42,7 +42,7 @@ public class MatrixToCsvTextConverterTest {
     }
 
     @Test
-    public void testSimpleMatrixRequiringQuotes() {
+    public void matrixToStringWithQuoting() {
         String[][] matrix = {
                 {"dog", "say \"hi\""},
                 {"frog", "aa,bb"}
@@ -54,9 +54,18 @@ public class MatrixToCsvTextConverterTest {
         assertEquals(expected, csvResult, "Mismatch expected CSV output");
     }
 
+    @Test
+    public void noQuotesForBlankValue() {
+        String[][] matrix = {{"cow bell", "", "hot dog"}};
+        String expected = "\"cow bell\",,\"hot dog\"";
+
+        String csvResult = normalConverter.createCsvText(matrix);
+        assertEquals(expected, csvResult, "Mismatch expected CSV output");
+    }
+
     @ParameterizedTest
     @MethodSource("quoteTestProvider")
-    public void testQuoteRules(String input, QuoteMode quoteMode, String expectedOutput) {
+    public void quoteModeChecking(String input, QuoteMode quoteMode, String expectedOutput) {
         MatrixToCsvTextConverter converter = new MatrixToCsvTextConverter(quoteMode);
         String[][] matrix = {{input}};
 
@@ -68,14 +77,14 @@ public class MatrixToCsvTextConverterTest {
     // Test Helper code below...
     //
 
+    // the following are special character that should always be quoted
+    private static final List<Character> MINIMAL_QUOTE_CHARACTERS
+            = List.of('"', ',', '\t', '\r', '\n');
+
     private static List<Arguments> quoteTestProvider() {
         List<QuoteTestInput> quoteTestInputList = createQuoteTestList();
         return convertToArgumentList(quoteTestInputList);
     }
-
-    // the following are special character that should always be quoted
-    private static final List<Character> MINIMAL_QUOTE_CHARACTERS
-            = List.of('"', ',', '\t', '\r', '\n');
 
     private static List<QuoteTestInput> createQuoteTestList() {
         List<QuoteTestInput> quoteTestInputList = new ArrayList<>();
@@ -83,18 +92,20 @@ public class MatrixToCsvTextConverterTest {
         // test a string with each type of character that must always be quoted
         for (Character minimalQuoteCharacter : MINIMAL_QUOTE_CHARACTERS) {
             String input = "aaa" + minimalQuoteCharacter + "bbb";
-            QuoteTestInput testQuoteInput = createAlwaysQuoteInput(input);
-            quoteTestInputList.add(testQuoteInput);
-        }
-        // test a string _solely_ with character that must always be quoted
-        for (Character minimalQuoteCharacter : MINIMAL_QUOTE_CHARACTERS) {
-            String input = Character.toString(minimalQuoteCharacter);
-            QuoteTestInput testQuoteInput = createAlwaysQuoteInput(input);
+            QuoteTestInput testQuoteInput = createExpectedQuotedTestInput(input);
             quoteTestInputList.add(testQuoteInput);
         }
 
+        // test a string _solely_ with character that must always be quoted
+        for (Character minimalQuoteCharacter : MINIMAL_QUOTE_CHARACTERS) {
+            String input = Character.toString(minimalQuoteCharacter);
+            QuoteTestInput testQuoteInput = createExpectedQuotedTestInput(input);
+            quoteTestInputList.add(testQuoteInput);
+        }
+
+        // for simple string with spaces, expect it to _not_ be quoted in 'lenient mode'
         String withSpaces = "string with spaces";
-        QuoteTestInput testQuoteInput = createAlwaysQuoteInput(withSpaces);
+        QuoteTestInput testQuoteInput = createExpectedQuotedTestInput(withSpaces);
         testQuoteInput.expectedValueMap.put(QuoteMode.LENIENT, withSpaces);
         quoteTestInputList.add(testQuoteInput);
 
@@ -117,7 +128,7 @@ public class MatrixToCsvTextConverterTest {
      * @param input the input string
      * @return QuoteTestInput object
      */
-    private static QuoteTestInput createAlwaysQuoteInput(String input) {
+    private static QuoteTestInput createExpectedQuotedTestInput(String input) {
         String quotedInput = quoteWrap(input);
         Map<QuoteMode,String> expectedMap = new LinkedHashMap<>();
         for (QuoteMode quoteMode : QuoteMode.values()) {
