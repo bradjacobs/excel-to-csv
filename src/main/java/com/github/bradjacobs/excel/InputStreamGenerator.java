@@ -34,6 +34,9 @@ public class InputStreamGenerator {
         else if (!Files.exists(inputFile)) {
             throw new FileNotFoundException(String.format("Invalid Excel file path: %s", inputFile.toAbsolutePath()));
         }
+        else if (Files.isDirectory(inputFile)) {
+            throw new IllegalArgumentException("The input file is a directory.");
+        }
         return new BufferedInputStream( Files.newInputStream(inputFile) );
     }
 
