@@ -68,7 +68,7 @@ public class SpecialCharacterSanitizer {
      * @return sanitized version of the input string
      */
     public String sanitize(String input) {
-        if (this.replacementMap.isEmpty()) {
+        if (input.isEmpty() || this.replacementMap.isEmpty()) {
             return input;
         }
         int length = input.length();
