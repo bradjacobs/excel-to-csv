@@ -95,7 +95,7 @@ public class SpecialCharacterSanitizerTest {
             "Façade, Facade",
             "CAFÉ, CAFE",
             "résumé, resume",
-            "deja vu, deja vu"
+            "déjà vu, deja vu"
     })
     void sanitizeBasicDiacritics(String input, String expected) {
         String result = new SpecialCharacterSanitizer(BASIC_DIACRITICS).sanitize(input);
