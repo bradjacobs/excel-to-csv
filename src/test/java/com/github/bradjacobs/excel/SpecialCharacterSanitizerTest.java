@@ -7,6 +7,7 @@ import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.FieldSource;
 
 import java.util.Arrays;
@@ -42,7 +43,7 @@ public class SpecialCharacterSanitizerTest {
     //   becomes a "normal" space character
     @ParameterizedTest
     @FieldSource("spaceChars")
-    public void testConvertToNormalSpace(String spaceChar) {
+    public void sanitizeSpacialSpaceCharacter(String spaceChar) {
         String inputString = "a" + spaceChar + "b";
         String expectedResult = "a b";
         String result = new SpecialCharacterSanitizer(SPACES).sanitize(inputString);
@@ -50,7 +51,7 @@ public class SpecialCharacterSanitizerTest {
     }
 
     @Test
-    public void testSanitizeDoubleCurlyQuotes() {
+    public void sanitizeWithDoubleCurlyQuotes() {
         String inputCurlyDoubleQuotes = "she said “hi” to my dog";
         String expectedResult = "she said \"hi\" to my dog";
         String result = new SpecialCharacterSanitizer(QUOTES).sanitize(inputCurlyDoubleQuotes);
@@ -58,7 +59,7 @@ public class SpecialCharacterSanitizerTest {
     }
 
     @Test
-    public void testSanitizeSingleCurlyQuotes() {
+    public void sanitizeWithSingleCurlyQuotes() {
         String inputCurlySingleQuotes = "she said ‘hi’ to my dog";
         String expectedResult = "she said 'hi' to my dog";
         String result = new SpecialCharacterSanitizer(QUOTES).sanitize(inputCurlySingleQuotes);
@@ -66,37 +67,43 @@ public class SpecialCharacterSanitizerTest {
     }
 
     @Test
-    public void testDontSanitizeWhitespaceIfNotConfigured() {
+    public void validateDisablingWhitespaceSanitization() {
         String inputString = "has \u00a0 special space";
         String result = new SpecialCharacterSanitizer(new HashSet<>()).sanitize(inputString);
         assertEquals(inputString, result, "expected input string to remain unchanged.");
     }
 
     @Test
-    public void testDontSanitizeQuotesIfNotConfigured() {
+    public void validateDisablingQuoteSanitization() {
         String inputString = "has special \u201C quote";
         String result = new SpecialCharacterSanitizer(new HashSet<>()).sanitize(inputString);
         assertEquals(inputString, result, "expected input string to remain unchanged.");
     }
 
     @Test
-    public void testDefaultConfigurations() {
+    public void checkDefaultConfigurationFlags() {
         String inputString = "\u2018 ab \u201C cd \u00a0 ef";
         String expectedString = "' ab \" cd   ef";
         String result = new SpecialCharacterSanitizer().sanitize(inputString);
         assertEquals(expectedString, result, "mismatch expected Sanitized String.");
     }
 
-    @Test
-    public void testBasicDiacritics() {
-        String inputString = "_é_cat_Ç_";
-        String expectedString = "_e_cat_C_";
-        String result = new SpecialCharacterSanitizer(BASIC_DIACRITICS).sanitize(inputString);
-        assertEquals(expectedString, result, "mismatch expected Sanitized String.");
+    @ParameterizedTest
+    @CsvSource({
+            "lēad, lead",
+            "naïve, naive",
+            "Façade, Facade",
+            "CAFÉ, CAFE",
+            "résumé, resume",
+            "deja vu, deja vu"
+    })
+    void sanitizeBasicDiacritics(String input, String expected) {
+        String result = new SpecialCharacterSanitizer(BASIC_DIACRITICS).sanitize(input);
+        assertEquals(expected, result, "mismatch expected sanitized diacritics");
     }
 
     @Test
-    public void testInvalidNullParameter() {
+    public void validateNullParameter() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new SpecialCharacterSanitizer((Set<CharSanitizeFlags>) null);
         });
