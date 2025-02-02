@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 // TODO - the next round of refactoring could probably involve using a 'lambda parameter'
-//   to help further reduce some of the redundant code throught this test file.
+//   to help further reduce some of the redundant code through this test file.
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class ExcelReaderExceptionHandlingTest {
