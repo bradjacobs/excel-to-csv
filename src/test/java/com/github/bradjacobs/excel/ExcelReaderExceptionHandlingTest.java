@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -31,12 +32,8 @@ import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.api.TestInstance.Lifecycle;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-// TODO - the next round of refactoring could probably involve using a 'lambda parameter'
-//   to help further reduce some of the redundant code through this test file.
-
 @TestInstance(Lifecycle.PER_CLASS)
 public class ExcelReaderExceptionHandlingTest {
-
     private static final Path VALID_TEST_INPUT_PATH = getPathObject("test_data.xlsx");
     private static final File VALID_TEST_INPUT_FILE = VALID_TEST_INPUT_PATH.toFile();
     private static final Path VALID_TEST_INPUT_PSWD_PATH = getPathObject("test_data_w_pswd_1234.xlsx");
@@ -94,100 +91,60 @@ public class ExcelReaderExceptionHandlingTest {
         @MethodSource("invalidInputPaths")
         public void invalidInputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             Path path = location != null ? Paths.get(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToCsvFile(path, VALID_OUT_PATH);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable = () -> DEFAULT_EXCEL_READER.convertToCsvFile(path, VALID_OUT_PATH);
+            assertExecutableException(executable, expectedException, expectedMessage);
         }
 
         @ParameterizedTest
         @MethodSource("invalidInputPaths")
         public void invalidInputFileParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             File file = location != null ? new File(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToCsvFile(file, VALID_OUT_FILE);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable = () -> DEFAULT_EXCEL_READER.convertToCsvFile(file, VALID_OUT_FILE);
+            assertExecutableException(executable, expectedException, expectedMessage);
         }
 
         @ParameterizedTest
         @MethodSource("invalidInputUrls")
         public void invalidInputUrlParamWithPath(String location, Class<? extends Exception> expectedException, String expectedMessage) throws MalformedURLException {
             URL url = location != null ? new URL(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToCsvFile(url, VALID_OUT_PATH);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable = () -> DEFAULT_EXCEL_READER.convertToCsvFile(url, VALID_OUT_PATH);
+            assertExecutableException(executable, expectedException, expectedMessage);
         }
 
         @ParameterizedTest
         @MethodSource("invalidInputUrls")
         public void invalidInputUrlParamWithFile(String location, Class<? extends Exception> expectedException, String expectedMessage) throws MalformedURLException {
             URL url = location != null ? new URL(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToCsvFile(url, VALID_OUT_FILE);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable = () -> DEFAULT_EXCEL_READER.convertToCsvFile(url, VALID_OUT_FILE);
+            assertExecutableException(executable, expectedException, expectedMessage);
         }
 
         @ParameterizedTest
         @MethodSource("invalidOutputPaths")
         public void invalidOutputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) throws MalformedURLException {
             Path path = location != null ? Paths.get(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToCsvFile(VALID_TEST_INPUT_PATH, path);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable1 = () -> DEFAULT_EXCEL_READER.convertToCsvFile(VALID_TEST_INPUT_PATH, path);
+            assertExecutableException(executable1, expectedException, expectedMessage);
 
             // repeat the same test using URL input param.  \
             //   The invalid CSV out param should be detected _BEFORE_ the invalid url is detected
             URL url = new URL("http://somesite.com/file.xlsx");
-            exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToCsvFile(url, path);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable2 = () -> DEFAULT_EXCEL_READER.convertToCsvFile(url, path);
+            assertExecutableException(executable2, expectedException, expectedMessage);
         }
 
         @ParameterizedTest
         @MethodSource("invalidOutputPaths")
         public void invalidOutputFileParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) throws MalformedURLException {
             File file = location != null ? new File(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToCsvFile(VALID_TEST_INPUT_FILE, file);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable1 = () -> DEFAULT_EXCEL_READER.convertToCsvFile(VALID_TEST_INPUT_FILE, file);
+            assertExecutableException(executable1, expectedException, expectedMessage);
 
             // repeat the same test using URL input param.  \
             //   The invalid CSV out param should be detected _BEFORE_ the invalid url is detected
             URL url = new URL("http://somesite.com/file.xlsx");
-            exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToCsvFile(url, file);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable2 = () -> DEFAULT_EXCEL_READER.convertToCsvFile(url, file);
+            assertExecutableException(executable2, expectedException, expectedMessage);
         }
     }
 
@@ -199,39 +156,24 @@ public class ExcelReaderExceptionHandlingTest {
         @MethodSource("invalidInputPaths")
         public void invalidInputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             Path path = location != null ? Paths.get(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToCsvText(path);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable = () -> DEFAULT_EXCEL_READER.convertToCsvText(path);
+            assertExecutableException(executable, expectedException, expectedMessage);
         }
 
         @ParameterizedTest
         @MethodSource("invalidInputPaths")
         public void invalidInputFileParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             File file = location != null ? new File(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToCsvText(file);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable = () -> DEFAULT_EXCEL_READER.convertToCsvText(file);
+            assertExecutableException(executable, expectedException, expectedMessage);
         }
 
         @ParameterizedTest
         @MethodSource("invalidInputUrls")
         public void invalidInputUrlParamWithPath(String location, Class<? extends Exception> expectedException, String expectedMessage) throws MalformedURLException {
             URL url = location != null ? new URL(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToCsvText(url);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable = () -> DEFAULT_EXCEL_READER.convertToCsvText(url);
+            assertExecutableException(executable, expectedException, expectedMessage);
         }
     }
 
@@ -243,39 +185,41 @@ public class ExcelReaderExceptionHandlingTest {
         @MethodSource("invalidInputPaths")
         public void invalidInputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             Path path = location != null ? Paths.get(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToDataMatrix(path);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable = () -> DEFAULT_EXCEL_READER.convertToDataMatrix(path);
+            assertExecutableException(executable, expectedException, expectedMessage);
         }
 
         @ParameterizedTest
         @MethodSource("invalidInputPaths")
         public void invalidInputFileParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             File file = location != null ? new File(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToDataMatrix(file);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable = () -> DEFAULT_EXCEL_READER.convertToDataMatrix(file);
+            assertExecutableException(executable, expectedException, expectedMessage);
         }
 
         @ParameterizedTest
         @MethodSource("invalidInputUrls")
         public void invalidInputUrlParamWithPath(String location, Class<? extends Exception> expectedException, String expectedMessage) throws MalformedURLException {
             URL url = location != null ? new URL(location) : null;
-            Exception exception = assertThrows(Exception.class, () -> {
-                DEFAULT_EXCEL_READER.convertToDataMatrix(url);
-            });
-            assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-            if (expectedMessage != null) {
-                assertEquals(expectedMessage, exception.getMessage());
-            }
+            Executable executable = () -> DEFAULT_EXCEL_READER.convertToDataMatrix(url);
+            assertExecutableException(executable, expectedException, expectedMessage);
+        }
+    }
+
+    /**
+     * Junit run the executable and check that is throws the expected exception and msg.
+     * @param executable executable
+     * @param expectedException expectedException
+     * @param expectedMessage expectedMessage
+     */
+    private void assertExecutableException(
+            Executable executable,
+            Class<? extends Exception> expectedException,
+            String expectedMessage) {
+        Exception exception = assertThrows(Exception.class, executable);
+        assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
+        if (expectedMessage != null) {
+            assertEquals(expectedMessage, exception.getMessage());
         }
     }
 
