@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,6 +11,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -246,12 +249,11 @@ public class ExcelReaderTest {
     }
 
     private String readResourceFileText(String fileName) {
-        try {
-            URL resource = this.getClass().getClassLoader().getResource(fileName);
-            assertNotNull(resource);
-            return new String( Files.readAllBytes( Paths.get(resource.getPath()) ) );
+        try (InputStream is =  this.getClass().getClassLoader().getResourceAsStream(fileName)) {
+            assertNotNull(is);
+            return IOUtils.toString(is, StandardCharsets.UTF_8);
         }
-        catch (Exception e) {
+        catch (IOException e) {
             throw new RuntimeException(String.format("Unable to read test resource file: %s.  Reason: %s", fileName, e.getMessage()), e);
         }
     }
