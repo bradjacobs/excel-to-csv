@@ -80,7 +80,7 @@ public class ExcelReaderTest {
         URL inputFileUrl = getTestLocalFileUrl();
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
         String csvText = excelReader.convertToCsvText(inputFileUrl);
-        assertEquals(csvText, expectedCsvText, "mismatch of expected csv output");
+        assertEquals(expectedCsvText, csvText, "mismatch of expected csv output");
     }
 
     @Test
