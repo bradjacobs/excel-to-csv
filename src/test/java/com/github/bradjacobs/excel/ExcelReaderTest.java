@@ -4,8 +4,9 @@
 package com.github.bradjacobs.excel;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,7 +22,6 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -39,7 +39,6 @@ public class ExcelReaderTest {
     private static final int EXPECTED_COL_COUNT = 5;
 
     private static final String TEST_OUTPUT_FILE_NAME = "test_output.csv";
-    private static final File TEST_OUTPUT_FILE = new File(TEST_OUTPUT_FILE_NAME);
 
     private static Stream<Arguments> quoteVariations() {
         return Stream.of(
@@ -121,25 +120,8 @@ public class ExcelReaderTest {
     }
 
     @Test
-    public void testSaveFile() throws Exception {
-        cleanupTestFile(); // first check if residual file still around from a previous test.
-
-        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
-        File inputFile = getTestFileObject();
-        excelReader.convertToCsvFile(inputFile, TEST_OUTPUT_FILE);
-        assertTrue(TEST_OUTPUT_FILE.exists(), "expected csv file was NOT created");
-
-        String outputFileContent =
-                Files.readString(Paths.get(TEST_OUTPUT_FILE.getAbsolutePath()), StandardCharsets.UTF_8);
-        String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
-        assertEquals(expectedCsvText, outputFileContent, "mismatch of content of saved csv file");
-    }
-
-    @Test
     public void testFilePathAsUrl() throws Exception {
-        URL fileUrl = this.getClass().getClassLoader().getResource(TEST_DATA_FILE);
-        assertNotNull(fileUrl);
-
+        URL fileUrl = getTestResourceFileUrl(TEST_DATA_FILE);
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
         String csvText = excelReader.convertToCsvText(fileUrl);
         String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
@@ -177,8 +159,7 @@ public class ExcelReaderTest {
     // Test that some cells that only contain "whitespace" get trimmed to empty string
     @Test
     public void testTrimmingSpaces() throws Exception {
-        URL resourceUrl = this.getClass().getClassLoader().getResource("spaces_data.xlsx");
-        assertNotNull(resourceUrl);
+        URL resourceUrl = getTestResourceFileUrl("spaces_data.xlsx");
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
 
@@ -194,9 +175,7 @@ public class ExcelReaderTest {
     //   in this case the column should not be counted.
     @Test
     public void testHandleExtraBlankColumns() throws Exception {
-        URL resourceUrl = this.getClass().getClassLoader().getResource("spaces_data.xlsx");
-        assertNotNull(resourceUrl);
-
+        URL resourceUrl = getTestResourceFileUrl("spaces_data.xlsx");
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).setSheetName("LAST_COL_WHITESPACE").build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals(1, csvMatrix[0].length, "mismatch of expected number of columns in csv output.");
@@ -205,9 +184,7 @@ public class ExcelReaderTest {
     // Happy Path testcase reading an Excel file that is password protected.
     @Test
     public void testReadPasswordProtectedFile() throws Exception {
-        URL resourceUrl = this.getClass().getClassLoader().getResource("test_data_w_pswd_1234.xlsx");
-        assertNotNull(resourceUrl);
-
+        URL resourceUrl = getTestResourceFileUrl("test_data_w_pswd_1234.xlsx");
         ExcelReader excelReader = ExcelReader.builder().setPassword("1234").build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals("aaa", csvMatrix[0][0]);
@@ -218,9 +195,7 @@ public class ExcelReaderTest {
     //   cause an ArrayIndexOutOfBoundsException
     @Test
     public void testBadRowRepro() throws Exception {
-        URL resourceUrl = this.getClass().getClassLoader().getResource("repro.xlsx");
-        assertNotNull(resourceUrl);
-
+        URL resourceUrl = getTestResourceFileUrl("repro.xlsx");
         ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals("aaa", csvMatrix[0][0]);
@@ -229,12 +204,36 @@ public class ExcelReaderTest {
         assertEquals("ddd", csvMatrix[2][1]);
     }
 
-    @AfterEach
-    private void cleanupTestFile() {
-        if (TEST_OUTPUT_FILE.exists()) {
-            boolean wasDeleted = TEST_OUTPUT_FILE.delete();
-            assertTrue(wasDeleted, "unable to delete file: " + TEST_OUTPUT_FILE.getAbsolutePath());
-            assertFalse(TEST_OUTPUT_FILE.exists(), "unable to delete file");  // paranoia double-check
+    @Nested
+    class SavingCsvFileTests {
+        @Test
+        public void testSavePathObject(@TempDir Path tempDir) throws Exception {
+            Path testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME);
+
+            ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+            Path inputFile = getTestFileObject().toPath();
+            excelReader.convertToCsvFile(inputFile, testOutputFile);
+            assertTrue(Files.exists(testOutputFile), "expected csv file was NOT created");
+
+            String outputFileContent =
+                    Files.readString(testOutputFile, StandardCharsets.UTF_8);
+            String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
+            assertEquals(expectedCsvText, outputFileContent, "mismatch of content of saved csv file");
+        }
+
+        @Test
+        public void testSaveFileObject(@TempDir Path tempDir) throws Exception {
+            File testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME).toFile();
+
+            ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+            File inputFile = getTestFileObject();
+            excelReader.convertToCsvFile(inputFile, testOutputFile);
+            assertTrue(testOutputFile.exists(), "expected csv file was NOT created");
+
+            String outputFileContent =
+                    Files.readString(Paths.get(testOutputFile.getAbsolutePath()), StandardCharsets.UTF_8);
+            String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
+            assertEquals(expectedCsvText, outputFileContent, "mismatch of content of saved csv file");
         }
     }
 
@@ -243,7 +242,11 @@ public class ExcelReaderTest {
     }
 
     private URL getTestLocalFileUrl() {
-        URL resourceUrl = this.getClass().getClassLoader().getResource(TEST_DATA_FILE);
+        return getTestResourceFileUrl(TEST_DATA_FILE);
+    }
+
+    private URL getTestResourceFileUrl(String fileName) {
+        URL resourceUrl = this.getClass().getClassLoader().getResource(fileName);
         assertNotNull(resourceUrl);
         return resourceUrl;
     }
