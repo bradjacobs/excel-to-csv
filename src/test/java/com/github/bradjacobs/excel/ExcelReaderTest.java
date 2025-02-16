@@ -275,7 +275,7 @@ public class ExcelReaderTest {
 
             char expectedBom = '\uFEFF';
             // the file that had the bom flag on shoud have it as the first character
-            assertEquals(csvFileString2.charAt(0), expectedBom, "Didn't find expecte Bom on saved csv file");
+            assertEquals(expectedBom, csvFileString2.charAt(0), "Didn't find expecte Bom on saved csv file");
 
             // now if remove this first bom character, then the 2 strings should be equal
             String trimmedCsvFileString2 = csvFileString2.substring(1);
