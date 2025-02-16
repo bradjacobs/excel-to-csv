@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -234,6 +235,51 @@ public class ExcelReaderTest {
                     Files.readString(Paths.get(testOutputFile.getAbsolutePath()), StandardCharsets.UTF_8);
             String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
             assertEquals(expectedCsvText, outputFileContent, "mismatch of content of saved csv file");
+        }
+
+        // if the uotput csv file saved does NOT have any unicode,
+        //  then the 'SaveUnicodeFileWithBom' flag should have no effect.
+        @Test
+        public void testBomFlagWithoutUnicode(@TempDir Path tempDir) throws Exception {
+            File testOutputFile1 = tempDir.resolve("test_bom_flag_off.csv").toFile();
+            File testOutputFile2 = tempDir.resolve("test_bom_flag_on.csv").toFile();
+
+            File inputFile = getTestFileObject();
+
+            ExcelReader excelReader1 = ExcelReader.builder().setSaveUnicodeFileWithBom(false).build();
+            excelReader1.convertToCsvFile(inputFile, testOutputFile1);
+            ExcelReader excelReader2 = ExcelReader.builder().setSaveUnicodeFileWithBom(true).build();
+            excelReader2.convertToCsvFile(inputFile, testOutputFile2);
+
+            assertEquals(testOutputFile1.length(), testOutputFile2.length(), "expect 2 files to be the same size");
+        }
+
+        @Test
+        public void testBomFlagWithUnicode(@TempDir Path tempDir) throws Exception {
+            File testOutputFile1 = tempDir.resolve("test_bom_flag_off.csv").toFile();
+            File testOutputFile2 = tempDir.resolve("test_bom_flag_on.csv").toFile();
+
+            URL inputFileUrl = getTestResourceFileUrl("repro.xlsx");
+            String sheetName = "WithUnicode";
+
+            ExcelReader excelReader1 = ExcelReader.builder()
+                    .setSaveUnicodeFileWithBom(false).setSheetName(sheetName).build();
+            ExcelReader excelReader2 = ExcelReader.builder()
+                    .setSaveUnicodeFileWithBom(true).setSheetName(sheetName).build();
+
+            excelReader1.convertToCsvFile(inputFileUrl, testOutputFile1);
+            excelReader2.convertToCsvFile(inputFileUrl, testOutputFile2);
+
+            String csvFileString1 =  FileUtils.readFileToString(testOutputFile1, StandardCharsets.UTF_8);
+            String csvFileString2 =  FileUtils.readFileToString(testOutputFile2, StandardCharsets.UTF_8);
+
+            char expectedBom = '\uFEFF';
+            // the file that had the bom flag on shoud have it as the first character
+            assertEquals(csvFileString2.charAt(0), expectedBom, "Didn't find expecte Bom on saved csv file");
+
+            // now if remove this first bom character, then the 2 strings should be equal
+            String trimmedCsvFileString2 = csvFileString2.substring(1);
+            assertEquals(csvFileString1, trimmedCsvFileString2);
         }
     }
 
