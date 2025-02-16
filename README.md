@@ -49,9 +49,9 @@ String[][] csvData = excelReader.convertToDataMatrix(new File("input.xlsx"));
 ```java
 // write csv file w/ specific settings
 ExcelReader excelReader = ExcelReader.builder()
-        .setQuoteMode(QuoteMode.LENIENT) // only quote values if necessary
-        .setSheetIndex(1) // grab the 2nd worksheet
-        .setSkipEmptyRows(true) // ignore any empty rows from the Excel worksheet
+        .quoteMode(QuoteMode.LENIENT) // only quote values if necessary
+        .sheetIndex(1) // grab the 2nd worksheet
+        .skipEmptyRows(true) // ignore any empty rows from the Excel worksheet
         .build();
 excelReader.convertToCsvFile(new File("input.xlsx"), new File("output.csv"));
 ```

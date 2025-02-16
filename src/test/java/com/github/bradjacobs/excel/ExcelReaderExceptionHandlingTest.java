@@ -229,7 +229,7 @@ public class ExcelReaderExceptionHandlingTest {
     class InvalidBuilderParamTests  {
         @Test
         public void outOfBoundsSheetIndex() {
-            ExcelReader excelReader = ExcelReader.builder().setSheetIndex(99).build();
+            ExcelReader excelReader = ExcelReader.builder().sheetIndex(99).build();
             assertThrows(IllegalArgumentException.class, () -> {
                 excelReader.convertToCsvText(VALID_TEST_INPUT_FILE);
             });
@@ -238,7 +238,7 @@ public class ExcelReaderExceptionHandlingTest {
         @Test
         public void negativeSheetIndex() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                ExcelReader.builder().setSheetIndex(-5).build();
+                ExcelReader.builder().sheetIndex(-5).build();
             });
             assertEquals("SheetIndex cannot be negative", exception.getMessage());
         }
@@ -246,13 +246,13 @@ public class ExcelReaderExceptionHandlingTest {
         @Test
         public void settingNullQuoteMode() {
             assertThrows(IllegalArgumentException.class, () -> {
-                ExcelReader.builder().setQuoteMode(null).build();
+                ExcelReader.builder().quoteMode(null).build();
             });
         }
 
         @Test
         public void testInvalidSheetName() {
-            ExcelReader excelReader = ExcelReader.builder().setSheetName("FAKE_WORKSHEET_NAME").build();
+            ExcelReader excelReader = ExcelReader.builder().sheetName("FAKE_WORKSHEET_NAME").build();
             assertThrows(IllegalArgumentException.class, () -> {
                 excelReader.convertToCsvText(VALID_TEST_INPUT_FILE);
             });
@@ -270,7 +270,7 @@ public class ExcelReaderExceptionHandlingTest {
                 "'',no password was supplied" // first param is empty string
         })
         public void invalidPasswordCheck(String password, String expectedMessageSubstring) {
-            ExcelReader excelReader = ExcelReader.builder().setPassword(password).build();
+            ExcelReader excelReader = ExcelReader.builder().password(password).build();
             Exception exception = assertThrows(Exception.class, () -> {
                 excelReader.convertToCsvText(VALID_TEST_INPUT_PSWD_FILE);
             });

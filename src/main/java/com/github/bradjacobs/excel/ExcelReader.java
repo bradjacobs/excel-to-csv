@@ -201,7 +201,7 @@ public class ExcelReader {
          * Set with sheet of Excel file to read (defaults to '0', i.e. the first sheet)
          * @param sheetIndex (0-based index of which sheet in Excel file to convert)
          */
-        public Builder setSheetIndex(int sheetIndex) {
+        public Builder sheetIndex(int sheetIndex) {
             if (sheetIndex < 0) {
                 throw new IllegalArgumentException("SheetIndex cannot be negative");
             }
@@ -214,7 +214,7 @@ public class ExcelReader {
          *  (if sheetName is set then sheetIndex is ignored)
          * @param sheetName name of Excel sheet
          */
-        public Builder setSheetName(String sheetName) {
+        public Builder sheetName(String sheetName) {
             this.sheetName = sheetName;
             return this;
         }
@@ -223,7 +223,7 @@ public class ExcelReader {
          * Whether to skip any empty rows.
          * @param skipEmptyRows (defaults to true)
          */
-        public Builder setSkipEmptyRows(boolean skipEmptyRows) {
+        public Builder skipEmptyRows(boolean skipEmptyRows) {
             this.skipEmptyRows = skipEmptyRows;
             return this;
         }
@@ -236,7 +236,7 @@ public class ExcelReader {
          *  LENIENT: add quotes around values that only really 'need' it to adhere to valid CSV (roughly similar to Excel 'save-as' CSV)
          *  NEVER:   never add quotes to any values.
          */
-        public Builder setQuoteMode(QuoteMode quoteMode) {
+        public Builder quoteMode(QuoteMode quoteMode) {
             if (quoteMode == null) {
                 throw new IllegalArgumentException("Cannot set quoteMode to null");
             }
@@ -248,13 +248,13 @@ public class ExcelReader {
          * Define a password to open the Excel file (if needed)
          * @param password excel file password
          */
-        public Builder setPassword(String password) {
+        public Builder password(String password) {
             // if user tries to set blank/empty string, then save as 'null'
             this.password = password != null && password.isEmpty() ? null : password;
             return this;
         }
 
-        public Builder setCharSanitizeFlags(CharSanitizeFlags... charSanitizeFlags) {
+        public Builder charSanitizeFlags(CharSanitizeFlags... charSanitizeFlags) {
             if (charSanitizeFlags == null) {
                 throw new IllegalArgumentException("Cannot set charSanitizeFlags to null");
             }
@@ -266,7 +266,7 @@ public class ExcelReader {
          * Use a BOM when writing output file if data contains 'unicode characters'
          * @param saveUnicodeFileWithBom (defaults to true)
          */
-        public Builder setSaveUnicodeFileWithBom(boolean saveUnicodeFileWithBom) {
+        public Builder saveUnicodeFileWithBom(boolean saveUnicodeFileWithBom) {
             this.saveUnicodeFileWithBom = saveUnicodeFileWithBom;
             return this;
         }

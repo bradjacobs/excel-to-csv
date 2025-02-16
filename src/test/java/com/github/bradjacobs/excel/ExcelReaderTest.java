@@ -56,7 +56,7 @@ public class ExcelReaderTest {
         String expectedCsvText = readResourceFileText(expectedResultFileName);
         File inputFile = getTestFileObject();
 
-        ExcelReader excelReader = ExcelReader.builder().setQuoteMode(quoteMode).setSkipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().quoteMode(quoteMode).skipEmptyRows(false).build();
         String csvText = excelReader.convertToCsvText(inputFile);
 
         assertEquals(expectedCsvText, csvText, "mismatch of expected csv output");
@@ -68,7 +68,7 @@ public class ExcelReaderTest {
         String expectedCsvText = readResourceFileText(expectedResultFileName);
         Path inputFile = getTestFileObject().toPath();
 
-        ExcelReader excelReader = ExcelReader.builder().setQuoteMode(quoteMode).setSkipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().quoteMode(quoteMode).skipEmptyRows(false).build();
         String csvText = excelReader.convertToCsvText(inputFile);
 
         assertEquals(expectedCsvText, csvText, "mismatch of expected csv output");
@@ -79,14 +79,14 @@ public class ExcelReaderTest {
         String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
 
         URL inputFileUrl = getTestLocalFileUrl();
-        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
         String csvText = excelReader.convertToCsvText(inputFileUrl);
         assertEquals(expectedCsvText, csvText, "mismatch of expected csv output");
     }
 
     @Test
     public void testMatrixOutput() throws Exception {
-        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
         File inputFile = getTestFileObject();
 
         String[][] csvData = excelReader.convertToDataMatrix(inputFile);
@@ -104,12 +104,12 @@ public class ExcelReaderTest {
         File inputFile = getTestFileObject();
 
         ExcelReader excelReader1 = ExcelReader.builder()
-                .setSkipEmptyRows(false)
+                .skipEmptyRows(false)
                 .build();
         String[][] csvDataHasEmptyRows = excelReader1.convertToDataMatrix(inputFile);
 
         ExcelReader excelReader2 = ExcelReader.builder()
-                .setSkipEmptyRows(true)
+                .skipEmptyRows(true)
                 .build();
         String[][] csvDataNoEmptyRows = excelReader2.convertToDataMatrix(inputFile);
 
@@ -123,7 +123,7 @@ public class ExcelReaderTest {
     @Test
     public void testFilePathAsUrl() throws Exception {
         URL fileUrl = getTestResourceFileUrl(TEST_DATA_FILE);
-        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
         String csvText = excelReader.convertToCsvText(fileUrl);
         String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
         assertNotNull(csvText);
@@ -133,8 +133,8 @@ public class ExcelReaderTest {
     @Test
     public void testReadSheetByName() throws Exception {
         ExcelReader excelReader = ExcelReader.builder()
-                .setSkipEmptyRows(false)
-                .setSheetName(TEST_SHEET_NAME.toLowerCase())  // use lower to confirm match is case-insensitive.
+                .skipEmptyRows(false)
+                .sheetName(TEST_SHEET_NAME.toLowerCase())  // use lower to confirm match is case-insensitive.
                 .build();
         File inputFile = getTestFileObject();
 
@@ -147,8 +147,8 @@ public class ExcelReaderTest {
     @Test
     public void testReadBlankSheet() throws Exception {
         ExcelReader excelReader = ExcelReader.builder()
-                .setSheetName(TEST_BLANK_SHEET_NAME)
-                .setSkipEmptyRows(false)
+                .sheetName(TEST_BLANK_SHEET_NAME)
+                .skipEmptyRows(false)
                 .build();
         File inputFile = getTestFileObject();
 
@@ -161,7 +161,7 @@ public class ExcelReaderTest {
     @Test
     public void testTrimmingSpaces() throws Exception {
         URL resourceUrl = getTestResourceFileUrl("spaces_data.xlsx");
-        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
 
         // the first row is a header row, but every other row should have
@@ -177,7 +177,7 @@ public class ExcelReaderTest {
     @Test
     public void testHandleExtraBlankColumns() throws Exception {
         URL resourceUrl = getTestResourceFileUrl("spaces_data.xlsx");
-        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).setSheetName("LAST_COL_WHITESPACE").build();
+        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).sheetName("LAST_COL_WHITESPACE").build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals(1, csvMatrix[0].length, "mismatch of expected number of columns in csv output.");
     }
@@ -186,7 +186,7 @@ public class ExcelReaderTest {
     @Test
     public void testReadPasswordProtectedFile() throws Exception {
         URL resourceUrl = getTestResourceFileUrl("test_data_w_pswd_1234.xlsx");
-        ExcelReader excelReader = ExcelReader.builder().setPassword("1234").build();
+        ExcelReader excelReader = ExcelReader.builder().password("1234").build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals("aaa", csvMatrix[0][0]);
         assertEquals("bbb", csvMatrix[0][1]);
@@ -197,7 +197,7 @@ public class ExcelReaderTest {
     @Test
     public void testBadRowRepro() throws Exception {
         URL resourceUrl = getTestResourceFileUrl("repro.xlsx");
-        ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals("aaa", csvMatrix[0][0]);
         assertEquals("bbb", csvMatrix[0][1]);
@@ -211,7 +211,7 @@ public class ExcelReaderTest {
         public void testSavePathObject(@TempDir Path tempDir) throws Exception {
             Path testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME);
 
-            ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+            ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
             Path inputFile = getTestFileObject().toPath();
             excelReader.convertToCsvFile(inputFile, testOutputFile);
             assertTrue(Files.exists(testOutputFile), "expected csv file was NOT created");
@@ -226,7 +226,7 @@ public class ExcelReaderTest {
         public void testSaveFileObject(@TempDir Path tempDir) throws Exception {
             File testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME).toFile();
 
-            ExcelReader excelReader = ExcelReader.builder().setSkipEmptyRows(false).build();
+            ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
             File inputFile = getTestFileObject();
             excelReader.convertToCsvFile(inputFile, testOutputFile);
             assertTrue(testOutputFile.exists(), "expected csv file was NOT created");
@@ -237,7 +237,7 @@ public class ExcelReaderTest {
             assertEquals(expectedCsvText, outputFileContent, "mismatch of content of saved csv file");
         }
 
-        // if the uotput csv file saved does NOT have any unicode,
+        // if the output csv file saved does NOT have any unicode,
         //  then the 'SaveUnicodeFileWithBom' flag should have no effect.
         @Test
         public void testBomFlagWithoutUnicode(@TempDir Path tempDir) throws Exception {
@@ -246,9 +246,9 @@ public class ExcelReaderTest {
 
             File inputFile = getTestFileObject();
 
-            ExcelReader excelReader1 = ExcelReader.builder().setSaveUnicodeFileWithBom(false).build();
+            ExcelReader excelReader1 = ExcelReader.builder().saveUnicodeFileWithBom(false).build();
             excelReader1.convertToCsvFile(inputFile, testOutputFile1);
-            ExcelReader excelReader2 = ExcelReader.builder().setSaveUnicodeFileWithBom(true).build();
+            ExcelReader excelReader2 = ExcelReader.builder().saveUnicodeFileWithBom(true).build();
             excelReader2.convertToCsvFile(inputFile, testOutputFile2);
 
             assertEquals(testOutputFile1.length(), testOutputFile2.length(), "expect 2 files to be the same size");
@@ -263,9 +263,9 @@ public class ExcelReaderTest {
             String sheetName = "WithUnicode";
 
             ExcelReader excelReader1 = ExcelReader.builder()
-                    .setSaveUnicodeFileWithBom(false).setSheetName(sheetName).build();
+                    .saveUnicodeFileWithBom(false).sheetName(sheetName).build();
             ExcelReader excelReader2 = ExcelReader.builder()
-                    .setSaveUnicodeFileWithBom(true).setSheetName(sheetName).build();
+                    .saveUnicodeFileWithBom(true).sheetName(sheetName).build();
 
             excelReader1.convertToCsvFile(inputFileUrl, testOutputFile1);
             excelReader2.convertToCsvFile(inputFileUrl, testOutputFile2);
