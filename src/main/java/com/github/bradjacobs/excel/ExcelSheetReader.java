@@ -21,6 +21,11 @@ import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitize
 class ExcelSheetReader {
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
+    static {
+        // set to true to get actual value visible in a formula cell,
+        //   and not the raw formula itself.
+        EXCEL_DATA_FORMATTER.setUseCachedValuesForFormulaCells(true);
+    }
 
     private final boolean skipEmptyRows;
     private final SpecialCharacterSanitizer specialCharSanitizer;
@@ -136,32 +141,11 @@ class ExcelSheetReader {
             return "";
         }
 
-        String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell, formulaEvaluator);
+        String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell);
 
         // if there are any certain special unicode characters (like nbsp or smart quotes),
         // replace w/ normal character equivalent
         cellValue = specialCharSanitizer.sanitize(cellValue);
-
         return cellValue.trim();
     }
-
-    /**
-     * NOTE: this formulaEvaluator was copied directly from the "dummyEvaluator" in org.apache.poi.ss.util.SheetUtil,
-     *  b/c it's private and the need for it is exactly the same.
-     *  Namely: "...returns formula string for formula cells. Dummy evaluator makes it to format the cached formula result."
-     *  @see org.apache.poi.ss.util.SheetUtil
-     */
-    private static final FormulaEvaluator formulaEvaluator = new FormulaEvaluator() {
-        @Override public void clearAllCachedResultValues() {}
-        @Override public void notifySetFormula(Cell cell) {}
-        @Override public void notifyDeleteCell(Cell cell) {}
-        @Override public void notifyUpdateCell(Cell cell) {}
-        @Override public CellValue evaluate(Cell cell) { return null; }
-        @Override public Cell evaluateInCell(Cell cell) { return null; }
-        @Override public void setupReferencedWorkbooks(Map<String, FormulaEvaluator> workbooks) {}
-        @Override public void setDebugEvaluationOutputForNextEval(boolean value) {}
-        @Override public void setIgnoreMissingWorkbooks(boolean ignore) {}
-        @Override public void evaluateAll() {}
-        @Override public CellType evaluateFormulaCell(Cell cell) { return cell.getCachedFormulaResultType(); }
-    };
 }
