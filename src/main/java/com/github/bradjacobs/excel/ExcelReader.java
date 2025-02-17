@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags;
+import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -23,8 +23,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.SPACES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
 
 /**
  * Simple class that reads an Excel Worksheet
@@ -187,13 +188,15 @@ public class ExcelReader {
     }
 
     public static class Builder {
+        private static final CharSanitizeFlag[] DEFAULT_SANITIZE_FLAGS = new CharSanitizeFlag[] {SPACES, QUOTES };
+
         private int sheetIndex = 0;    // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name
         private boolean skipEmptyRows = false; // skip any empty lines when set
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
         private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains unicode.
-        private Set<CharSanitizeFlags> charSanitizeFlags = Set.of(SPACES, QUOTES);
+        private final Set<CharSanitizeFlag> charSanitizeFlags = new HashSet<>(Arrays.asList(DEFAULT_SANITIZE_FLAGS));
 
         private Builder() {}
 
@@ -254,11 +257,21 @@ public class ExcelReader {
             return this;
         }
 
-        public Builder charSanitizeFlags(CharSanitizeFlags... charSanitizeFlags) {
-            if (charSanitizeFlags == null) {
-                throw new IllegalArgumentException("Cannot set charSanitizeFlags to null");
-            }
-            this.charSanitizeFlags = new HashSet<>(Arrays.asList(charSanitizeFlags));
+        public Builder sanitizeWhitespace(boolean sanitizeWhitespace) {
+            return setSanitizeFlag(SPACES, sanitizeWhitespace);
+        }
+
+        public Builder sanitizeQuotes(boolean sanitizeQuotes) {
+            return setSanitizeFlag(QUOTES, sanitizeQuotes);
+        }
+
+        public Builder sanitizeDiacritics(boolean sanitizeDiacritics) {
+            return setSanitizeFlag(BASIC_DIACRITICS, sanitizeDiacritics);
+        }
+
+        private Builder setSanitizeFlag(CharSanitizeFlag flag, boolean shouldAdd) {
+            if (shouldAdd) { this.charSanitizeFlags.add(flag); }
+            else { this.charSanitizeFlags.remove(flag); }
             return this;
         }
 

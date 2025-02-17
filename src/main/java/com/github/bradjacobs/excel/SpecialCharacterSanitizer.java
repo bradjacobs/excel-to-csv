@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.SPACES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -25,14 +25,14 @@ import static java.util.stream.Collectors.toMap;
 public class SpecialCharacterSanitizer {
 
     // enums to define the types of sanitizations to perform
-    public enum CharSanitizeFlags {
+    public enum CharSanitizeFlag {
         SPACES, // replace special space characters with normal space 0x20 (note '\n','\r','\t' are _NOT_ considered)
         QUOTES, // replace special quotes (like smart quotes) with normal single/double quote character
         BASIC_DIACRITICS // replace basic diacritics (e.g. 'é' -> 'e').  Not every possibility is considered
     }
 
     // by default, handle spaces and quotes
-    private static final Set<CharSanitizeFlags> DEFAULT_FLAGS = Set.of(SPACES, QUOTES);
+    private static final Set<CharSanitizeFlag> DEFAULT_FLAGS = Set.of(SPACES, QUOTES);
     private static final Character SPACE_CHAR = ' ';
 
     private final Map<Character,Character> replacementMap;
@@ -41,11 +41,11 @@ public class SpecialCharacterSanitizer {
         this(DEFAULT_FLAGS);
     }
 
-    public SpecialCharacterSanitizer(CharSanitizeFlags... charSanitizeFlags) {
+    public SpecialCharacterSanitizer(CharSanitizeFlag... charSanitizeFlags) {
         this(convertToSet(charSanitizeFlags));
     }
 
-    public SpecialCharacterSanitizer(Set<CharSanitizeFlags> charSanitizeFlags) {
+    public SpecialCharacterSanitizer(Set<CharSanitizeFlag> charSanitizeFlags) {
         if (charSanitizeFlags == null) {
             throw new IllegalArgumentException("Must provide non-null charSanitizeFlags.");
         }
@@ -85,7 +85,7 @@ public class SpecialCharacterSanitizer {
         return sb.toString();
     }
 
-    private static Set<CharSanitizeFlags> convertToSet(CharSanitizeFlags... charSanitizeFlags) {
+    private static Set<CharSanitizeFlag> convertToSet(CharSanitizeFlag... charSanitizeFlags) {
         if (charSanitizeFlags == null) {
             return null;
         }

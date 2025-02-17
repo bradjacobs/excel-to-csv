@@ -283,6 +283,33 @@ public class ExcelReaderTest {
         }
     }
 
+    @Nested
+    class CharacterSanitizerTests {
+        @Test
+        public void testDeaultNoDiacriticsSanitization() throws Exception {
+            URL inputFileUrl = getTestResourceFileUrl("repro.xlsx");
+            String sheetName = "WithUnicode";
+
+            ExcelReader excelReader = ExcelReader.builder().sheetName(sheetName).build();
+            String[][] dataMatrix = excelReader.convertToDataMatrix(inputFileUrl);
+            assertEquals("Façade", dataMatrix[0][0]);
+        }
+
+        @Test
+        public void testDiacriticsSanitization() throws Exception {
+            URL inputFileUrl = getTestResourceFileUrl("repro.xlsx");
+            String sheetName = "WithUnicode";
+
+            ExcelReader excelReader = ExcelReader.builder()
+                    .sanitizeDiacritics(true)
+                    .sheetName(sheetName)
+                    .build();
+            String[][] dataMatrix = excelReader.convertToDataMatrix(inputFileUrl);
+            assertEquals("Facade", dataMatrix[0][0]);
+        }
+    }
+
+
     private File getTestFileObject() {
         return new File( getTestLocalFileUrl().getPath() );
     }

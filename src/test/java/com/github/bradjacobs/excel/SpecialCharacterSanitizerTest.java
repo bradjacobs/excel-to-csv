@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags;
+import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -15,9 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags.SPACES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Named.named;
@@ -105,12 +105,12 @@ public class SpecialCharacterSanitizerTest {
     @Test
     public void validateNullParameter() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new SpecialCharacterSanitizer((Set<CharSanitizeFlags>) null);
+            new SpecialCharacterSanitizer((Set<CharSanitizeFlag>) null);
         });
         assertEquals("Must provide non-null charSanitizeFlags.", exception.getMessage());
 
         Exception exception2 = assertThrows(IllegalArgumentException.class, () -> {
-            new SpecialCharacterSanitizer((CharSanitizeFlags[]) null);
+            new SpecialCharacterSanitizer((CharSanitizeFlag[]) null);
         });
         assertEquals("Must provide non-null charSanitizeFlags.", exception2.getMessage());
     }

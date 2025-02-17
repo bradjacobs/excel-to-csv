@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlags;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
 
 class ExcelSheetReader {
     private static final boolean EMULATE_CSV = true;
@@ -27,7 +27,7 @@ class ExcelSheetReader {
     private final SpecialCharacterSanitizer specialCharSanitizer;
 
     protected ExcelSheetReader(boolean skipEmptyRows,
-                               Set<CharSanitizeFlags> charSanitizeFlags) {
+                               Set<CharSanitizeFlag> charSanitizeFlags) {
         this.skipEmptyRows = skipEmptyRows;
         this.specialCharSanitizer = new SpecialCharacterSanitizer(charSanitizeFlags);
     }
