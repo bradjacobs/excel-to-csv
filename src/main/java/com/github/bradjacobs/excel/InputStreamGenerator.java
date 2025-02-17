@@ -23,7 +23,7 @@ public class InputStreamGenerator {
     private static final int CONNECTION_TIMEOUT = 20000;
     // some websites require a userAgent value set.
     //    side:  seen a case where a userAgent with substring 'java' would fail  (empirical evidence)
-    private static final String USER_AGENT_VALUE = "jclient/" + System.getProperty("java.version");
+    private static final String USER_AGENT_VALUE = "javaClient/" + System.getProperty("java.version");
 
     public InputStream getInputStream(Path inputFile) throws IOException {
         if (inputFile == null) {
