@@ -189,7 +189,7 @@ public class ExcelReader {
     public static class Builder {
         private int sheetIndex = 0;    // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name
-        private boolean skipEmptyRows = true; // default will skip any empty lines
+        private boolean skipEmptyRows = false; // skip any empty lines when set
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
         private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains unicode.
