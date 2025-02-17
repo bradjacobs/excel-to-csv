@@ -188,7 +188,7 @@ public class ExcelReader {
     }
 
     public static class Builder {
-        private static final CharSanitizeFlag[] DEFAULT_SANITIZE_FLAGS = new CharSanitizeFlag[] {SPACES, QUOTES };
+        private static final CharSanitizeFlag[] DEFAULT_SANITIZE_FLAGS = { SPACES, QUOTES };
 
         private int sheetIndex = 0;    // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name

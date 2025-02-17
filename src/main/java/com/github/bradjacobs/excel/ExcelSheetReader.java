@@ -18,8 +18,7 @@ class ExcelSheetReader {
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
     static {
-        // set to true to get actual value visible in a formula cell,
-        //   and not the raw formula itself.
+        // set true to get actual visible value in a formula cell, and not the raw formula itself.
         EXCEL_DATA_FORMATTER.setUseCachedValuesForFormulaCells(true);
     }
 
@@ -133,10 +132,7 @@ class ExcelSheetReader {
      * @return string representation of the cell.
      */
     private String getCellValue(Cell cell) {
-        if (cell == null) {
-            return "";
-        }
-
+        // note: the data formatter can handle a 'null' cell as well.
         String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell);
 
         // if there are any certain special unicode characters (like nbsp or smart quotes),
