@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.DASHES;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
 
@@ -267,6 +268,10 @@ public class ExcelReader {
 
         public Builder sanitizeDiacritics(boolean sanitizeDiacritics) {
             return setSanitizeFlag(BASIC_DIACRITICS, sanitizeDiacritics);
+        }
+
+        public Builder sanitizeDashes(boolean sanitizeDashes) {
+            return setSanitizeFlag(DASHES, sanitizeDashes);
         }
 
         private Builder setSanitizeFlag(CharSanitizeFlag flag, boolean shouldAdd) {

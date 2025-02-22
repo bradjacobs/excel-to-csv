@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.DASHES;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
 import static java.util.stream.Collectors.toMap;
@@ -28,6 +29,7 @@ public class SpecialCharacterSanitizer {
     public enum CharSanitizeFlag {
         SPACES, // replace special space characters with normal space 0x20 (note '\n','\r','\t' are _NOT_ considered)
         QUOTES, // replace special quotes (like smart quotes) with normal single/double quote character
+        DASHES, // replace special dashes with basic dash '-' character
         BASIC_DIACRITICS // replace basic diacritics (e.g. 'é' -> 'e').  Not every possibility is considered
     }
 
@@ -55,6 +57,9 @@ public class SpecialCharacterSanitizer {
         }
         if (charSanitizeFlags.contains(QUOTES)) {
             this.replacementMap.putAll(QUOTE_ONLY_REPLACEMENT_MAP);
+        }
+        if (charSanitizeFlags.contains(DASHES)) {
+            this.replacementMap.putAll(DASH_REPLACEMENT_MAP);
         }
         if (charSanitizeFlags.contains(BASIC_DIACRITICS)) {
             this.replacementMap.putAll(DIACRITICS_CHAR_REPLACEMENT_MAP);
@@ -84,6 +89,10 @@ public class SpecialCharacterSanitizer {
         }
         return sb.toString();
     }
+
+    //
+    // Below are private static methods for the initial setup of the character lookup maps
+    //
 
     // note: intentionally _not_ considering ascent marks as single quotes.
     private static final Character[] SINGLE_QUOTE_CHARS = {
@@ -119,13 +128,34 @@ public class SpecialCharacterSanitizer {
             '\uFF02', // Fullwidth Quotation Mark
     };
 
+    private static final Character[] DASH_CHARS = {
+            '\u05A8', // armenian hyphen
+            '\u05BE', // hebrew punctuation maqaf
+            '\u1806', // mongolian soft hyphen
+            '\u2010', // hyphen
+            '\u2011', // non-breaking hyphen
+            '\u2012', // figure dash
+            '\u2013', // en dash
+            '\u2014', // em dash
+            '\u2015', // horizontal bar
+            '\u207B', // superscript minus
+            '\u208B', // subscript minus
+            '\u2E3A', // two-em dash
+            '\u2E3B', // three-em dash
+            '\uFE58', // small em dash
+            '\uFE63', // small hyphen-minus
+            '\uFF0D', // fullwidth hyphen-minus
+    };
+
     private static final Map<Character,Character> SPACE_ONLY_REPLACEMENT_MAP;
     private static final Map<Character,Character> QUOTE_ONLY_REPLACEMENT_MAP;
+    private static final Map<Character,Character> DASH_REPLACEMENT_MAP;
     private static final Map<Character,Character> DIACRITICS_CHAR_REPLACEMENT_MAP;
 
     static {
         SPACE_ONLY_REPLACEMENT_MAP = generateSpaceReplacementMap();
         QUOTE_ONLY_REPLACEMENT_MAP = generateQuoteReplacementMap();
+        DASH_REPLACEMENT_MAP = generateDashReplacementMap();
         DIACRITICS_CHAR_REPLACEMENT_MAP = generateBasicDiacriticsCharReplacementMap();
     }
 
@@ -146,6 +176,10 @@ public class SpecialCharacterSanitizer {
             putAll(generateReplacementMap(SINGLE_QUOTE_CHARS, '\''));
             putAll(generateReplacementMap(DOUBLE_QUOTE_CHARS, '"'));
         }};
+    }
+
+    private static Map<Character,Character> generateDashReplacementMap() {
+        return generateReplacementMap(DASH_CHARS, '-');
     }
 
     private static Map<Character,Character> generateReplacementMap(Character[] inputCharList, Character replacementChar) {

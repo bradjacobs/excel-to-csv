@@ -83,6 +83,7 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 | saveUnicodeFileWithBom | NO       | true            | prepend 'BOM' to output CSV file if unicode characters were detected.                                                                                                                                                                                                          |
 | sanitizeWhitespace     | NO       | true            | replace any unicode or abnormal space character (i.e. nbsp) with a normal space                                                                                                                                                                                                |
 | sanitizeQuotes         | NO       | true            | replace any special single/double quotes (i.e. smart quotes) with normal quotes                                                                                                                                                                                                |
+| sanitizeDashes         | NO       | false           | replace any specia dash/hyphen character (i.e. em dash) with normal dash                                                                                                                                                                                                       |
 | sanitizeDiacritics     | NO       | false           | replace diacritic characters with its basic counterpart (i.e. 'é' -> 'e', 'Ç' -> 'C')                                                                                                                                                                                          |
 
 ## OtherInfo
@@ -103,7 +104,6 @@ A work item list that I might get around to "eventually" (perhaps)
 
 
 ## AlternateImplementations
-
 Searching on the web can yield alternate solutions that require less code.  However, they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well
 
 <details>

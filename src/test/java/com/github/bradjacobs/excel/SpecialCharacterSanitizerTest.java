@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.DASHES;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -100,6 +101,21 @@ public class SpecialCharacterSanitizerTest {
     void sanitizeBasicDiacritics(String input, String expected) {
         String result = new SpecialCharacterSanitizer(BASIC_DIACRITICS).sanitize(input);
         assertEquals(expected, result, "mismatch expected sanitized diacritics");
+    }
+
+    @Test
+    public void sanitizeDashCharaters() {
+        String inputCurlySingleQuotes = "aaa–bbb－ccc";
+        String expectedResult = "aaa-bbb-ccc";
+        String result = new SpecialCharacterSanitizer(DASHES).sanitize(inputCurlySingleQuotes);
+        assertEquals(expectedResult, result, "mismatch result of quote character replacement");
+    }
+
+    @Test
+    public void varifyDashSanitizationDisabledByDefault() {
+        String inputCurlySingleQuotes = "aaa–bbb－ccc";
+        String result = new SpecialCharacterSanitizer().sanitize(inputCurlySingleQuotes);
+        assertEquals(inputCurlySingleQuotes, result, "mismatch result of quote character replacement");
     }
 
     @Test
