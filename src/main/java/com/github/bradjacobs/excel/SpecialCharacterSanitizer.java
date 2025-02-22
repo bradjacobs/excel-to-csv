@@ -5,8 +5,8 @@ package com.github.bradjacobs.excel;
 
 import java.text.Normalizer;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -42,10 +42,10 @@ public class SpecialCharacterSanitizer {
     }
 
     public SpecialCharacterSanitizer(CharSanitizeFlag... charSanitizeFlags) {
-        this(convertToSet(charSanitizeFlags));
+        this(charSanitizeFlags != null ? Arrays.asList(charSanitizeFlags) : null);
     }
 
-    public SpecialCharacterSanitizer(Set<CharSanitizeFlag> charSanitizeFlags) {
+    public SpecialCharacterSanitizer(Collection<CharSanitizeFlag> charSanitizeFlags) {
         if (charSanitizeFlags == null) {
             throw new IllegalArgumentException("Must provide non-null charSanitizeFlags.");
         }
@@ -83,13 +83,6 @@ public class SpecialCharacterSanitizer {
             }
         }
         return sb.toString();
-    }
-
-    private static Set<CharSanitizeFlag> convertToSet(CharSanitizeFlag... charSanitizeFlags) {
-        if (charSanitizeFlags == null) {
-            return null;
-        }
-        return new HashSet<>(Arrays.asList(charSanitizeFlags));
     }
 
     // note: intentionally _not_ considering ascent marks as single quotes.
