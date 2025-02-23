@@ -10,19 +10,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Given string array, escape each value to make csv-compatible and
+ * Given a 2-D string array, escape each value to make csv-compatible and
  * combine to be final csv text string.
  */
-//  NOTE: could have just utilized 'com.fasterxml.jackson.dataformat.csv.CsvMapper'
-//    for the quoting logic, but didn't want to have to pull in yet another dependency.
-//      (reserve the right to change decision on this)
 public class MatrixToCsvTextConverter {
-    // any string that has a character below this ascii value
-    //   will be quoted in 'Normal Mode'
+    // a string that has a character below this ascii value should be quoted.  (Normal Mode)
     private static final int NORMAL_CRITERIA_MINIMUM = 45;
 
-    // if a cell value contains any of the characters then the result should be "quoted"
-    // before writing to CSV file.  (Lenient Mode)
+    // a string with any of these explicit characters should be quoted.  (Lenient Mode)
     private static final Set<Character> MINIMAL_QUOTE_CHARACTERS =
             new HashSet<>(Arrays.asList('"', ',', '\t', '\r', '\n'));
 
@@ -30,7 +25,14 @@ public class MatrixToCsvTextConverter {
 
     private final QuoteMode quoteMode;
 
+    /**
+     * Constructor
+     * @param quoteMode quoteMode type to determine rules for 'quoting' string values
+     */
     public MatrixToCsvTextConverter(QuoteMode quoteMode) {
+        if (quoteMode == null) {
+            throw new IllegalArgumentException("QuoteMode cannot be null.");
+        }
         this.quoteMode = quoteMode;
     }
 
@@ -76,6 +78,11 @@ public class MatrixToCsvTextConverter {
         return sb.toString();
     }
 
+    /**
+     * Determine if the value should be quoted based on the quoteMode
+     * @param value value
+     * @return true if value should be quoted for csv text.
+     */
     private boolean shouldQuoteWrap(String value) {
         if (this.quoteMode.equals(QuoteMode.NEVER)) {
             return false;
@@ -106,6 +113,11 @@ public class MatrixToCsvTextConverter {
         return false;
     }
 
+    /**
+     * checks if data matrix array is empty
+     * @param dataMatrix dataMatrix
+     * @return true if dataMatrix is considered 'empty'
+     */
     private boolean isEmptyDataMatrix(String[][] dataMatrix) {
         return (dataMatrix == null || dataMatrix.length == 0 || dataMatrix[0].length == 0);
     }
