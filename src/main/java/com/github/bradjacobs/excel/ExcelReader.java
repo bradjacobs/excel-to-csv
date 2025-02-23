@@ -161,16 +161,7 @@ public class ExcelReader {
     }
 
     private Path fileToPath(File file) {
-        if (file == null) {
-            return null;
-        }
-        try {
-            return Paths.get(file.getAbsolutePath());
-        }
-        catch (InvalidPathException ex) {
-            throw new IllegalArgumentException("The file path contains an illegal character: "
-                    + file.getAbsolutePath());
-        }
+        return (file != null ? file.toPath() : null);
     }
 
     private boolean containsUnicode(String input) {
