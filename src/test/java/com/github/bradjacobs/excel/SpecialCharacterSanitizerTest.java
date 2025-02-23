@@ -4,7 +4,10 @@
 package com.github.bradjacobs.excel;
 
 import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -82,11 +85,11 @@ public class SpecialCharacterSanitizerTest {
     }
 
     @Test
-    public void checkDefaultConfigurationFlags() {
-        String inputString = "\u2018 ab \u201C cd \u00a0 ef";
-        String expectedString = "' ab \" cd   ef";
-        String result = new SpecialCharacterSanitizer().sanitize(inputString);
-        assertEquals(expectedString, result, "mismatch expected Sanitized String.");
+    public void sanitizeDashCharaters() {
+        String inputCurlySingleQuotes = "aaa–bbb－ccc";
+        String expectedResult = "aaa-bbb-ccc";
+        String result = new SpecialCharacterSanitizer(DASHES).sanitize(inputCurlySingleQuotes);
+        assertEquals(expectedResult, result, "mismatch result of quote character replacement");
     }
 
     @ParameterizedTest
@@ -103,19 +106,43 @@ public class SpecialCharacterSanitizerTest {
         assertEquals(expected, result, "mismatch expected sanitized diacritics");
     }
 
-    @Test
-    public void sanitizeDashCharaters() {
-        String inputCurlySingleQuotes = "aaa–bbb－ccc";
-        String expectedResult = "aaa-bbb-ccc";
-        String result = new SpecialCharacterSanitizer(DASHES).sanitize(inputCurlySingleQuotes);
-        assertEquals(expectedResult, result, "mismatch result of quote character replacement");
-    }
+    @Nested
+    @DisplayName("Default Flag Tests")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class DefaultSanitizeFlagTests {
+        // whitespace sanitization ON by default
+        @Test
+        public void whitespaceDefaultSanitize() {
+            String input = "good\u00a0day";
+            String expected = "good day";
+            String result = new SpecialCharacterSanitizer().sanitize(input);
+            assertEquals(expected, result, "mismatch expected sanitized string");
+        }
 
-    @Test
-    public void varifyDashSanitizationDisabledByDefault() {
-        String inputCurlySingleQuotes = "aaa–bbb－ccc";
-        String result = new SpecialCharacterSanitizer().sanitize(inputCurlySingleQuotes);
-        assertEquals(inputCurlySingleQuotes, result, "mismatch result of quote character replacement");
+        // quote sanitization ON by default
+        @Test
+        public void quoteDefaultSanitize() {
+            String input = "with “doubles” and ‘singles’";
+            String expected = "with \"doubles\" and 'singles'";
+            String result = new SpecialCharacterSanitizer().sanitize(input);
+            assertEquals(expected, result, "mismatch expected sanitized string");
+        }
+
+        // dash sanitization OFF by default
+        @Test
+        public void dashDefaultSanitize() {
+            String input = "Foo–Bar";
+            String result = new SpecialCharacterSanitizer().sanitize(input);
+            assertEquals(input, result, "mismatch expected sanitized string");
+        }
+
+        // diacritics sanitization OFF by default
+        @Test
+        public void diacriticsDefaultSanitize() {
+            String input = "résumé";
+            String result = new SpecialCharacterSanitizer().sanitize(input);
+            assertEquals(input, result, "mismatch expected sanitized string");
+        }
     }
 
     @Test
