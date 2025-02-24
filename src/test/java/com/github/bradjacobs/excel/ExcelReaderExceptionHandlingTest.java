@@ -288,7 +288,7 @@ public class ExcelReaderExceptionHandlingTest {
             excelReader.convertToCsvFile(VALID_TEST_INPUT_FILE, outFile);
         });
         assertContains(
-                "path contains an illegal character",
+                "Nul character not allowed",
                 exception.getMessage());
     }
 
