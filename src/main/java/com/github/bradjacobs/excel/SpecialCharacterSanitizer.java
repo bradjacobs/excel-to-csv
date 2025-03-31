@@ -51,18 +51,10 @@ public class SpecialCharacterSanitizer {
         if (charSanitizeFlags == null) {
             throw new IllegalArgumentException("Must provide non-null charSanitizeFlags.");
         }
+
         this.replacementMap = new HashMap<>();
-        if (charSanitizeFlags.contains(SPACES)) {
-            this.replacementMap.putAll(SPACE_ONLY_REPLACEMENT_MAP);
-        }
-        if (charSanitizeFlags.contains(QUOTES)) {
-            this.replacementMap.putAll(QUOTE_ONLY_REPLACEMENT_MAP);
-        }
-        if (charSanitizeFlags.contains(DASHES)) {
-            this.replacementMap.putAll(DASH_REPLACEMENT_MAP);
-        }
-        if (charSanitizeFlags.contains(BASIC_DIACRITICS)) {
-            this.replacementMap.putAll(DIACRITICS_CHAR_REPLACEMENT_MAP);
+        for (CharSanitizeFlag charSanitizeFlag : charSanitizeFlags) {
+            this.replacementMap.putAll(FLAG_REPLACEMENT_LOOKUP_MAP.get(charSanitizeFlag));
         }
     }
 
@@ -147,17 +139,14 @@ public class SpecialCharacterSanitizer {
             '\uFF0D', // fullwidth hyphen-minus
     };
 
-    private static final Map<Character,Character> SPACE_ONLY_REPLACEMENT_MAP;
-    private static final Map<Character,Character> QUOTE_ONLY_REPLACEMENT_MAP;
-    private static final Map<Character,Character> DASH_REPLACEMENT_MAP;
-    private static final Map<Character,Character> DIACRITICS_CHAR_REPLACEMENT_MAP;
-
-    static {
-        SPACE_ONLY_REPLACEMENT_MAP = generateSpaceReplacementMap();
-        QUOTE_ONLY_REPLACEMENT_MAP = generateQuoteReplacementMap();
-        DASH_REPLACEMENT_MAP = generateDashReplacementMap();
-        DIACRITICS_CHAR_REPLACEMENT_MAP = generateBasicDiacriticsCharReplacementMap();
-    }
+    private static final
+        Map<CharSanitizeFlag, Map<Character,Character>> FLAG_REPLACEMENT_LOOKUP_MAP
+            = Map.of(
+                    SPACES, generateSpaceReplacementMap(),
+                    QUOTES, generateQuoteReplacementMap(),
+                    DASHES, generateDashReplacementMap(),
+                    BASIC_DIACRITICS, generateBasicDiacriticsCharReplacementMap()
+    );
 
     private static Map<Character,Character> generateSpaceReplacementMap() {
         Map<Character, Character> replacementMap = new LinkedHashMap<>();
