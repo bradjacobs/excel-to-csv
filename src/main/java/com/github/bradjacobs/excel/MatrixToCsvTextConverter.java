@@ -7,7 +7,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+
+import static com.github.bradjacobs.excel.QuoteMode.ALWAYS;
+import static com.github.bradjacobs.excel.QuoteMode.LENIENT;
+import static com.github.bradjacobs.excel.QuoteMode.NEVER;
+import static com.github.bradjacobs.excel.QuoteMode.NORMAL;
 
 /**
  * Given a 2-D string array, escape each value to make csv-compatible and
@@ -23,7 +30,7 @@ public class MatrixToCsvTextConverter {
 
     private static final String NEW_LINE = System.lineSeparator();
 
-    private final QuoteMode quoteMode;
+    private final Predicate<String> shouldQuoteRule;
 
     /**
      * Constructor
@@ -33,7 +40,7 @@ public class MatrixToCsvTextConverter {
         if (quoteMode == null) {
             throw new IllegalArgumentException("QuoteMode cannot be null.");
         }
-        this.quoteMode = quoteMode;
+        this.shouldQuoteRule = QUOTE_RULE_MAP.get(quoteMode);
     }
 
     /**
@@ -57,8 +64,7 @@ public class MatrixToCsvTextConverter {
             }
             for (int i = 0; i < columnCount; i++) {
                 String cellValue = rowData[i];
-
-                if (shouldQuoteWrap(cellValue)) {
+                if (shouldQuoteRule.test(cellValue)) {
                     // must first escape double quotes
                     if (cellValue.contains("\"")) {
                         cellValue = StringUtils.replace(cellValue,"\"", "\"\"");
@@ -79,46 +85,47 @@ public class MatrixToCsvTextConverter {
     }
 
     /**
-     * Determine if the value should be quoted based on the quoteMode
-     * @param value value
-     * @return true if value should be quoted for csv text.
-     */
-    private boolean shouldQuoteWrap(String value) {
-        if (this.quoteMode.equals(QuoteMode.NEVER)) {
-            return false;
-        }
-        else if (value == null || value.isEmpty()) {
-            // going to ignore all blanks for now
-            return false;
-        }
-        else if (this.quoteMode.equals(QuoteMode.ALWAYS)) {
-            return true;
-        }
-
-        int valueLength = value.length();
-        if (this.quoteMode.equals(QuoteMode.NORMAL)) {
-            for (int i = 0; i < valueLength; i++) {
-                if (value.charAt(i) < NORMAL_CRITERIA_MINIMUM) {
-                    return true;
-                }
-            }
-        }
-        else if (this.quoteMode.equals(QuoteMode.LENIENT)) {
-            for (int i = 0; i < valueLength; i++) {
-                if (MINIMAL_QUOTE_CHARACTERS.contains(value.charAt(i))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
      * checks if data matrix array is empty
      * @param dataMatrix dataMatrix
      * @return true if dataMatrix is considered 'empty'
      */
     private boolean isEmptyDataMatrix(String[][] dataMatrix) {
         return (dataMatrix == null || dataMatrix.length == 0 || dataMatrix[0].length == 0);
+    }
+
+    // Below is the logic if a value should be quoted, depending on the quoteMode.
+    private static final Predicate<Character> IS_LOW_ASCII_CHAR = c -> c < NORMAL_CRITERIA_MINIMUM;
+    private static final Predicate<Character> IS_MIN_CHAR = MINIMAL_QUOTE_CHARACTERS::contains;
+
+    private static final Predicate<String> NEVER_QUOTE_RULE = s -> false;
+    private static final Predicate<String> ALWAYS_QUOTE_RULE = s -> !StringUtils.isEmpty(s);
+    private static final Predicate<String> NORMAL_QUOTE_RULE = new CharRulePredicate(IS_LOW_ASCII_CHAR);
+    private static final Predicate<String> MIN_QUOTE_RULE = new CharRulePredicate(IS_MIN_CHAR);
+
+    private static final Map<QuoteMode, Predicate<String>> QUOTE_RULE_MAP = Map.of(
+            NEVER, NEVER_QUOTE_RULE,
+            ALWAYS, ALWAYS_QUOTE_RULE,
+            NORMAL, NORMAL_QUOTE_RULE,
+            LENIENT, MIN_QUOTE_RULE
+    );
+
+    private static class CharRulePredicate implements Predicate<String> {
+        private final Predicate<Character> charPredicate;
+        public CharRulePredicate(Predicate<Character> charPredicate) {
+            this.charPredicate = charPredicate;
+        }
+
+        @Override
+        public boolean test(String value) {
+            if (StringUtils.isEmpty(value)) {
+                return false;
+            }
+            for (int i = 0; i < value.length(); i++) {
+                if (charPredicate.test(value.charAt(i))) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

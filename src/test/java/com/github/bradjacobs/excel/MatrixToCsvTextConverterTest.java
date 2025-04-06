@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MatrixToCsvTextConverterTest {
 
@@ -71,6 +72,14 @@ public class MatrixToCsvTextConverterTest {
 
         String output = converter.createCsvText(matrix);
         assertEquals(expectedOutput, output);
+    }
+
+    @Test
+    public void invalidNullQuoteMode() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            MatrixToCsvTextConverter converter = new MatrixToCsvTextConverter(null);
+        });
+        assertEquals("QuoteMode cannot be null.", exception.getMessage());
     }
 
     //
