@@ -8,6 +8,7 @@
   * [ExcelReaderDetails](#ExcelReaderDetails)
   + [BuilderDetails](#BuilderDetails)
 - [OtherInfo](#OtherInfo)
+- [KnownCellFormattingIssues](#KnownCelFormattingIssues)
 - [TODOs](#TODOs)
 - [AlternateImplementations](#AlternateImplementations)
 - [FinalThoughts](#FinalThoughts)
@@ -89,18 +90,24 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 ## OtherInfo
 * All rows in the output CSV will have the exact same number of columns. (which will be maximum non-blank column detected)
 * The CSV data values should retain same 'formatting' as the original Excel file. (i.e. Dates and Numeric values)
-* No _formulas_ are copied.  Only the value as it 'physically appears' in a given cell
-  * (_Exception_ - cells that have a conditional formatting rule, such as a "data bar", may result in incorrect or invalid cell value)
+  * No _formulas_ are copied.  Only the value as it 'physically appears' in a given cell
+  * _**(see 'Known Cell Formatting Issues' for exceptions)_
 * Currently no quotes will be added around 'blank' values 
 * Empty cells will be converted to empty string (not 'null')
 * All cell values are "trimmed" (assuming one usually does NOT want leading/trailing whitespace)
+
+## KnownCellFormattingIssues
+Minor issues that may be address in the future
+* Cells that have "hidden custom fomratting" `;;;` will render as  semicolons instead of blank
+* Cells with custom formatting DataBar will show a value, even if marked as "icon only"
+* Cells with custom formatting IconSet will show a value, even if marked as "icon only"
 
 ## TODOs
 A work item list that I might get around to "eventually" (perhaps)
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
 * Integrate a real logger into the code.
-* Research better handling for cells that show a "data bar or other custom formatting". (see comment in previous section)
+* Address any of the "Known Cell Formatting Issues" (above)
 * Add more JavaDocs
 * More Unittest cleanup
 
