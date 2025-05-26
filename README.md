@@ -8,8 +8,8 @@
   * [ExcelReaderDetails](#ExcelReaderDetails)
   + [BuilderDetails](#BuilderDetails)
 - [OtherInfo](#OtherInfo)
-- [KnownCellFormattingIssues](#KnownCelFormattingIssues)
 - [TODOs](#TODOs)
+- [KnownCellFormattingIssues](#KnownCelFormattingIssues)
 - [AlternateImplementations](#AlternateImplementations)
 - [FinalThoughts](#FinalThoughts)
 
@@ -96,21 +96,22 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 * Empty cells will be converted to empty string (not 'null')
 * All cell values are "trimmed" (assuming one usually does NOT want leading/trailing whitespace)
 
-## KnownCellFormattingIssues
-Minor issues that may be address in the future
-* Cells that have "hidden custom fomratting" `;;;` will render as  semicolons instead of blank
-* Cells with custom formatting DataBar will show a value, even if marked as "icon only"
-* Cells with custom formatting IconSet will show a value, even if marked as "icon only"
-
 ## TODOs
-A work item list that I might get around to "eventually" (perhaps)
+A work item list that I _MIGHT_ get around to "eventually" (perhaps)
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
 * Integrate a real logger into the code.
-* Address any of the "Known Cell Formatting Issues" (above)
+* Address any of the "Known Cell Formatting Issues" (below)
+* Add the option to 'skip/ignore' any rows/columns that are 'hidden'
+  * e.g. rows and columns that have a height/width of "0" respectively 
 * Add more JavaDocs
 * More Unittest cleanup
 
+## KnownCellFormattingIssues
+Minor issues that may be addressed in the future
+* Cells that have "hidden custom fomratting" `;;;` will render as  semicolons instead of blank
+* Cells with custom formatting DataBar/IconSet will show a value, even if marked as "icon only"
+  * _Generally Speaking_, there are some situations where you would want to capture the value, and others you would not.
 
 ## AlternateImplementations
 Searching on the web can yield alternate solutions that require less code.  However, they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well
