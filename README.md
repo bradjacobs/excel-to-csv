@@ -109,7 +109,7 @@ A work item list that I _MIGHT_ get around to "eventually" (perhaps)
 
 ## KnownCellFormattingIssues
 Minor issues that may be addressed in the future
-* Cells that have "hidden custom fomratting" `;;;` will render as  semicolons instead of blank
+* Cells that have "hidden custom fomratting" `;;;` will render as  semicolons or the original value instead of blank
 * Cells with custom formatting DataBar/IconSet will show a value, even if marked as "icon only"
   * _Generally Speaking_, there are some situations where you would want to capture the value, and others you would not.
 
