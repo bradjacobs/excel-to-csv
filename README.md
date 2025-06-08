@@ -8,9 +8,9 @@
   * [ExcelReaderDetails](#ExcelReaderDetails)
   + [BuilderDetails](#BuilderDetails)
 - [OtherInfo](#OtherInfo)
-- [TODOs](#TODOs)
-- [KnownCellFormattingIssues](#KnownCelFormattingIssues)
+- [KnownCellDataIssues](#KnownCellDataIssues)
 - [AlternateImplementations](#AlternateImplementations)
+- [TODOs](#TODOs)
 - [FinalThoughts](#FinalThoughts)
 
 
@@ -84,34 +84,23 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 | saveUnicodeFileWithBom | NO       | true            | prepend 'BOM' to output CSV file if unicode characters were detected.                                                                                                                                                                                                          |
 | sanitizeWhitespace     | NO       | true            | replace any unicode or abnormal space character (i.e. nbsp) with a normal space                                                                                                                                                                                                |
 | sanitizeQuotes         | NO       | true            | replace any special single/double quotes (i.e. smart quotes) with normal quotes                                                                                                                                                                                                |
-| sanitizeDashes         | NO       | false           | replace any specia dash/hyphen character (i.e. em dash) with normal dash                                                                                                                                                                                                       |
+| sanitizeDashes         | NO       | false           | replace any special dash/hyphen character (i.e. em dash) with normal dash                                                                                                                                                                                                       |
 | sanitizeDiacritics     | NO       | false           | replace diacritic characters with its basic counterpart (i.e. 'é' -> 'e', 'Ç' -> 'C')                                                                                                                                                                                          |
 
 ## OtherInfo
 * All rows in the output CSV will have the exact same number of columns. (which will be maximum non-blank column detected)
 * The CSV data values should retain same 'formatting' as the original Excel file. (i.e. Dates and Numeric values)
   * No _formulas_ are copied.  Only the value as it 'physically appears' in a given cell
-  * _**(see 'Known Cell Formatting Issues' for exceptions)_
-* Currently no quotes will be added around 'blank' values 
+  * _**(see 'Known Cell Data Issues' for exceptions)_
+* Currently, no quotes will be added around 'blank' values 
 * Empty cells will be converted to empty string (not 'null')
 * All cell values are "trimmed" (assuming one usually does NOT want leading/trailing whitespace)
 
-## TODOs
-A work item list that I _MIGHT_ get around to "eventually" (perhaps)
-* Put a more legitimate project version in the pom.xml
-* Consider making a 'release version' or something that can be referenced via maven dependency
-* Integrate a real logger into the code.
-* Address any of the "Known Cell Formatting Issues" (below)
-* Add the option to 'skip/ignore' any rows/columns that are 'hidden'
-  * e.g. rows and columns that have a height/width of "0" respectively 
-* Add more JavaDocs
-* More Unittest cleanup
-
-## KnownCellFormattingIssues
-Minor issues that may be addressed in the future
-* Cells that have "hidden custom fomratting" `;;;` will render as  semicolons or the original value instead of blank
+## KnownCellDataIssues
+Minor issues that may (or may not) be addressed in the future
+* "Linked Cells" (Stock, Geography, etc.), typically render as "#VALUE!"
 * Cells with custom formatting DataBar/IconSet will show a value, even if marked as "icon only"
-  * _Generally Speaking_, there are some situations where you would want to capture the value, and others you would not.
+* Cells that have "hidden custom formatting" `;;;` will render as semicolons _or_ the original value instead of blank
 
 ## AlternateImplementations
 Searching on the web can yield alternate solutions that require less code.  However, they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well
@@ -130,15 +119,27 @@ try (CSVPrinter output = new CSVPrinter(new FileWriter("output.csv"), CSVFormat.
     });
 }
 ```
-This appears to work with a lot less code.  _**BUT**_... it seems to expose a few limitations with the POI functionality.
+This is a nice solution with _A LOT_ less code.  _**BUT**_... it seems to expose a few limitations with the POI functionality.
 
 Namely:
 * empty cells could cause data to seemingly 'shift' to a different column
   * i.e. if no value in Column A, but is a value in Column B, then the Column B value will show up as the first value in the row.
-* Bigger Excel files (> 1MB ?) will throw an exception with message: _"The text would exceed the max allowed overall size of extracted text"_
+* Bigger Excel files (> 1 MB ?) will throw an exception with message: _"The text would exceed the max allowed overall size of extracted text"_
 * It will give data from all sheets (even if you only want one)
 * The output csv text might not have the cells quoted the way you want (subjective)
 </details>
+
+## TODOs
+A work item list that I _MIGHT_ get around to "eventually" (perhaps)
+* Put a more legitimate project version in the pom.xml
+* Consider making a 'release version' or something that can be referenced via maven dependency
+* Integrate a real logger into the code.
+* Add the option to 'skip/ignore' any rows/columns that are 'hidden'
+  * i.e. rows and columns that have a height/width of "0" respectively
+* Address any of the "Known Cell Formatting Issues" (above)
+* Add more JavaDocs
+* Reorganize Excel Test data for Junit tests.
+* More Unittest cleanup
 
 ## FinalThoughts
 I don't actively work on this project much and only make occasional tweaks just for fun.
