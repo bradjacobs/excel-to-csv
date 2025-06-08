@@ -47,21 +47,18 @@ class ExcelSheetReader {
             throw new IllegalArgumentException("Sheet parameter cannot be null.");
         }
 
-        // NOTE: need to add 1 to the lastRowNum to make sure you don't skip the last row
-        //  (however doesn't seem to need for this when using row.getLastCellNum, which seems odd)
-        int numOfRows = sheet.getLastRowNum() + 1;
+        List<Row> rowList = getRows(sheet);
 
         // first scan the rows to find the max column width
-        int maxColumn = getMaxColumn(sheet, numOfRows);
+        int maxColumn = getMaxColumn(rowList);
 
-        List<String[]> csvData = new ArrayList<>(numOfRows);
+        List<String[]> csvData = new ArrayList<>(rowList.size());
 
         // NOTE: avoid using "sheet.iterator" when looping through rows,
         //   b/c it can bail out early when it encounters the first empty line
         //   (even if there is more data rows remaining)
-        for (int i = 0; i < numOfRows; i++) {
+        for (Row row : rowList) {
             String[] rowValues = new String[maxColumn];
-            Row row = sheet.getRow(i);
             int columnCount = 0;
             // must check for null b/c a blank/empty row can (sometimes) return as null.
             if (row != null) {
@@ -86,15 +83,13 @@ class ExcelSheetReader {
     }
 
     /**
-     * Iterate through the rows to find the max column width
-     * @param sheet sheet
-     * @param numOfRows total Number of Rows
+     * Iterate through the rows to find the max column that contains a value
+     * @param rowList list of rows for a sheet
      * @return max column
      */
-    private int getMaxColumn(Sheet sheet, int numOfRows) {
+    private int getMaxColumn(List<Row> rowList) {
         int maxColumn = 0;
-        for (int i = 0; i < numOfRows; i++) {
-            Row row = sheet.getRow(i);
+        for (Row row : rowList) {
             if (row != null) {
                 int currentRowCellCount = row.getLastCellNum();
                 if (currentRowCellCount > maxColumn) {
@@ -139,5 +134,25 @@ class ExcelSheetReader {
         // replace w/ normal character equivalent
         cellValue = specialCharSanitizer.sanitize(cellValue);
         return cellValue.trim();
+    }
+
+    /**
+     * Method to grab all the rows for the sheet ahead of time
+     *   NOTE: some of the elements in the result list could be 'null'
+     * @param sheet input Excel Sheet
+     * @return list of rows
+     */
+    // TODO: figure out the scenario where originally saw some rows as 'null'
+    //   then figure out if there is a more appropriate way to handle them.
+    private List<Row> getRows(Sheet sheet) {
+        // NOTE: need to add 1 to the lastRowNum to make sure you don't skip the last row
+        //  (however doesn't seem to need for this when using row.getLastCellNum, which seems odd)
+        int numOfRows = sheet.getLastRowNum() + 1;
+        List<Row> resultList = new ArrayList<>(numOfRows);
+
+        for (int i = 0; i < numOfRows; i++) {
+            resultList.add(sheet.getRow(i));
+        }
+        return resultList;
     }
 }
