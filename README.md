@@ -80,6 +80,7 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 | quoteMode              | NO       | NORMAL          | how aggressive to wrap quotes around values<br><br>*ALWAYS*: always put quotes around values<br>*NORMAL*: put quotes around most values that are non-alphanumeric<br>*LENIENT*: only add quotes around values that are needed to be CSV compliant<br>*NEVER*: never add quotes |
 | sheetIndex             | NO       | 0               | 0-based index of which worksheet to convert to CSV                                                                                                                                                                                                                             |
 | sheetName              | NO       | (blank)         | Name of the worksheet tab to be converted to CSV<br> (if set then 'sheetIndex' is ignored)                                                                                                                                                                                     |
+| autoTrim               | NO       | true            | Trim any leading/trailing whitespace on cell values.                                                                                                                                                                                                                           |
 | skipEmptyRows          | NO       | false           | filter out all 'blank' rows from the Excel worksheet                                                                                                                                                                                                                           |
 | saveUnicodeFileWithBom | NO       | true            | prepend 'BOM' to output CSV file if unicode characters were detected.                                                                                                                                                                                                          |
 | sanitizeWhitespace     | NO       | true            | replace any unicode or abnormal space character (i.e. nbsp) with a normal space                                                                                                                                                                                                |
@@ -94,7 +95,6 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
   * _**(see 'Known Cell Data Issues' for exceptions)_
 * Currently, no quotes will be added around 'blank' values 
 * Empty cells will be converted to empty string (not 'null')
-* All cell values are "trimmed" (assuming one usually does NOT want leading/trailing whitespace)
 
 ## KnownCellDataIssues
 Minor issues that may (or may not) be addressed in the future

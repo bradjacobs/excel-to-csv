@@ -51,7 +51,9 @@ public class ExcelReader {
         this.saveUnicodeFileWithBom = builder.saveUnicodeFileWithBom;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         this.excelSheetReader = new ExcelSheetReader(
-                builder.skipEmptyRows, builder.charSanitizeFlags);
+                builder.autoTrim,
+                builder.skipEmptyRows,
+                builder.charSanitizeFlags);
         this.inputStreamGenerator = new InputStreamGenerator();
 
         // override the internal POI utils size limit to allow for 'bigger Excel files'
@@ -182,6 +184,7 @@ public class ExcelReader {
 
         private int sheetIndex = 0;    // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name
+        private boolean autoTrim = true; // trim any leading/trailing whitespac
         private boolean skipEmptyRows = false; // skip any empty lines when set
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
@@ -218,6 +221,15 @@ public class ExcelReader {
          */
         public Builder skipEmptyRows(boolean skipEmptyRows) {
             this.skipEmptyRows = skipEmptyRows;
+            return this;
+        }
+
+        /**
+         * Whether to trim whitespace on cell values
+         * @param autoTrim (defaults to true)
+         */
+        public Builder autoTrim(boolean autoTrim) {
+            this.autoTrim = autoTrim;
             return this;
         }
 

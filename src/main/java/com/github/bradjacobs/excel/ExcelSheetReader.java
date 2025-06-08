@@ -22,11 +22,15 @@ class ExcelSheetReader {
         EXCEL_DATA_FORMATTER.setUseCachedValuesForFormulaCells(true);
     }
 
+    private final boolean autoTrim;
     private final boolean skipEmptyRows;
     private final SpecialCharacterSanitizer specialCharSanitizer;
 
-    protected ExcelSheetReader(boolean skipEmptyRows,
-                               Set<CharSanitizeFlag> charSanitizeFlags) {
+    protected ExcelSheetReader(
+            boolean autoTrim,
+            boolean skipEmptyRows,
+            Set<CharSanitizeFlag> charSanitizeFlags) {
+        this.autoTrim = autoTrim;
         this.skipEmptyRows = skipEmptyRows;
         this.specialCharSanitizer = new SpecialCharacterSanitizer(charSanitizeFlags);
     }
@@ -133,7 +137,11 @@ class ExcelSheetReader {
         // if there are any certain special unicode characters (like nbsp or smart quotes),
         // replace w/ normal character equivalent
         cellValue = specialCharSanitizer.sanitize(cellValue);
-        return cellValue.trim();
+
+        if (this.autoTrim) {
+            cellValue = cellValue.trim();
+        }
+        return cellValue;
     }
 
     /**

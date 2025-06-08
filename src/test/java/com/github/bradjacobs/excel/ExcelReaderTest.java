@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -169,6 +170,23 @@ public class ExcelReaderTest {
         for (int i = 1; i < csvMatrix.length; i++) {
             String[] row = csvMatrix[i];
             assertEquals("", row[1], String.format("Expected empty string following cell '%s'", row[0]));
+        }
+    }
+
+    @Test
+    public void testDisablingTrimSpaces() throws Exception {
+        URL resourceUrl = getTestResourceFileUrl("spaces_data.xlsx");
+        ExcelReader excelReader = ExcelReader.builder()
+                .skipEmptyRows(false)
+                .autoTrim(false)
+                .build();
+        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
+
+        // the first row is a header row, but every other row should have
+        //  and empty/blank value in the second cell
+        for (int i = 1; i < csvMatrix.length; i++) {
+            String[] row = csvMatrix[i];
+            assertNotEquals("", row[1], String.format("Expected non-empty string following cell '%s'", row[0]));
         }
     }
 
