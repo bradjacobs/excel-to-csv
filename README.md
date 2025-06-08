@@ -130,7 +130,11 @@ Namely:
 </details>
 
 ## TODOs
-A work item list that I _MIGHT_ get around to "eventually" (perhaps)
+Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
+
+<details>
+  <summary>Todo Item List... (Click To Expand)</summary>
+
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
 * Integrate a real logger into the code.
@@ -140,6 +144,7 @@ A work item list that I _MIGHT_ get around to "eventually" (perhaps)
 * Add more JavaDocs
 * Reorganize Excel Test data for Junit tests.
 * More Unittest cleanup
+</details>
 
 ## FinalThoughts
 I don't actively work on this project much and only make occasional tweaks just for fun.
