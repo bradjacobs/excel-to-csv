@@ -146,7 +146,7 @@ class ExcelSheetReader {
 
     /**
      * Method to grab all the rows for the sheet ahead of time
-     *   NOTE: some of the elements in the result list could be 'null'
+     *   NOTE: some elements in the result list could be 'null'
      * @param sheet input Excel Sheet
      * @return list of rows
      */

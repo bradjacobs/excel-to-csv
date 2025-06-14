@@ -85,7 +85,7 @@ public class SpecialCharacterSanitizerTest {
     }
 
     @Test
-    public void sanitizeDashCharaters() {
+    public void sanitizeDashCharacters() {
         String inputCurlySingleQuotes = "aaa–bbb－ccc";
         String expectedResult = "aaa-bbb-ccc";
         String result = new SpecialCharacterSanitizer(DASHES).sanitize(inputCurlySingleQuotes);
@@ -101,7 +101,7 @@ public class SpecialCharacterSanitizerTest {
             "résumé, resume",
             "déjà vu, deja vu"
     })
-    void sanitizeBasicDiacritics(String input, String expected) {
+    public void sanitizeBasicDiacritics(String input, String expected) {
         String result = new SpecialCharacterSanitizer(BASIC_DIACRITICS).sanitize(input);
         assertEquals(expected, result, "mismatch expected sanitized diacritics");
     }

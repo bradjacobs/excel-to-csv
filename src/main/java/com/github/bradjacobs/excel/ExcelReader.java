@@ -184,7 +184,7 @@ public class ExcelReader {
 
         private int sheetIndex = 0;    // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name
-        private boolean autoTrim = true; // trim any leading/trailing whitespac
+        private boolean autoTrim = true; // trim any leading/trailing whitespace
         private boolean skipEmptyRows = false; // skip any empty lines when set
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;

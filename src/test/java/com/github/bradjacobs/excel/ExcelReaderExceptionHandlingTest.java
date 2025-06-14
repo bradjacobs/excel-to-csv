@@ -76,7 +76,7 @@ public class ExcelReaderExceptionHandlingTest {
         protected static List<Arguments> invalidOutputPaths() {
             return Arrays.asList(
                     arguments(named("Invalid Output file extension", "outfile.exe"), IllegalArgumentException.class, "Illegal outputFile extension 'exe'.  Must be either 'csv', 'txt' or blank"),
-                    arguments(named("Invalid Output directory", "/fakedirectory/myOutputFile.csv"), IllegalArgumentException.class, "Attempted to save CSV output file in a non-existent directory: /fakedirectory/myOutputFile.csv"),
+                    arguments(named("Invalid Output directory", "/fakeDirectory/myOutputFile.csv"), IllegalArgumentException.class, "Attempted to save CSV output file in a non-existent directory: /fakeDirectory/myOutputFile.csv"),
                     arguments(named("Null Csv Output Param", null), IllegalArgumentException.class, "Must supply outputFile location to save CSV data."),
                     arguments(named("Directory Output Param", DIR_PATH), IllegalArgumentException.class, "The outputFile cannot be an existing directory.")
             );
