@@ -94,6 +94,7 @@ public class SpecialCharacterSanitizer {
             '\u201A', // Low Single Curved Quote - Left
             '\u201B', // Single High-Reversed
             '\u2032', // Single Prime
+            '\u2035', // Reversed Single Prime
             '\u2039', // Single Angle Quote (Guillemet) - Left
             '\u203A', // Single Angle Quote (Guillemet) - Right
             '\u2358', // Apl Functional Symbol Quote Underbar
@@ -114,6 +115,7 @@ public class SpecialCharacterSanitizer {
             '\u201E', // Low Double Curved Quote - Left
             '\u201F', // Double High-Reversed
             '\u2033', // Double Prime
+            '\u2036', // Reversed Double Prime
             '\u275D', // Heavy Double Turned Comma Quotation Mark (ornament)
             '\u275E', // Heavy Double Comma Quotation Mark (ornament)
             '\u2826', // Braille Double Closing Quotation Mark
