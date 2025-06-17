@@ -88,10 +88,12 @@ public class SpecialCharacterSanitizer {
 
     // note: intentionally _not_ considering ascent marks as single quotes.
     private static final Character[] SINGLE_QUOTE_CHARS = {
+            '\u02BC', // Letter Apostrophe
             '\u2018', // Single Curved Quote - Left
             '\u2019', // Single Curved Quote - Right
             '\u201A', // Low Single Curved Quote - Left
             '\u201B', // Single High-Reversed
+            '\u2032', // Single Prime
             '\u2039', // Single Angle Quote (Guillemet) - Left
             '\u203A', // Single Angle Quote (Guillemet) - Right
             '\u2358', // Apl Functional Symbol Quote Underbar
@@ -104,16 +106,19 @@ public class SpecialCharacterSanitizer {
     };
 
     private static final Character[] DOUBLE_QUOTE_CHARS = {
+            '\u0022', // Ditto
             '\u00AB', // Double Angle Quote (Guillemet) - Left
             '\u00BB', // Double Angle Quote (Guillemet) - Right
             '\u201C', // "Smart" Double Curved Quote - Left
             '\u201D', // "Smart" Double Curved Quote - Right
             '\u201E', // Low Double Curved Quote - Left
             '\u201F', // Double High-Reversed
+            '\u2033', // Double Prime
             '\u275D', // Heavy Double Turned Comma Quotation Mark (ornament)
             '\u275E', // Heavy Double Comma Quotation Mark (ornament)
             '\u2826', // Braille Double Closing Quotation Mark
             '\u2834', // Braille Double Opening Quotation Mark
+            '\u3003', // Asian Ditto
             '\u301D', // Reversed Double Prime Quotation Mark
             '\u301E', // Double Prime Quotation Mark
             '\u301F', // Low Double Prime Quotation Mark
