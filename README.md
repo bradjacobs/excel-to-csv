@@ -82,6 +82,7 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 | sheetName              | NO       | (blank)         | Name of the worksheet tab to be converted to CSV<br> (if set then 'sheetIndex' is ignored)                                                                                                                                                                                     |
 | autoTrim               | NO       | true            | Trim any leading/trailing whitespace on cell values.                                                                                                                                                                                                                           |
 | skipEmptyRows          | NO       | false           | filter out all 'blank' rows from the Excel worksheet                                                                                                                                                                                                                           |
+| skipInvisibleCells     | NO       | false           | if true, skip any rows or columns that are not visible (zero-height row or zoro-width column)                                                                                                                                                                                                                          |
 | saveUnicodeFileWithBom | NO       | true            | prepend 'BOM' to output CSV file if unicode characters were detected.                                                                                                                                                                                                          |
 | sanitizeWhitespace     | NO       | true            | replace any unicode or abnormal space character (i.e. nbsp) with a normal space                                                                                                                                                                                                |
 | sanitizeQuotes         | NO       | true            | replace any special single/double quotes (i.e. smart quotes) with normal quotes                                                                                                                                                                                                |
@@ -138,9 +139,7 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
 * Integrate a real logger into the code.
-* Add the option to 'skip/ignore' any rows/columns that are 'hidden'
-  * i.e. rows and columns that have a height/width of "0" respectively
-* Address any of the "Known Cell Formatting Issues" (above)
+* Address any of the "Known Cell Data Issues" (above)
 * Add more JavaDocs
 * Reorganize Excel Test data for Junit tests.
 * More Unittest cleanup

@@ -53,6 +53,7 @@ public class ExcelReader {
         this.excelSheetReader = new ExcelSheetReader(
                 builder.autoTrim,
                 builder.skipEmptyRows,
+                builder.skipInvisibleCells,
                 builder.charSanitizeFlags);
         this.inputStreamGenerator = new InputStreamGenerator();
 
@@ -186,6 +187,7 @@ public class ExcelReader {
         private String sheetName = ""; // optionally provide a specific sheet name
         private boolean autoTrim = true; // trim any leading/trailing whitespace
         private boolean skipEmptyRows = false; // skip any empty lines when set
+        private boolean skipInvisibleCells = false; // skip any rows/columns that are not visible
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
         private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains unicode.
@@ -221,6 +223,15 @@ public class ExcelReader {
          */
         public Builder skipEmptyRows(boolean skipEmptyRows) {
             this.skipEmptyRows = skipEmptyRows;
+            return this;
+        }
+
+        /**
+         * Whether to skip hidden rows/columns
+         * @param skipInvisibleCells (defaults to false)
+         */
+        public Builder skipInvisibleCells(boolean skipInvisibleCells) {
+            this.skipInvisibleCells = skipInvisibleCells;
             return this;
         }
 

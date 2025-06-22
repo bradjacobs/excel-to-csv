@@ -24,14 +24,17 @@ class ExcelSheetReader {
 
     private final boolean autoTrim;
     private final boolean skipEmptyRows;
+    private final boolean skipInvisibleCells;
     private final SpecialCharacterSanitizer specialCharSanitizer;
 
     protected ExcelSheetReader(
             boolean autoTrim,
             boolean skipEmptyRows,
+            boolean skipInvisibleCells,
             Set<CharSanitizeFlag> charSanitizeFlags) {
         this.autoTrim = autoTrim;
         this.skipEmptyRows = skipEmptyRows;
+        this.skipInvisibleCells = skipInvisibleCells;
         this.specialCharSanitizer = new SpecialCharacterSanitizer(charSanitizeFlags);
     }
 
@@ -55,6 +58,8 @@ class ExcelSheetReader {
 
         // first scan the rows to find the max column width
         int maxColumn = getMaxColumn(rowList);
+        int[] limitedColumns = getLimitedVisibleColumns(sheet, maxColumn);
+        int totalColumnWidth = limitedColumns != null ? limitedColumns.length : maxColumn;
 
         List<String[]> csvData = new ArrayList<>(rowList.size());
 
@@ -62,19 +67,31 @@ class ExcelSheetReader {
         //   b/c it can bail out early when it encounters the first empty line
         //   (even if there is more data rows remaining)
         for (Row row : rowList) {
-            String[] rowValues = new String[maxColumn];
-            int columnCount = 0;
-            // must check for null b/c a blank/empty row can (sometimes) return as null.
+            String[] rowValues = new String[totalColumnWidth];
+
+            // must check for null b/c a blank/empty row can (sometimes) be null.
+            int j = 0;
             if (row != null) {
-                columnCount = Math.min( Math.max(row.getLastCellNum(), 0), maxColumn );
-                for (int j = 0; j < columnCount; j++) {
-                    rowValues[j] = getCellValue(row.getCell(j));
+                // get the columnCount for the given row (can vary row by row)
+                int columnCount = Math.min( Math.max(row.getLastCellNum(), 0), maxColumn );
+
+                if (limitedColumns != null) {
+                    for (int visibleColumn : limitedColumns) {
+                        if (visibleColumn >= columnCount) {
+                            break;
+                        }
+                        rowValues[j++] = getCellValue(row.getCell(visibleColumn));
+                    }
+                }
+                else {
+                    for (j = 0; j < columnCount; j++) {
+                        rowValues[j] = getCellValue(row.getCell(j));
+                    }
                 }
             }
 
-            // fill any 'extra' column cells with blank.
-            for (int j = columnCount; j < maxColumn; j++) {
-                rowValues[j] = "";
+            while (j < totalColumnWidth) {
+                rowValues[j++] = "";
             }
 
             // ignore empty row if necessary
@@ -131,7 +148,9 @@ class ExcelSheetReader {
      * @return string representation of the cell.
      */
     private String getCellValue(Cell cell) {
-        // note: the data formatter can handle a 'null' cell as well.
+        if (cell == null) {
+            return "";
+        }
         String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell);
 
         // if there are any certain special unicode characters (like nbsp or smart quotes),
@@ -147,11 +166,10 @@ class ExcelSheetReader {
     /**
      * Method to grab all the rows for the sheet ahead of time
      *   NOTE: some elements in the result list could be 'null'
+     *       (nulls are usually a 'default unaltered rows')
      * @param sheet input Excel Sheet
      * @return list of rows
      */
-    // TODO: figure out the scenario where originally saw some rows as 'null'
-    //   then figure out if there is a more appropriate way to handle them.
     private List<Row> getRows(Sheet sheet) {
         // NOTE: need to add 1 to the lastRowNum to make sure you don't skip the last row
         //  (however doesn't seem to need for this when using row.getLastCellNum, which seems odd)
@@ -159,8 +177,38 @@ class ExcelSheetReader {
         List<Row> resultList = new ArrayList<>(numOfRows);
 
         for (int i = 0; i < numOfRows; i++) {
-            resultList.add(sheet.getRow(i));
+            Row row = sheet.getRow(i);
+            if (this.skipInvisibleCells && row != null && row.getZeroHeight()) {
+                continue;
+            }
+            resultList.add(row);
         }
         return resultList;
+    }
+
+    /**
+     * Get any restricted column indexes to be considered for generating final data
+     *   A 'null' is returned for no column restrictions
+     * @param sheet Excel Sheet
+     * @param maxColumn max columns
+     * @return array of limited columns (or null for no limitation)
+     */
+    private int[] getLimitedVisibleColumns(Sheet sheet, int maxColumn) {
+        if (this.skipInvisibleCells) {
+            List<Integer> visibleColumnList = new ArrayList<>();
+            for (int i = 0; i < maxColumn; i++) {
+                boolean isColumnHidden = sheet.isColumnHidden(i);
+                if (!isColumnHidden) {
+                    visibleColumnList.add(i);
+                }
+            }
+
+            if (visibleColumnList.size() < maxColumn) {
+                return visibleColumnList.stream().mapToInt(Integer::intValue).toArray();
+            }
+        }
+
+        // null means hidden columns are not considered (or none were actually found)
+        return null;
     }
 }
