@@ -4,7 +4,6 @@
 package com.github.bradjacobs.excel;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -15,27 +14,18 @@ import java.util.Set;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
 
 class ExcelSheetReader {
-    private static final boolean EMULATE_CSV = true;
-    private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
-    static {
-        // set true to get actual visible value in a formula cell, and not the raw formula itself.
-        EXCEL_DATA_FORMATTER.setUseCachedValuesForFormulaCells(true);
-    }
-
-    private final boolean autoTrim;
     private final boolean skipEmptyRows;
     private final boolean skipInvisibleCells;
-    private final SpecialCharacterSanitizer specialCharSanitizer;
+    private final CellValueReader cellValueReader;
 
     protected ExcelSheetReader(
             boolean autoTrim,
             boolean skipEmptyRows,
             boolean skipInvisibleCells,
             Set<CharSanitizeFlag> charSanitizeFlags) {
-        this.autoTrim = autoTrim;
         this.skipEmptyRows = skipEmptyRows;
         this.skipInvisibleCells = skipInvisibleCells;
-        this.specialCharSanitizer = new SpecialCharacterSanitizer(charSanitizeFlags);
+        this.cellValueReader = new CellValueReader(autoTrim, charSanitizeFlags);
     }
 
     /**
@@ -148,19 +138,7 @@ class ExcelSheetReader {
      * @return string representation of the cell.
      */
     private String getCellValue(Cell cell) {
-        if (cell == null) {
-            return "";
-        }
-        String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell);
-
-        // if there are any certain special unicode characters (like nbsp or smart quotes),
-        // replace w/ normal character equivalent
-        cellValue = specialCharSanitizer.sanitize(cellValue);
-
-        if (this.autoTrim) {
-            cellValue = cellValue.trim();
-        }
-        return cellValue;
+        return cellValueReader.getCellValue(cell);
     }
 
     /**
