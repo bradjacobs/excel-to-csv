@@ -138,8 +138,9 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
+* Move all the 'skipInvisibleCells' row/column logic from ExcelSheetReader to a different class
 * Integrate a real logger into the code.
-* Address any of the "Known Cell Data Issues" (above)
+* Address any of the "Known Cell Data Issues" (above) if possible
 * Add more JavaDocs
 * Reorganize Excel Test data for Junit tests.
 * More Unittest cleanup
