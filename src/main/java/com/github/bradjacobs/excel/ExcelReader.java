@@ -50,11 +50,7 @@ public class ExcelReader {
         this.password = builder.password;
         this.saveUnicodeFileWithBom = builder.saveUnicodeFileWithBom;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
-        this.excelSheetReader = new ExcelSheetReader(
-                builder.autoTrim,
-                builder.skipEmptyRows,
-                builder.skipInvisibleCells,
-                builder.charSanitizeFlags);
+        this.excelSheetReader = createExcelSheetReader(builder);
         this.inputStreamGenerator = new InputStreamGenerator();
 
         // override the internal POI utils size limit to allow for 'bigger Excel files'
@@ -100,7 +96,7 @@ public class ExcelReader {
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
         try (inputStream; Workbook wb = WorkbookFactory.create(inputStream, password)) {
             Sheet sheet = getSheet(wb);
-            return excelSheetReader.convertToCsvData(sheet);
+            return excelSheetReader.convertToMatrixData(sheet);
         }
     }
 
@@ -174,6 +170,24 @@ public class ExcelReader {
             }
         }
         return false;
+    }
+
+    /**
+     * Creates an ExcelSheetReader based on the builder configuration.
+     * @param builder builder
+     * @return new ExcelSheetReader instance
+     */
+    private static ExcelSheetReader createExcelSheetReader(Builder builder) {
+        if (builder.skipInvisibleCells) {
+            return new ExcelSheetVisibleCellsReader(
+                    builder.autoTrim,
+                    builder.skipEmptyRows,
+                    builder.charSanitizeFlags);
+        }
+        return new ExcelSheetReader(
+                builder.autoTrim,
+                builder.skipEmptyRows,
+                builder.charSanitizeFlags);
     }
 
     public static Builder builder() {

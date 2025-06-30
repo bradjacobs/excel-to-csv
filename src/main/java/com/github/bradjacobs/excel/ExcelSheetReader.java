@@ -10,87 +10,89 @@ import org.apache.poi.ss.usermodel.Sheet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
 
 class ExcelSheetReader {
-    private final boolean skipEmptyRows;
-    private final boolean skipInvisibleCells;
-    private final CellValueReader cellValueReader;
+    protected final boolean skipEmptyRows;
+    protected final CellValueReader cellValueReader;
 
     protected ExcelSheetReader(
             boolean autoTrim,
             boolean skipEmptyRows,
-            boolean skipInvisibleCells,
             Set<CharSanitizeFlag> charSanitizeFlags) {
         this.skipEmptyRows = skipEmptyRows;
-        this.skipInvisibleCells = skipInvisibleCells;
         this.cellValueReader = new CellValueReader(autoTrim, charSanitizeFlags);
     }
 
     /**
-     * Create CSV data from the given Excel Sheet
+     * Create 2-D data matrix from the given Excel Sheet
      * @param sheet Excel Sheet
      * @return 2-D array representing CSV format
      *   each row will have the same number of columns
      */
-    public String[][] convertToCsvData(Sheet sheet)  {
-        List<String[]> excelListData = convertToCsvDataList(sheet);
+    public String[][] convertToMatrixData(Sheet sheet)  {
+        List<String[]> excelListData = convertToMatrixDataList(sheet);
         return excelListData.toArray(new String[0][0]);
     }
 
-    public List<String[]> convertToCsvDataList(Sheet sheet) {
+    public List<String[]> convertToMatrixDataList(Sheet sheet) {
         if (sheet == null) {
             throw new IllegalArgumentException("Sheet parameter cannot be null.");
         }
 
+        // grab all the rows from the sheet
         List<Row> rowList = getRows(sheet);
-
         // first scan the rows to find the max column width
         int maxColumn = getMaxColumn(rowList);
-        int[] limitedColumns = getLimitedVisibleColumns(sheet, maxColumn);
-        int totalColumnWidth = limitedColumns != null ? limitedColumns.length : maxColumn;
+        // get all the column (indexes) that are to be read
+        int[] availableColumns = getAvailableColumns(sheet, maxColumn);
 
-        List<String[]> csvData = new ArrayList<>(rowList.size());
+        return convertToMatrixDataList(rowList, availableColumns);
+    }
+
+    protected int[] getAvailableColumns(Sheet sheet, int maxColumn) {
+        return IntStream.range(0, maxColumn).toArray();
+    }
+
+    protected List<String[]> convertToMatrixDataList(List<Row> rowList, int[] availableColumns) {
+        List<String[]> matrixDataList = new ArrayList<>(rowList.size());
+
+        int lastColumnIndex = availableColumns.length > 0 ? availableColumns[availableColumns.length-1] : -1;
+        int totalColumnCount = availableColumns.length;
 
         // NOTE: avoid using "sheet.iterator" when looping through rows,
         //   b/c it can bail out early when it encounters the first empty line
         //   (even if there is more data rows remaining)
         for (Row row : rowList) {
-            String[] rowValues = new String[totalColumnWidth];
+            String[] rowValues = new String[totalColumnCount];
 
-            // must check for null b/c a blank/empty row can (sometimes) be null.
-            int j = 0;
+            // must check for null because a blank/empty row can (sometimes) be null.
+            int columnIndex = 0;
             if (row != null) {
-                // get the columnCount for the given row (can vary row by row)
-                int columnCount = Math.min( Math.max(row.getLastCellNum(), 0), maxColumn );
+                int rowColumnCount = Math.max(row.getLastCellNum(), 0);
+                int lastRowColumnIndex = Math.min(rowColumnCount-1, lastColumnIndex);
 
-                if (limitedColumns != null) {
-                    for (int visibleColumn : limitedColumns) {
-                        if (visibleColumn >= columnCount) {
-                            break;
-                        }
-                        rowValues[j++] = getCellValue(row.getCell(visibleColumn));
+                for (int availableColumn : availableColumns) {
+                    if (availableColumn > lastRowColumnIndex) {
+                        break;
                     }
-                }
-                else {
-                    for (j = 0; j < columnCount; j++) {
-                        rowValues[j] = getCellValue(row.getCell(j));
-                    }
+                    rowValues[columnIndex++] = getCellValue(row.getCell(availableColumn));
                 }
             }
 
-            while (j < totalColumnWidth) {
-                rowValues[j++] = "";
+            while (columnIndex < totalColumnCount) {
+                rowValues[columnIndex++] = "";
             }
 
             // ignore empty row if necessary
             if (this.skipEmptyRows && isEmptyRow(rowValues)) {
                 continue;
             }
-            csvData.add(rowValues);
+            matrixDataList.add(rowValues);
         }
-        return csvData;
+        return matrixDataList;
     }
 
     /**
@@ -98,7 +100,7 @@ class ExcelSheetReader {
      * @param rowList list of rows for a sheet
      * @return max column
      */
-    private int getMaxColumn(List<Row> rowList) {
+    protected int getMaxColumn(List<Row> rowList) {
         int maxColumn = 0;
         for (Row row : rowList) {
             if (row != null) {
@@ -121,7 +123,7 @@ class ExcelSheetReader {
         return maxColumn;
     }
 
-    private boolean isEmptyRow(String[] rowData) {
+    protected boolean isEmptyRow(String[] rowData) {
         for (String r : rowData) {
             if (r != null && !r.isEmpty()) {
                 return false;
@@ -137,7 +139,7 @@ class ExcelSheetReader {
      * @param cell excel cell
      * @return string representation of the cell.
      */
-    private String getCellValue(Cell cell) {
+    protected String getCellValue(Cell cell) {
         return cellValueReader.getCellValue(cell);
     }
 
@@ -148,45 +150,15 @@ class ExcelSheetReader {
      * @param sheet input Excel Sheet
      * @return list of rows
      */
-    private List<Row> getRows(Sheet sheet) {
+    protected List<Row> getRows(Sheet sheet) {
         // NOTE: need to add 1 to the lastRowNum to make sure you don't skip the last row
         //  (however doesn't seem to need for this when using row.getLastCellNum, which seems odd)
         int numOfRows = sheet.getLastRowNum() + 1;
         List<Row> resultList = new ArrayList<>(numOfRows);
 
         for (int i = 0; i < numOfRows; i++) {
-            Row row = sheet.getRow(i);
-            if (this.skipInvisibleCells && row != null && row.getZeroHeight()) {
-                continue;
-            }
-            resultList.add(row);
+            resultList.add(sheet.getRow(i));
         }
         return resultList;
-    }
-
-    /**
-     * Get any restricted column indexes to be considered for generating final data
-     *   A 'null' is returned for no column restrictions
-     * @param sheet Excel Sheet
-     * @param maxColumn max columns
-     * @return array of limited columns (or null for no limitation)
-     */
-    private int[] getLimitedVisibleColumns(Sheet sheet, int maxColumn) {
-        if (this.skipInvisibleCells) {
-            List<Integer> visibleColumnList = new ArrayList<>();
-            for (int i = 0; i < maxColumn; i++) {
-                boolean isColumnHidden = sheet.isColumnHidden(i);
-                if (!isColumnHidden) {
-                    visibleColumnList.add(i);
-                }
-            }
-
-            if (visibleColumnList.size() < maxColumn) {
-                return visibleColumnList.stream().mapToInt(Integer::intValue).toArray();
-            }
-        }
-
-        // null means hidden columns are not considered (or none were actually found)
-        return null;
     }
 }

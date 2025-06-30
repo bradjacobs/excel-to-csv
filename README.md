@@ -100,7 +100,7 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 ## KnownCellDataIssues
 Minor issues that may (or may not) be addressed in the future
 * "Linked Cells" (Stock, Geography, etc.), typically render as "#VALUE!"
-* Cells with custom formatting DataBar/IconSet will show a value, even if marked as "icon only"
+* Cells with custom formatting of DataBar or IconSet will show a value, even if marked as "icon only"
 * Cells that have "hidden custom formatting" `;;;` will render as semicolons _or_ the original value instead of blank
 
 ## AlternateImplementations
@@ -138,7 +138,6 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
-* Move all the 'skipInvisibleCells' row/column logic from ExcelSheetReader to a different class
 * Integrate a real logger into the code.
 * Address any of the "Known Cell Data Issues" (above) if possible
 * Add more JavaDocs
