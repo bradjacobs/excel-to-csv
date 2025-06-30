@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
@@ -50,10 +51,6 @@ class ExcelSheetReader {
         int[] availableColumns = getAvailableColumns(sheet, maxColumn);
 
         return convertToMatrixDataList(rowList, availableColumns);
-    }
-
-    protected int[] getAvailableColumns(Sheet sheet, int maxColumn) {
-        return IntStream.range(0, maxColumn).toArray();
     }
 
     protected List<String[]> convertToMatrixDataList(List<Row> rowList, int[] availableColumns) {
@@ -151,14 +148,22 @@ class ExcelSheetReader {
      * @return list of rows
      */
     protected List<Row> getRows(Sheet sheet) {
-        // NOTE: need to add 1 to the lastRowNum to make sure you don't skip the last row
+        // NOTE: need to add 1 to the lastRowNum to make sure don't skip the last row
         //  (however doesn't seem to need for this when using row.getLastCellNum, which seems odd)
         int numOfRows = sheet.getLastRowNum() + 1;
-        List<Row> resultList = new ArrayList<>(numOfRows);
 
-        for (int i = 0; i < numOfRows; i++) {
-            resultList.add(sheet.getRow(i));
-        }
-        return resultList;
+        return IntStream.range(0, numOfRows)
+                .mapToObj(sheet::getRow)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Determine which columns of the sheet should be read
+     * @param sheet sheet
+     * @param maxColumn max column count
+     * @return int array of column indicies to be read
+     */
+    protected int[] getAvailableColumns(Sheet sheet, int maxColumn) {
+        return IntStream.range(0, maxColumn).toArray();
     }
 }
