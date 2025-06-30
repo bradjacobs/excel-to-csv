@@ -3,12 +3,11 @@
  */
 package com.github.bradjacobs.excel;
 
+import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 
 import java.util.Set;
-
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.*;
 
 class CellValueReader {
     private static final boolean EMULATE_CSV = true;
