@@ -68,11 +68,11 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 2. Execute desired methods on ExcelReader
 
 ### ExcelReaderDetails
-| METHOD              | INPUTS                       | OUTPUT     | DESCRIPTION                                                                                                                                      |
-|---------------------|------------------------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| convertToCsvText    | Excel File                   | String     | Given Excel file input return a String representing the Worksheet as CSV                                                                         |
-| convertToDataMatrix | Excel File                   | String[][] | Given Excel file input return a 2-D String array representing the Worksheet as CSV<br> (each array element represents a cell from the worksheet) |
-| convertToCsvFile    | Excel File & Output CSV File | (none)     | Given Excel file input write output directly to a specified destination file.                                                                    |
+| METHOD              | INPUTS                       | OUTPUT&nbsp; | DESCRIPTION                                                                                                                                      |
+|---------------------|------------------------------|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| convertToCsvText    | Excel File                   | String       | Given Excel file input return a String representing the Worksheet as CSV                                                                         |
+| convertToDataMatrix | Excel File                   | String[][]   | Given Excel file input return a 2-D String array representing the Worksheet as CSV<br> (each array element represents a cell from the worksheet) |
+| convertToCsvFile    | Excel File & Output CSV File | (none)       | Given Excel file input write output directly to a specified destination file.                                                                    |
 
 ### BuilderDetails
 | FIELD                  | REQUIRED | DEFAULT         | DETAILS                                                                                                                                                                                                                                                                        |
