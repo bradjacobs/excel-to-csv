@@ -19,6 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MatrixToCsvTextConverterTest {
 
+    // the following are special character that should always be quoted
+    private static final List<Character> MINIMAL_QUOTE_CHARACTERS
+            = List.of('"', ',', '\t', '\r', '\n');
+
     private static final MatrixToCsvTextConverter normalConverter
             = new MatrixToCsvTextConverter(QuoteMode.NORMAL);
 
@@ -85,10 +89,6 @@ public class MatrixToCsvTextConverterTest {
     //
     // Test Helper code below...
     //
-
-    // the following are special character that should always be quoted
-    private static final List<Character> MINIMAL_QUOTE_CHARACTERS
-            = List.of('"', ',', '\t', '\r', '\n');
 
     private static List<Arguments> quoteTestProvider() {
         List<QuoteTestInput> quoteTestInputList = createQuoteTestList();

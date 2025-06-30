@@ -52,7 +52,7 @@ public class ExcelReaderExceptionHandlingTest {
     // DEV NOTE: the abstract class is a 'workaround' such that the '@Nested' classes can
     //     access the argument lists because Nested classes are not supposed to be 'static',
     //     but yet they need to be in order to access static methodSource.
-    //     using @TestInstance(Lifecycle.PER_CLASS) seems to be good enough, but it could
+    //     using @TestInstance(Lifecycle.PER_CLASS) seems to work, BUT it could
     //     still produce a bunch of warnings which are distracting.
     abstract static class AbstractNestedTestClass {
         protected static List<Arguments> invalidInputPaths() {

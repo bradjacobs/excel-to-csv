@@ -44,7 +44,7 @@ public class CellValueReaderTest {
     }
 
     @Test
-    public void withDiacriticsSet() throws Exception {
+    public void withDiacriticsSet() {
         Set<SpecialCharacterSanitizer.CharSanitizeFlag> flagSet = Set.of(BASIC_DIACRITICS);
         CellValueReader cellValueReader = new CellValueReader(true, flagSet);
         Cell cell = createMockStringCell("Façade");
@@ -61,11 +61,12 @@ public class CellValueReaderTest {
 
     @Test
     public void formulaConversion() {
-        // note: this is a semi-poor example of a true Excel Formula cell.
+        // note: this is a semi-poor representation of a true Excel Formula cell.
         CellValueReader cellValueReader = new CellValueReader(true, Set.of(QUOTES));
         Cell cell = mock(Cell.class);
         when(cell.getCellType()).thenReturn(CellType.FORMULA);
         when(cell.getCachedFormulaResultType()).thenReturn(CellType.NUMERIC);
+        when(cell.getCellFormula()).thenReturn("A1+B1"); // cellFormula string is only used if the code is misconfigured
         when(cell.getNumericCellValue()).thenReturn(31.2d);
 
         String result = cellValueReader.getCellValue(cell);
