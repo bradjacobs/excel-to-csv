@@ -161,7 +161,7 @@ class ExcelSheetReader {
      * Determine which columns of the sheet should be read
      * @param sheet sheet
      * @param maxColumn max column count
-     * @return int array of column indicies to be read
+     * @return int array of column indices to be read
      */
     protected int[] getAvailableColumns(Sheet sheet, int maxColumn) {
         return IntStream.range(0, maxColumn).toArray();
