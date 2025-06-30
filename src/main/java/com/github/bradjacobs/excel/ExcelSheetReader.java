@@ -56,8 +56,8 @@ class ExcelSheetReader {
     protected List<String[]> convertToMatrixDataList(List<Row> rowList, int[] availableColumns) {
         List<String[]> matrixDataList = new ArrayList<>(rowList.size());
 
-        int lastColumnIndex = availableColumns.length > 0 ? availableColumns[availableColumns.length-1] : -1;
         int totalColumnCount = availableColumns.length;
+        int lastColumnIndex = totalColumnCount > 0 ? availableColumns[totalColumnCount-1] : -1;
 
         // NOTE: avoid using "sheet.iterator" when looping through rows,
         //   b/c it can bail out early when it encounters the first empty line
