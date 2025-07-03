@@ -14,6 +14,7 @@ import java.util.Set;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -71,6 +72,15 @@ public class CellValueReaderTest {
 
         String result = cellValueReader.getCellValue(cell);
         assertEquals("31.2", result, "mismatch expected cell value");
+    }
+
+    @Test
+    public void nullSanitizeFlags() {
+        // sanitize flags parameter must be non-null
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new CellValueReader(true, null);
+        });
+        assertEquals("Must provide non-null charSanitizeFlags.", exception.getMessage(), "Mismatch exception message");
     }
 
     /**

@@ -284,8 +284,8 @@ public class ExcelReader {
             return this;
         }
 
-        public Builder sanitizeWhitespace(boolean sanitizeWhitespace) {
-            return setSanitizeFlag(SPACES, sanitizeWhitespace);
+        public Builder sanitizeSpaces(boolean sanitizeSpaces) {
+            return setSanitizeFlag(SPACES, sanitizeSpaces);
         }
 
         public Builder sanitizeQuotes(boolean sanitizeQuotes) {

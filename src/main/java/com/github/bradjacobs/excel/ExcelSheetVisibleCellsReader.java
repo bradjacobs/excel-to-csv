@@ -6,10 +6,10 @@ package com.github.bradjacobs.excel;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * ExcelSheetReader that only handleS 'visible' cells.
@@ -38,20 +38,8 @@ class ExcelSheetVisibleCellsReader extends ExcelSheetReader {
     /** @inheritDoc */
     @Override
     protected int[] getAvailableColumns(Sheet sheet, int maxColumn) {
-        List<Integer> visibleColumnList = new ArrayList<>();
-        for (int i = 0; i < maxColumn; i++) {
-            if (! sheet.isColumnHidden(i)) {
-                visibleColumnList.add(i);
-            }
-        }
-
-        // if any hidden columns were detected, return remaining visible columns,
-        //   otherwise return getAvailableColumns from parent class
-        if (visibleColumnList.size() < maxColumn) {
-            return visibleColumnList.stream().mapToInt(Integer::intValue).toArray();
-        }
-        else {
-            return super.getAvailableColumns(sheet, maxColumn);
-        }
+        return IntStream.range(0, maxColumn)
+                .filter(idx -> !sheet.isColumnHidden(idx))
+                .toArray();
     }
 }
