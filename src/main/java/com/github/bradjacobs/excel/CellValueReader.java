@@ -38,6 +38,14 @@ class CellValueReader {
         }
         String cellValue = EXCEL_DATA_FORMATTER.formatCellValue(cell);
 
+        // NOTE: the code snippet below shows how to ensure that the value is blank
+        //   if the custom format of '3 semicolons' ::: was used to hide cell contents.
+        //   However, this is currently commented out because it could have
+        //     a large negative performance impact without much gain.
+        //if (cell.getCellStyle().getDataFormatString().equals(";;;")) {
+        //    cellValue = "";
+        //}
+
         // if there are any certain special unicode characters (like nbsp or smart quotes),
         // replace w/ normal character equivalent
         cellValue = specialCharSanitizer.sanitize(cellValue);
