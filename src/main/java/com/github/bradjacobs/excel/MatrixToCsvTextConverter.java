@@ -68,7 +68,7 @@ public class MatrixToCsvTextConverter {
                 if (shouldQuoteRule.test(cellValue)) {
                     // must first escape double quotes
                     if (cellValue.contains("\"")) {
-                        cellValue = Strings.CS.replace(cellValue,"\"", "\"\"");
+                        cellValue = Strings.CS.replace(cellValue, "\"", "\"\"");
                     }
                     sb.append('\"').append(cellValue).append('\"');
                 }
