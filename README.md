@@ -39,16 +39,16 @@ String csvText = excelReader.convertToCsvText(new File("input.xlsx"));
 ```
 
 ```java
-// get 2-D string array representing the entire worksheet (each value represents a 'cell')
+// get 2-D string array representing the data in the worksheet
 ExcelReader excelReader = ExcelReader.builder().build();
-String[][] csvData = excelReader.convertToDataMatrix(Paths.get("input.xlsx"));
+String[][] dataMatrix = excelReader.convertToDataMatrix(Paths.get("input.xlsx"));
 // or
-String[][] csvData = excelReader.convertToDataMatrix(new File("input.xlsx"));
+String[][] dataMatrix = excelReader.convertToDataMatrix(new File("input.xlsx"));
 ```
 
 ### Advanced
 ```java
-// write csv file w/ specific settings
+// write csv file with specific settings
 ExcelReader excelReader = ExcelReader.builder()
         .quoteMode(QuoteMode.LENIENT) // only quote values if necessary
         .sheetIndex(1) // grab the 2nd worksheet
@@ -100,8 +100,8 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 ## KnownCellDataIssues
 Minor issues that may (or may not) be addressed in the future
 * "Linked Cells" (Stock, Geography, etc.), typically render as "#VALUE!"
+* Cells with 'custom format' may rander incorrectly (including ;;; format)
 * Cells with custom formatting of DataBar or IconSet will show a value, even if marked as "icon only"
-* Cells that have "hidden custom formatting" `;;;` will render as semicolons _or_ the original value instead of blank
 
 ## AlternateImplementations
 Searching on the web can yield alternate solutions that require less code.  However, they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well

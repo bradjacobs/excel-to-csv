@@ -197,7 +197,7 @@ public class ExcelReader {
     public static class Builder {
         private static final CharSanitizeFlag[] DEFAULT_SANITIZE_FLAGS = { SPACES, QUOTES };
 
-        private int sheetIndex = 0;    // default to the first tab
+        private int sheetIndex = 0; // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name
         private boolean autoTrim = true; // trim any leading/trailing whitespace
         private boolean skipEmptyRows = false; // skip any empty lines when set

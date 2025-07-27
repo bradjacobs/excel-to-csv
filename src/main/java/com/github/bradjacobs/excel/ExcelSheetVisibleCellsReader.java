@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * ExcelSheetReader that only handleS 'visible' cells.
+ * ExcelSheetReader that only handles 'visible' cells.
  *   i.e. the cells must have width > 0 and height > 0
  */
 class ExcelSheetVisibleCellsReader extends ExcelSheetReader {
