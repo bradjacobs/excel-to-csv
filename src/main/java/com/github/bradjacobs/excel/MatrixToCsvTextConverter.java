@@ -4,6 +4,7 @@
 package com.github.bradjacobs.excel;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -67,7 +68,7 @@ public class MatrixToCsvTextConverter {
                 if (shouldQuoteRule.test(cellValue)) {
                     // must first escape double quotes
                     if (cellValue.contains("\"")) {
-                        cellValue = StringUtils.replace(cellValue,"\"", "\"\"");
+                        cellValue = Strings.CS.replace(cellValue,"\"", "\"\"");
                     }
                     sb.append('\"').append(cellValue).append('\"');
                 }
