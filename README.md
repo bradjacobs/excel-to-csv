@@ -100,7 +100,7 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 ## KnownCellDataIssues
 Minor issues that may (or may not) be addressed in the future
 * "Linked Cells" (Stock, Geography, etc.), typically render as "#VALUE!"
-* Cells with 'custom format' may rander incorrectly (including ;;; format)
+* Cells with 'custom format' may render incorrectly (including ;;; format)
 * Cells with custom formatting of DataBar or IconSet will show a value, even if marked as "icon only"
 
 ## AlternateImplementations
