@@ -86,8 +86,8 @@ public class SpecialCharacterSanitizerTest {
 
     @Test
     public void sanitizeDashCharacters() {
-        String inputCurlySingleQuotes = "aaa–bbb－ccc";
-        String expectedResult = "aaa-bbb-ccc";
+        String inputCurlySingleQuotes = "aaa–bbb－ccc˗d−e";
+        String expectedResult = "aaa-bbb-ccc-d-e";
         String result = new SpecialCharacterSanitizer(DASHES).sanitize(inputCurlySingleQuotes);
         assertEquals(expectedResult, result, "mismatch result of quote character replacement");
     }

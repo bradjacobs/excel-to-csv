@@ -128,6 +128,8 @@ public class SpecialCharacterSanitizer {
     };
 
     private static final Character[] DASH_CHARS = {
+            //'\u00AD', // soft hyphen (Note: include or not?  usually invisible)
+            '\u02D7', // modifier letter minus sign
             '\u05A8', // armenian hyphen
             '\u05BE', // hebrew punctuation maqaf
             '\u1806', // mongolian soft hyphen
@@ -139,6 +141,8 @@ public class SpecialCharacterSanitizer {
             '\u2015', // horizontal bar
             '\u207B', // superscript minus
             '\u208B', // subscript minus
+            '\u2212', // minus sign
+            '\u2796', // heavy minus sign
             '\u2E3A', // two-em dash
             '\u2E3B', // three-em dash
             '\uFE58', // small em dash
