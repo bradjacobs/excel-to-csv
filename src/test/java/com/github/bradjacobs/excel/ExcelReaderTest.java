@@ -57,7 +57,7 @@ public class ExcelReaderTest {
         String expectedCsvText = readResourceFileText(expectedResultFileName);
         File inputFile = getTestFileObject();
 
-        ExcelReader excelReader = ExcelReader.builder().quoteMode(quoteMode).skipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().quoteMode(quoteMode).build();
         String csvText = excelReader.convertToCsvText(inputFile);
 
         assertEquals(expectedCsvText, csvText, "mismatch of expected csv output");
@@ -69,7 +69,7 @@ public class ExcelReaderTest {
         String expectedCsvText = readResourceFileText(expectedResultFileName);
         Path inputFile = getTestFileObject().toPath();
 
-        ExcelReader excelReader = ExcelReader.builder().quoteMode(quoteMode).skipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().quoteMode(quoteMode).build();
         String csvText = excelReader.convertToCsvText(inputFile);
 
         assertEquals(expectedCsvText, csvText, "mismatch of expected csv output");
@@ -80,14 +80,14 @@ public class ExcelReaderTest {
         String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
 
         URL inputFileUrl = getTestLocalFileUrl();
-        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().build();
         String csvText = excelReader.convertToCsvText(inputFileUrl);
         assertEquals(expectedCsvText, csvText, "mismatch of expected csv output");
     }
 
     @Test
     public void testMatrixOutput() throws Exception {
-        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().build();
         File inputFile = getTestFileObject();
 
         String[][] csvData = excelReader.convertToDataMatrix(inputFile);
@@ -124,7 +124,7 @@ public class ExcelReaderTest {
     @Test
     public void testFilePathAsUrl() throws Exception {
         URL fileUrl = getTestResourceFileUrl(TEST_DATA_FILE);
-        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().build();
         String csvText = excelReader.convertToCsvText(fileUrl);
         String expectedCsvText = readResourceFileText(EXPECTED_NORMAL_CSV_FILE);
         assertNotNull(csvText);
@@ -134,7 +134,6 @@ public class ExcelReaderTest {
     @Test
     public void testReadSheetByName() throws Exception {
         ExcelReader excelReader = ExcelReader.builder()
-                .skipEmptyRows(false)
                 .sheetName(TEST_SHEET_NAME.toLowerCase())  // use lower to confirm match is case-insensitive.
                 .build();
         File inputFile = getTestFileObject();
@@ -149,7 +148,6 @@ public class ExcelReaderTest {
     public void testReadBlankSheet() throws Exception {
         ExcelReader excelReader = ExcelReader.builder()
                 .sheetName(TEST_BLANK_SHEET_NAME)
-                .skipEmptyRows(false)
                 .build();
         File inputFile = getTestFileObject();
 
@@ -162,7 +160,7 @@ public class ExcelReaderTest {
     @Test
     public void testTrimmingSpaces() throws Exception {
         URL resourceUrl = getTestResourceFileUrl("spaces_data.xlsx");
-        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
 
         // the first row is a header row, but every other row should have
@@ -177,7 +175,6 @@ public class ExcelReaderTest {
     public void testDisablingTrimSpaces() throws Exception {
         URL resourceUrl = getTestResourceFileUrl("spaces_data.xlsx");
         ExcelReader excelReader = ExcelReader.builder()
-                .skipEmptyRows(false)
                 .autoTrim(false)
                 .build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
@@ -195,7 +192,7 @@ public class ExcelReaderTest {
     @Test
     public void testHandleExtraBlankColumns() throws Exception {
         URL resourceUrl = getTestResourceFileUrl("spaces_data.xlsx");
-        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).sheetName("LAST_COL_WHITESPACE").build();
+        ExcelReader excelReader = ExcelReader.builder().sheetName("LAST_COL_WHITESPACE").build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals(1, csvMatrix[0].length, "mismatch of expected number of columns in csv output.");
     }
@@ -215,7 +212,7 @@ public class ExcelReaderTest {
     @Test
     public void testBadRowRepro() throws Exception {
         URL resourceUrl = getTestResourceFileUrl("repro.xlsx");
-        ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
+        ExcelReader excelReader = ExcelReader.builder().build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals("aaa", csvMatrix[0][0]);
         assertEquals("bbb", csvMatrix[0][1]);
@@ -229,7 +226,7 @@ public class ExcelReaderTest {
         public void testSavePathObject(@TempDir Path tempDir) throws Exception {
             Path testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME);
 
-            ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
+            ExcelReader excelReader = ExcelReader.builder().build();
             Path inputFile = getTestFileObject().toPath();
             excelReader.convertToCsvFile(inputFile, testOutputFile);
             assertTrue(Files.exists(testOutputFile), "expected csv file was NOT created");
@@ -244,7 +241,7 @@ public class ExcelReaderTest {
         public void testSaveFileObject(@TempDir Path tempDir) throws Exception {
             File testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME).toFile();
 
-            ExcelReader excelReader = ExcelReader.builder().skipEmptyRows(false).build();
+            ExcelReader excelReader = ExcelReader.builder().build();
             File inputFile = getTestFileObject();
             excelReader.convertToCsvFile(inputFile, testOutputFile);
             assertTrue(testOutputFile.exists(), "expected csv file was NOT created");
