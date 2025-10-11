@@ -166,8 +166,11 @@ public class SpecialCharacterSanitizer {
                 replacementMap.put(c, SPACE_CHAR);
             }
         }
-        replacementMap.put('\u200b', SPACE_CHAR); // ZERO-WIDTH SPACE (tbd if this should be here)
         replacementMap.put('\u2800', SPACE_CHAR); // BRAILLE SPACE
+        // NOTE: 'zero width' spaces are NOT counted as spaces
+        //   '\u200b' - ZERO-WIDTH SPACE
+        //   '\ufeff' - ZERO WIDTH NO-BREAK SPACE
+        //   '\u180e' - MONGOLIAN VOWEL SEPARATOR
         return replacementMap;
     }
 

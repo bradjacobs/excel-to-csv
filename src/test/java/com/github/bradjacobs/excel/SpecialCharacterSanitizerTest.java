@@ -39,7 +39,6 @@ public class SpecialCharacterSanitizerTest {
             arguments(named("PUNCTUATION SPACE", "\u2008")),
             arguments(named("THIN SPACE", "\u2009")),
             arguments(named("HAIR SPACE", "\u200a")),
-            arguments(named("ZERO-WIDTH SPACE", "\u200b")),
             arguments(named("BRAILLE SPACE", "\u2800"))
     );
 
