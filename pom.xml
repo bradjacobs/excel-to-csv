@@ -14,6 +14,7 @@
 		<apache.poi.version>5.4.1</apache.poi.version>
 		<commons.io.version>2.20.0</commons.io.version>
 		<commons.lang3.version>3.19.0</commons.lang3.version>
+		<commons.codec.version>1.19.0</commons.codec.version>
 		<junit.version>5.14.0</junit.version>
 		<mockito.version>5.20.0</mockito.version>
 	</properties>
@@ -55,15 +56,34 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
+
+	<dependencyManagement>
+		<!-- Lock versions to avoid diamond dependency version convergence -->
+		<dependencies>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons.io.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons.lang3.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>${commons.codec.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>
