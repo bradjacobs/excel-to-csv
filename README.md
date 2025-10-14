@@ -100,7 +100,16 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 ## KnownCellDataIssues
 Minor issues that may (or may not) be addressed in the future
 * "Linked Cells" (Stock, Geography, etc.), typically render as "#VALUE!"
-* Cells with 'custom format' may render incorrectly (including ;;; format)
+* Some cells with 'custom format' may render incorrectly (including ;;; format)
+* Some Numeric cells with certain custom formats may render with incorrect values
+  <details><summary>(Expand For Details)</summary>
+
+    * _Example_: a cell with the value <span style="color:blue;">50</span> and custom format <span style="color:blue;">#.00,</span>
+      * Renders in Excel as <span style="color:green;">.05</span>
+      * Renders in POI code as <span style="color:red;">.10</span>
+    * Believe this is related to 'BigDecimal' mentioned in https://github.com/apache/poi/pull/321
+    * Suspect the issue is related to the BigDecimal with an incorrect scale value [HERE](https://github.com/apache/poi/blob/REL_5_4_1/poi/src/main/java/org/apache/poi/ss/usermodel/DataFormatter.java#L971) (conjecture)
+  </details>
 * Cells with custom formatting of DataBar or IconSet will show a value, even if marked as "icon only"
 
 ## AlternateImplementations
