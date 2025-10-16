@@ -89,6 +89,14 @@ class ExcelSheetReader {
             }
             matrixDataList.add(rowValues);
         }
+
+        // remove any trailing blank rows (even if 'skipEmptyRows==false')
+        if (! this.skipEmptyRows) {
+            while (!matrixDataList.isEmpty() && isEmptyRow(matrixDataList.get(matrixDataList.size()-1))) {
+                matrixDataList.remove(matrixDataList.size()-1);
+            }
+        }
+
         return matrixDataList;
     }
 

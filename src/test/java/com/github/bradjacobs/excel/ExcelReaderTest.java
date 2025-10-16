@@ -220,6 +220,20 @@ public class ExcelReaderTest {
         assertEquals("ddd", csvMatrix[2][1]);
     }
 
+    // If there are a bunch of empty blank rows after all the data
+    // has been read then they should get removed, regardless of skipEmptyRows value
+    // Cannot think of any reason they should remain (at present)
+    @Test
+    public void testExtraBlankRowsRepro() throws Exception {
+        URL resourceUrl = getTestResourceFileUrl("repro.xlsx");
+        ExcelReader excelReader = ExcelReader.builder()
+                .sheetName("ExtraBlankRowsAfterData")
+                .skipEmptyRows(false)
+                .build();
+        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
+        assertEquals(2, csvMatrix.length, "mismatch expected row count");
+    }
+
     @Nested
     class SavingCsvFileTests {
         @Test
