@@ -124,10 +124,8 @@ public class MatrixToCsvTextConverterTest {
     private static List<Arguments> convertToArgumentList(List<QuoteTestInput> quoteTestInputList) {
         List<Arguments> argumentsList = new ArrayList<>();
         for (QuoteTestInput quoteTestInput : quoteTestInputList) {
-            Map<QuoteMode, String> expectedMap = quoteTestInput.expectedValueMap;
-            for (Map.Entry<QuoteMode, String> entry : expectedMap.entrySet()) {
-                argumentsList.add(Arguments.of(quoteTestInput.inputValue, entry.getKey(), entry.getValue()));
-            }
+            quoteTestInput.expectedValueMap.forEach(
+                    (k, v) -> argumentsList.add(Arguments.of(quoteTestInput.inputValue, k, v)));
         }
         return argumentsList;
     }
