@@ -12,7 +12,7 @@
 	<properties>
 		<java.version>11</java.version> <!-- minimum JDK required -->
 		<apache.poi.version>5.4.1</apache.poi.version>
-		<commons.io.version>2.20.0</commons.io.version>
+		<commons.io.version>2.21.0</commons.io.version>
 		<commons.lang3.version>3.19.0</commons.lang3.version>
 		<commons.codec.version>1.19.0</commons.codec.version>
 		<junit.version>5.14.1</junit.version>
