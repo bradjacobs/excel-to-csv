@@ -8,8 +8,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.net.URL;
 
+import static com.github.bradjacobs.excel.util.TestResourceUtil.getResourceFileUrl;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ExcelSkipHiddenDataTest {
 
@@ -24,7 +24,7 @@ public class ExcelSkipHiddenDataTest {
     @ValueSource(strings = {"BaseCase", "LastColumn", "FirstLastRow",
             "AllColumnHidden", "FirstLastColumn", "Multi"})
     public void testMissingRowsAndColumns(String sheetNamePrefix) throws Exception {
-        URL inputFile = getTestResourceFileUrl(TEST_DATA_FILE);
+        URL inputFile = getResourceFileUrl(TEST_DATA_FILE);
 
         ExcelReader dataExcelReader = ExcelReader.builder()
                 .sheetName(sheetNamePrefix + INPUT_DATA_SHEET_SUFFIX)
@@ -38,11 +38,5 @@ public class ExcelSkipHiddenDataTest {
         String[][] expectedMatrix = expectedExcelReader.convertToDataMatrix(inputFile);
 
         assertArrayEquals(expectedMatrix, actualMatrix);
-    }
-
-    private URL getTestResourceFileUrl(String fileName) {
-        URL resourceUrl = this.getClass().getClassLoader().getResource(fileName);
-        assertNotNull(resourceUrl);
-        return resourceUrl;
     }
 }

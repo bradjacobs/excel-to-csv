@@ -24,8 +24,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.github.bradjacobs.excel.util.TestResourceUtil.getResourceFilePath;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Named.named;
@@ -34,16 +34,16 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class ExcelReaderExceptionHandlingTest {
-    private static final Path VALID_TEST_INPUT_PATH = getPathObject("test_data.xlsx");
+    private static final Path VALID_TEST_INPUT_PATH = getResourceFilePath("test_data.xlsx");
     private static final File VALID_TEST_INPUT_FILE = VALID_TEST_INPUT_PATH.toFile();
-    private static final Path VALID_TEST_INPUT_PSWD_PATH = getPathObject("test_data_w_pswd_1234.xlsx");
+    private static final Path VALID_TEST_INPUT_PSWD_PATH = getResourceFilePath("test_data_w_pswd_1234.xlsx");
     private static final File VALID_TEST_INPUT_PSWD_FILE = VALID_TEST_INPUT_PSWD_PATH.toFile();
     private static final Path VALID_OUT_PATH = Paths.get("out.csv");
     private static final File VALID_OUT_FILE = VALID_OUT_PATH.toFile();
 
     private static final ExcelReader DEFAULT_EXCEL_READER = ExcelReader.builder().build();
 
-    private static final String TEXT_FILE_PATH = getPathObject("fake.txt").toAbsolutePath().toString();
+    private static final String TEXT_FILE_PATH = getResourceFilePath("fake.txt").toAbsolutePath().toString();
     private static final String DIR_PATH = Paths.get("").toAbsolutePath().toString();
 
     private static final String INPUT_FILE_NOT_FOUND_PATH = "/bogus/path/here/file.xlsx";
@@ -295,14 +295,5 @@ public class ExcelReaderExceptionHandlingTest {
     private void assertContains(String subString, String mainString) {
         assertTrue(mainString.contains(subString),
                 String.format("Expected to find substring '%s' in string '%s'.", subString, mainString));
-    }
-
-    private static Path getPathObject(String fileName) {
-        return Paths.get(getResourceFileLocation(fileName));
-    }
-    private static String getResourceFileLocation(String fileName) {
-        URL resourceUrl = ExcelReaderExceptionHandlingTest.class.getClassLoader().getResource(fileName);
-        assertNotNull(resourceUrl);
-        return resourceUrl.getPath();
     }
 }
