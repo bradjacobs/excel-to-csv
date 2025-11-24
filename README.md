@@ -82,7 +82,7 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 | sheetName              | NO       | (blank) | Name of the worksheet tab to be converted to CSV<br> (if set then 'sheetIndex' is ignored)                                                                                                                                                                                     |
 | autoTrim               | NO       | true    | Trim any leading/trailing whitespace on cell values.                                                                                                                                                                                                                           |
 | skipEmptyRows          | NO       | false   | filter out all 'blank' rows from the Excel worksheet                                                                                                                                                                                                                           |
-| skipInvisibleCells     | NO       | false   | when true, limit to only visible cells (i.e. row height > 0 and column width > 0)                                                                                                                                                                                           |
+| skipInvisibleCells     | NO       | false   | when true, limit to only visible cells (i.e. row height > 0 and column width > 0)                                                                                                                                                                                              |
 | saveUnicodeFileWithBom | NO       | true    | prepend 'BOM' to output CSV file if unicode characters were detected.                                                                                                                                                                                                          |
 | sanitizeSpaces         | NO       | true    | replace any unicode or abnormal space character (i.e. nbsp) with a normal space                                                                                                                                                                                                |
 | sanitizeQuotes         | NO       | true    | replace any special single/double quotes (i.e. smart quotes) with normal quotes                                                                                                                                                                                                |
@@ -102,14 +102,6 @@ Minor issues that may (or may not) be addressed in the future
 * "Linked Cells" (Stock, Geography, etc.), typically render as "#VALUE!"
 * Some cells with 'custom format' may render incorrectly (including ;;; format)
 * Some Numeric cells with certain custom formats may render with incorrect values
-  <details><summary>(Expand For Details)</summary>
-
-    * _Example_: a cell with the value <code style="color:blue;">50</code> and custom format <code style="color:blue;">#.00,</code>
-      * Renders in Excel as <code style="color:green;">.05</code>
-      * Renders in POI code as <code style="color:red;">.10</code>
-    * Believe this is related to 'BigDecimal' mentioned in https://github.com/apache/poi/pull/321
-    * Suspect the issue is related to the BigDecimal with an incorrect scale value [HERE](https://github.com/apache/poi/blob/REL_5_4_1/poi/src/main/java/org/apache/poi/ss/usermodel/DataFormatter.java#L971) (conjecture)
-  </details>
 * Cells with custom formatting of DataBar or IconSet will show a value, even if marked as "icon only"
 
 ## AlternateImplementations
