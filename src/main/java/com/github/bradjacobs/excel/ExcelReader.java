@@ -195,7 +195,7 @@ public class ExcelReader {
     }
 
     public static class Builder {
-        private static final CharSanitizeFlag[] DEFAULT_SANITIZE_FLAGS = { SPACES, QUOTES };
+        private static final Set<CharSanitizeFlag> DEFAULT_SANITIZE_FLAGS = Set.of(SPACES, QUOTES);
 
         private int sheetIndex = 0; // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name
@@ -205,7 +205,7 @@ public class ExcelReader {
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
         private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains unicode.
-        private final Set<CharSanitizeFlag> charSanitizeFlags = new HashSet<>(Arrays.asList(DEFAULT_SANITIZE_FLAGS));
+        private final Set<CharSanitizeFlag> charSanitizeFlags = new HashSet<>(DEFAULT_SANITIZE_FLAGS);
 
         private Builder() {}
 

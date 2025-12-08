@@ -27,7 +27,7 @@ public class MatrixToCsvTextConverter {
 
     // a string with any of these explicit characters should be quoted.  (Lenient Mode)
     private static final Set<Character> MINIMAL_QUOTE_CHARACTERS =
-            new HashSet<>(Arrays.asList('"', ',', '\t', '\r', '\n'));
+            new HashSet<>(Set.of('"', ',', '\t', '\r', '\n'));
 
     private static final String NEW_LINE = System.lineSeparator();
 

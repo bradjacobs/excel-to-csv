@@ -19,7 +19,7 @@ import java.util.zip.GZIPInputStream;
 
 public class InputStreamGenerator {
     private static final Set<String> VALID_URL_SCHEMES =
-            new HashSet<>(Arrays.asList("http", "https", "ftp", "file"));
+            Set.of("http", "https", "ftp", "file");
     private static final int CONNECTION_TIMEOUT = 20000;
     // some websites require a userAgent value set.
     //    side:  seen a case where a userAgent with substring 'java' would fail  (empirical evidence)
