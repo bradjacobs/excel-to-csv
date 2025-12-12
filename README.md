@@ -98,17 +98,25 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 * Empty cells will be converted to empty string (not 'null')
 
 ## KnownCellDataIssues
-Minor issues that may (or may not) be addressed in the future
-* "Linked Cells" (Stock, Geography, etc.), typically render as "#VALUE!"
-* Some cells with 'custom format' may render incorrectly (including ;;; format)
-* Some Numeric cells with certain custom formats may render with incorrect values
-* Cells with custom formatting of DataBar or IconSet will show a value, even if marked as "icon only"
+Known Cell Data Formatting Issues include (but not limited to) the following:
+<details>
+  <summary>(Click To Expand...)</summary>
+
+* Any cells with 'error values' (#NAME?, #VALUE!, etc) will appear in the output CSV file (this is expected)
+* Certain Linked or Embedded Objects typically render as "#VALUE!" (Pictures, Stock, Geography, etc.)
+* Special or Custom Formats may sometimes render incorrectly.
+  * most often noticed with date, time, or numeric values.
+  * the ;;; format will not produce a blank value
+* Number precision can sometimes be off for _very_ large (or _very_ small) values. 
+  * Usually reserved for abnormally big numbers (say 20+ digits, subjectively)
+* Cells of type DataBar or IconSet will show a value, even if marked as "icon only"
+</details>
 
 ## AlternateImplementations
 Searching on the web can yield alternate solutions that require less code.  However, they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well
 
 <details>
-  <summary>Example Alternate Implementation... (Click Me)</summary>
+  <summary>Example Alternate Implementation... (Click To Expand)</summary>
 
 From a [StackOverflow Post](https://stackoverflow.com/questions/40283179/how-to-convert-xlsx-file-to-csv), [OrangeDog](https://stackoverflow.com/users/476716/orangedog) points out there is an easier way to get CSV text, which would look something ike this:
 ```java
@@ -143,7 +151,8 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 * Address any of the "Known Cell Data Issues" (above) if possible
 * Add more JavaDocs
 * Reorganize Excel Test data for Junit tests.
-* More Unittest cleanup
+* Add more unittests (particularly around cell format scenarios)
+* General Unittest cleanup
 </details>
 
 ## FinalThoughts
