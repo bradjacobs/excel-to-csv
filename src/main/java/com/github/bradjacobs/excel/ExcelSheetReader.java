@@ -19,7 +19,7 @@ public class ExcelSheetReader {
     protected final boolean skipEmptyRows;
     protected final CellValueReader cellValueReader;
 
-    protected ExcelSheetReader(
+    public ExcelSheetReader(
             boolean autoTrim,
             boolean skipEmptyRows,
             Set<CharSanitizeFlag> charSanitizeFlags) {
