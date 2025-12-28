@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
 
-class ExcelSheetReader {
+public class ExcelSheetReader {
     protected final boolean skipEmptyRows;
     protected final CellValueReader cellValueReader;
 

@@ -9,7 +9,7 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 
 import java.util.Set;
 
-class CellValueReader {
+public class CellValueReader {
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
     static {

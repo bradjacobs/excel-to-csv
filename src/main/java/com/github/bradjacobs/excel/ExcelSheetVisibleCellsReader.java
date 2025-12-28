@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
  * ExcelSheetReader that only handles 'visible' cells.
  *   i.e. the cells must have width > 0 and height > 0
  */
-class ExcelSheetVisibleCellsReader extends ExcelSheetReader {
+public class ExcelSheetVisibleCellsReader extends ExcelSheetReader {
 
     public ExcelSheetVisibleCellsReader(
             boolean autoTrim,
