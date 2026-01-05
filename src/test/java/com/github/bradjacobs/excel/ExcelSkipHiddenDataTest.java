@@ -10,6 +10,7 @@ import java.net.URL;
 
 import static com.github.bradjacobs.excel.util.TestResourceUtil.getResourceFileUrl;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExcelSkipHiddenDataTest {
 
@@ -31,6 +32,12 @@ public class ExcelSkipHiddenDataTest {
                 .skipInvisibleCells(true)
                 .build();
         String[][] actualMatrix = dataExcelReader.convertToDataMatrix(inputFile);
+
+        if (actualMatrix.length > 0) {
+            String[] firstRow = actualMatrix[0];
+            // check to make sure we don't have rows that contain zero-length arrays (need only check the first)
+            assertTrue(firstRow.length > 0, "Matrix return rows with zero-length arrays");
+        }
 
         ExcelReader expectedExcelReader = ExcelReader.builder()
                 .sheetName(sheetNamePrefix + EXPECTED_DATA_SHEET_SUFFIX)

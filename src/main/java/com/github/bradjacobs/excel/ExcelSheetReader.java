@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,14 +55,18 @@ public class ExcelSheetReader {
     }
 
     protected List<String[]> convertToMatrixDataList(List<Row> rowList, int[] availableColumns) {
-        List<String[]> matrixDataList = new ArrayList<>(rowList.size());
+        // if there are no available columns then bail early.
+        if (availableColumns.length == 0) {
+            return Collections.emptyList();
+        }
 
         int totalColumnCount = availableColumns.length;
-        int lastColumnIndex = totalColumnCount > 0 ? availableColumns[totalColumnCount-1] : -1;
+        List<String[]> matrixDataList = new ArrayList<>(rowList.size());
+        int lastColumnIndex = availableColumns[totalColumnCount-1];
 
         // NOTE: avoid using "sheet.iterator" when looping through rows,
-        //   b/c it can bail out early when it encounters the first empty line
-        //   (even if there is more data rows remaining)
+        //   because it can bail out early when it encounters the first empty line
+        //   (even if there are more data rows remaining)
         for (Row row : rowList) {
             String[] rowValues = new String[totalColumnCount];
 
@@ -151,7 +156,7 @@ public class ExcelSheetReader {
     /**
      * Method to grab all the rows for the sheet ahead of time
      *   NOTE: some elements in the result list could be 'null'
-     *       (nulls are usually a 'default unaltered rows')
+     *       (nulls are usually 'default unaltered rows')
      * @param sheet input Excel Sheet
      * @return list of rows
      */
