@@ -177,15 +177,12 @@ public class ExcelReader {
      * @return new ExcelSheetReader instance
      */
     private static ExcelSheetReader createExcelSheetReader(Builder builder) {
-        if (builder.skipInvisibleCells) {
-            return new ExcelSheetVisibleCellsReader(
-                    builder.autoTrim,
-                    builder.skipEmptyRows,
-                    builder.charSanitizeFlags);
-        }
+        // todo: fix constructor
         return new ExcelSheetReader(
                 builder.autoTrim,
-                builder.skipEmptyRows,
+                builder.removeBlankRows,
+                builder.removeBlankColumns,
+                builder.removeInvisibleCells,
                 builder.charSanitizeFlags);
     }
 
@@ -197,8 +194,9 @@ public class ExcelReader {
         private int sheetIndex = 0; // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name
         private boolean autoTrim = true; // trim any leading/trailing whitespace
-        private boolean skipEmptyRows = false; // skip any empty lines when set
-        private boolean skipInvisibleCells = false; // skip any rows/columns that are not visible
+        private boolean removeBlankRows = false; // remove blank lines when true
+        private boolean removeBlankColumns = false; // remove blank columns when true
+        private boolean removeInvisibleCells = false; // remove any rows/columns that are not visible
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
         private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains unicode.
@@ -230,20 +228,29 @@ public class ExcelReader {
         }
 
         /**
-         * Whether to skip any empty rows.
-         * @param skipEmptyRows (defaults to false)
+         * Whether to remove any blank rows.
+         * @param removeBlankRows (defaults to false)
          */
-        public Builder skipEmptyRows(boolean skipEmptyRows) {
-            this.skipEmptyRows = skipEmptyRows;
+        public Builder removeBlankRows(boolean removeBlankRows) {
+            this.removeBlankRows = removeBlankRows;
             return this;
         }
 
         /**
-         * Whether to skip hidden rows/columns
-         * @param skipInvisibleCells (defaults to false)
+         * Whether to remove any blank columns.
+         * @param removeBlankColumns (defaults to false)
          */
-        public Builder skipInvisibleCells(boolean skipInvisibleCells) {
-            this.skipInvisibleCells = skipInvisibleCells;
+        public Builder removeBlankColumns(boolean removeBlankColumns) {
+            this.removeBlankColumns = removeBlankColumns;
+            return this;
+        }
+
+        /**
+         * Whether to remove hidden rows/columns
+         * @param removeInvisibleCells (defaults to false)
+         */
+        public Builder removeInvisibleCells(boolean removeInvisibleCells) {
+            this.removeInvisibleCells = removeInvisibleCells;
             return this;
         }
 

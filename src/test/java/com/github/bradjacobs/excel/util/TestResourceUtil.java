@@ -13,6 +13,9 @@ import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+/**
+ * Helper class to read in files from the test resources directory.
+ */
 public class TestResourceUtil {
 
     public static URL getResourceFileUrl(String fileName) {
@@ -43,5 +46,4 @@ public class TestResourceUtil {
             throw new RuntimeException(String.format("Unable to read test resource file: %s.  Reason: %s", fileName, e.getMessage()), e);
         }
     }
-
 }

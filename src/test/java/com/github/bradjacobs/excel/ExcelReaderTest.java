@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+// TODO - this class needs an overhaul.
 public class ExcelReaderTest {
     private static final String TEST_DATA_FILE = "test_data.xlsx";
     private static final String TEST_SHEET_NAME = "TEST_SHEET";
@@ -105,12 +106,12 @@ public class ExcelReaderTest {
         File inputFile = getResourceFileObject(TEST_DATA_FILE);
 
         ExcelReader excelReader1 = ExcelReader.builder()
-                .skipEmptyRows(false)
+                .removeBlankRows(false)
                 .build();
         String[][] csvDataHasEmptyRows = excelReader1.convertToDataMatrix(inputFile);
 
         ExcelReader excelReader2 = ExcelReader.builder()
-                .skipEmptyRows(true)
+                .removeBlankRows(true)
                 .build();
         String[][] csvDataNoEmptyRows = excelReader2.convertToDataMatrix(inputFile);
 
@@ -228,11 +229,34 @@ public class ExcelReaderTest {
         URL resourceUrl = getResourceFileUrl("repro.xlsx");
         ExcelReader excelReader = ExcelReader.builder()
                 .sheetName("ExtraBlankRowsAfterData")
-                .skipEmptyRows(false)
+                .removeBlankRows(false)
                 .build();
         String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals(2, csvMatrix.length, "mismatch expected row count");
     }
+
+    @Test
+    public void testFilterBlankCoumns() throws Exception {
+        URL resourceUrl = getResourceFileUrl("repro.xlsx");
+        ExcelReader excelReader = ExcelReader.builder()
+                .sheetName("WithBlankColumns1")
+                .removeBlankColumns(true)
+                .build();
+        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
+        assertEquals(3, csvMatrix[0].length, "mismatch expected column count");
+    }
+
+    @Test
+    public void testFilterFirstBlankCoumns() throws Exception {
+        URL resourceUrl = getResourceFileUrl("repro.xlsx");
+        ExcelReader excelReader = ExcelReader.builder()
+                .sheetName("WithBlankColumns2")
+                .removeBlankColumns(true)
+                .build();
+        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
+        assertEquals(1, csvMatrix[0].length, "mismatch expected column count");
+    }
+
 
     @Nested
     class SavingCsvFileTests {

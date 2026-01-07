@@ -7,24 +7,33 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
 
+// TODO javadocs
 public class ExcelSheetReader {
-    protected final boolean skipEmptyRows;
+    protected final boolean removeBlankRows;
+    protected final boolean removeBlankColumns;
+    protected final boolean removeInvisibleCells;
     protected final CellValueReader cellValueReader;
 
+    // TODO - fix this constructor parameter mess
     public ExcelSheetReader(
             boolean autoTrim,
-            boolean skipEmptyRows,
+            boolean removeBlankRows,
+            boolean removeBlankColumns,
+            boolean removeInvisibleCells,
             Set<CharSanitizeFlag> charSanitizeFlags) {
-        this.skipEmptyRows = skipEmptyRows;
+        this.removeBlankRows = removeBlankRows;
+        this.removeBlankColumns = removeBlankColumns;
+        this.removeInvisibleCells = removeInvisibleCells;
         this.cellValueReader = new CellValueReader(autoTrim, charSanitizeFlags);
     }
 
@@ -61,9 +70,9 @@ public class ExcelSheetReader {
         }
 
         int totalColumnCount = availableColumns.length;
-        List<String[]> matrixDataList = new ArrayList<>(rowList.size());
         int lastColumnIndex = availableColumns[totalColumnCount-1];
 
+        CsvRowConsumer csvRowConsumer = new CsvRowConsumer(this.removeBlankRows, this.removeBlankColumns);
         // NOTE: avoid using "sheet.iterator" when looping through rows,
         //   because it can bail out early when it encounters the first empty line
         //   (even if there are more data rows remaining)
@@ -87,22 +96,11 @@ public class ExcelSheetReader {
             while (columnIndex < totalColumnCount) {
                 rowValues[columnIndex++] = "";
             }
-
-            // ignore empty row if necessary
-            if (this.skipEmptyRows && isEmptyRow(rowValues)) {
-                continue;
-            }
-            matrixDataList.add(rowValues);
+            csvRowConsumer.accept(rowValues);
         }
 
-        // remove any trailing blank rows (even if 'skipEmptyRows==false')
-        if (! this.skipEmptyRows) {
-            while (!matrixDataList.isEmpty() && isEmptyRow(matrixDataList.get(matrixDataList.size()-1))) {
-                matrixDataList.remove(matrixDataList.size()-1);
-            }
-        }
-
-        return matrixDataList;
+        csvRowConsumer.finalizeRows();
+        return csvRowConsumer.getRows();
     }
 
     /**
@@ -133,7 +131,7 @@ public class ExcelSheetReader {
         return maxColumn;
     }
 
-    protected boolean isEmptyRow(String[] rowData) {
+    protected static boolean isEmptyRow(String[] rowData) {
         for (String r : rowData) {
             if (r != null && !r.isEmpty()) {
                 return false;
@@ -165,8 +163,12 @@ public class ExcelSheetReader {
         //  (however doesn't seem to need for this when using row.getLastCellNum, which seems odd)
         int numOfRows = sheet.getLastRowNum() + 1;
 
+        Predicate<Row> rowFilterPredicate = removeInvisibleCells ?
+                r -> r == null || !r.getZeroHeight() :
+                r -> true;
         return IntStream.range(0, numOfRows)
                 .mapToObj(sheet::getRow)
+                .filter(rowFilterPredicate)
                 .collect(Collectors.toList());
     }
 
@@ -177,6 +179,9 @@ public class ExcelSheetReader {
      * @return int array of column indices to be read
      */
     protected int[] getAvailableColumns(Sheet sheet, int maxColumn) {
-        return IntStream.range(0, maxColumn).toArray();
+        IntPredicate intPredicate = removeInvisibleCells ?
+                idx -> !sheet.isColumnHidden(idx) :
+                idx -> true;
+        return IntStream.range(0, maxColumn).filter(intPredicate).toArray();
     }
 }
