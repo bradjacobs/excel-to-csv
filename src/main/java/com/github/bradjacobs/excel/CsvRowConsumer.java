@@ -56,7 +56,7 @@ public class CsvRowConsumer implements Consumer<String[]> {
                 numberOfColumnsWithData < columnsWithDataArray.length) {
 
             // todo: this is not good if excel sheet is super big
-            //   because would even up having 2 copies in memory.
+            //   because would end up having 2 copies in memory.
             List<String[]> filteredRows = new ArrayList<>();
             for (String[] row : rowList) {
                 filteredRows.add(filterColumns(row, columnsWithDataArray, numberOfColumnsWithData));
