@@ -29,7 +29,7 @@ public class ExcelSkipHiddenDataTest {
 
         ExcelReader dataExcelReader = ExcelReader.builder()
                 .sheetName(sheetNamePrefix + INPUT_DATA_SHEET_SUFFIX)
-                .skipInvisibleCells(true)
+                .removeInvisibleCells(true)
                 .build();
         String[][] actualMatrix = dataExcelReader.convertToDataMatrix(inputFile);
 
