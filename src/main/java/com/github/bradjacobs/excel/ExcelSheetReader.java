@@ -7,9 +7,11 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -72,7 +74,8 @@ public class ExcelSheetReader {
         int totalColumnCount = availableColumns.length;
         int lastColumnIndex = availableColumns[totalColumnCount-1];
 
-        CsvRowConsumer csvRowConsumer = new CsvRowConsumer(this.removeBlankRows, this.removeBlankColumns);
+        StringArrayRowConsumer stringArrayRowConsumer =
+                new StringArrayRowConsumer(this.removeBlankRows, this.removeBlankColumns);
         // NOTE: avoid using "sheet.iterator" when looping through rows,
         //   because it can bail out early when it encounters the first empty line
         //   (even if there are more data rows remaining)
@@ -96,11 +99,14 @@ public class ExcelSheetReader {
             while (columnIndex < totalColumnCount) {
                 rowValues[columnIndex++] = "";
             }
-            csvRowConsumer.accept(rowValues);
+            stringArrayRowConsumer.accept(rowValues);
         }
 
-        csvRowConsumer.finalizeRows();
-        return csvRowConsumer.getRows();
+        // call finalizeRows to handle any extra remove blank row/column logic
+        stringArrayRowConsumer.finalizeRows();
+
+        // lastly return the all rows
+        return stringArrayRowConsumer.getRows();
     }
 
     /**
@@ -129,15 +135,6 @@ public class ExcelSheetReader {
             }
         }
         return maxColumn;
-    }
-
-    protected static boolean isEmptyRow(String[] rowData) {
-        for (String r : rowData) {
-            if (r != null && !r.isEmpty()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -183,5 +180,104 @@ public class ExcelSheetReader {
                 idx -> !sheet.isColumnHidden(idx) :
                 idx -> true;
         return IntStream.range(0, maxColumn).filter(intPredicate).toArray();
+    }
+
+    /**
+     * Consumer class to add the String[] rows, which will handle
+     * any additional logic regarding the removal of blank rows or columns (as needed)
+     */
+    private static class StringArrayRowConsumer implements Consumer<String[]> {
+        private final List<String[]> rowList = new ArrayList<>();
+        private final boolean removeBlankRows; // flag to remove blank rows
+        private final boolean removeBlankColumns; // flag to remove blank columns
+        private boolean[] columnsHaveDataArray = null; // tracks which columns have a value
+        private int numberOfColumnsHaveData = 0; // tracks total number of columns that have non-blank value.
+
+        public StringArrayRowConsumer(boolean removeBlankRows, boolean removeBlankColumns) {
+            this.removeBlankRows = removeBlankRows;
+            this.removeBlankColumns = removeBlankColumns;
+        }
+
+        /**
+         * Consumes all the String[] rows read from the excel file
+         * ASSERT that all rows passed in will have the same length.
+         * @param row String[] row
+         */
+        @Override
+        public void accept(String[] row) {
+            // Remove blank rows if configured
+            if (this.removeBlankRows && isEmptyRow(row))
+                return;
+
+            // if removing blank columns, then track which columns contain values.
+            if (this.removeBlankColumns) {
+                if (columnsHaveDataArray == null) {
+                    columnsHaveDataArray = new boolean[row.length];
+                }
+                if (numberOfColumnsHaveData < columnsHaveDataArray.length) {
+                    for (int i = 0; i < columnsHaveDataArray.length; i++) {
+                        if (!columnsHaveDataArray[i] && !row[i].isEmpty()) {
+                            columnsHaveDataArray[i] = true;
+                            numberOfColumnsHaveData++;
+                        }
+                    }
+                }
+            }
+            this.rowList.add(row);
+        }
+
+        public List<String[]> getRows() {
+            return Collections.unmodifiableList(rowList);
+        }
+
+        /**
+         * To be called after all rows have been added for any post-processing (if necessary)
+         */
+        public void finalizeRows() {
+            // remove any trailing blank rows (regardless of 'skipBlankRows' value)
+            while (!rowList.isEmpty() && isEmptyRow(rowList.get(rowList.size()-1))) {
+                rowList.remove(rowList.size()-1);
+            }
+
+            // remove any blank columns (if necessary)
+            if (removeBlankColumns &&
+                    !rowList.isEmpty() &&
+                    columnsHaveDataArray != null &&
+                    numberOfColumnsHaveData < columnsHaveDataArray.length) {
+
+                // todo: this is not good if excel sheet is super big
+                //   because would end up having 2 copies in memory.
+                List<String[]> filteredRows = new ArrayList<>();
+                for (String[] row : rowList) {
+                    filteredRows.add(filterColumns(row, columnsHaveDataArray, numberOfColumnsHaveData));
+                }
+                rowList.clear();
+                rowList.addAll(filteredRows);
+            }
+        }
+
+        private String[] filterColumns(String[] row, boolean[] columnHasData, int columnsWithDataCount) {
+            String[] filtered = new String[columnsWithDataCount];
+            for (int i = 0, idx = 0; i < columnHasData.length && i < row.length; i++) {
+                if (columnHasData[i]) {
+                    filtered[idx++] = row[i];
+                }
+            }
+            return filtered;
+        }
+    }
+
+    /**
+     * Check if row is considered to be 'blank/empty'
+     * @param rowData data row
+     * @return true if 'empty'
+     */
+    protected static boolean isEmptyRow(String[] rowData) {
+        for (String r : rowData) {
+            if (r != null && !r.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
