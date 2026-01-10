@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -244,19 +245,23 @@ public class ExcelSheetReader {
                     !rowList.isEmpty() &&
                     columnsHaveDataArray != null &&
                     numberOfColumnsHaveData < columnsHaveDataArray.length) {
-
-                // todo: this is not good if excel sheet is super big
-                //   because would end up having 2 copies in memory.
-                List<String[]> filteredRows = new ArrayList<>();
-                for (String[] row : rowList) {
-                    filteredRows.add(filterColumns(row, columnsHaveDataArray, numberOfColumnsHaveData));
-                }
-                rowList.clear();
-                rowList.addAll(filteredRows);
+                rowList.replaceAll(new FilterColumnsOperator(columnsHaveDataArray, numberOfColumnsHaveData));
             }
         }
+    }
 
-        private String[] filterColumns(String[] row, boolean[] columnHasData, int columnsWithDataCount) {
+    // Helper class to remove blank column(s) from each String[] row
+    private static class FilterColumnsOperator implements UnaryOperator<String[]> {
+        private final boolean[] columnHasData;
+        private final int columnsWithDataCount;
+
+        public FilterColumnsOperator(boolean[] columnHasData, int columnsWithDataCount) {
+            this.columnHasData = columnHasData;
+            this.columnsWithDataCount = columnsWithDataCount;
+        }
+
+        @Override
+        public String[] apply(String[] row) {
             String[] filtered = new String[columnsWithDataCount];
             for (int i = 0, idx = 0; i < columnHasData.length && i < row.length; i++) {
                 if (columnHasData[i]) {
