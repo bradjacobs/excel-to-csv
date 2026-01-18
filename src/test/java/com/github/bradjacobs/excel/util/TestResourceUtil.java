@@ -46,4 +46,16 @@ public class TestResourceUtil {
             throw new RuntimeException(String.format("Unable to read test resource file: %s.  Reason: %s", fileName, e.getMessage()), e);
         }
     }
+
+    /**
+     * Get InputStream for given file in resources directory.
+     * NOTE: caller is responsible for closing the inputStream.
+     * @param fileName fileName
+     * @return inputStream
+     */
+    public static InputStream readResourceFileInputStream(String fileName) {
+        InputStream is = TestResourceUtil.class.getClassLoader().getResourceAsStream(fileName);
+        assertNotNull(is, "Unable to read file: " + fileName);
+        return is;
+    }
 }

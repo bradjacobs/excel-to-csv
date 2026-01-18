@@ -24,7 +24,6 @@ import static com.github.bradjacobs.excel.util.TestResourceUtil.getResourceFileP
 import static com.github.bradjacobs.excel.util.TestResourceUtil.getResourceFileUrl;
 import static com.github.bradjacobs.excel.util.TestResourceUtil.readResourceFileText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -93,33 +92,12 @@ public class ExcelReaderTest {
 
         String[][] csvData = excelReader.convertToDataMatrix(inputFile);
         assertNotNull(csvData, "expected non-null data");
-        assertEquals(EXPECTED_ROW_COUNT, csvData.length,"mismatch expected number of rows");
+        assertEquals(EXPECTED_ROW_COUNT, csvData.length, "mismatch expected number of rows");
 
         for (String[] rowData : csvData) {
             assertNotNull(rowData, "unexpected null row");
-            assertEquals(EXPECTED_COL_COUNT, rowData.length,"mismatch expected columns");
+            assertEquals(EXPECTED_COL_COUNT, rowData.length, "mismatch expected columns");
         }
-    }
-
-    @Test
-    public void testSkipBlankRows() throws Exception {
-        File inputFile = getResourceFileObject(TEST_DATA_FILE);
-
-        ExcelReader excelReader1 = ExcelReader.builder()
-                .removeBlankRows(false)
-                .build();
-        String[][] csvDataHasEmptyRows = excelReader1.convertToDataMatrix(inputFile);
-
-        ExcelReader excelReader2 = ExcelReader.builder()
-                .removeBlankRows(true)
-                .build();
-        String[][] csvDataNoEmptyRows = excelReader2.convertToDataMatrix(inputFile);
-
-        // based on the fact we 'know' what the test data file looks like and
-        // there are currently 2 empty rows, there should be a row count difference of 2.
-        int hasEmptyRowCount = csvDataHasEmptyRows.length;
-        int noEmptyRowCount = csvDataNoEmptyRows.length;
-        assertEquals(noEmptyRowCount,hasEmptyRowCount-2, "mismatch of expected number fo rows when skipping blank rows");
     }
 
     @Test
@@ -135,7 +113,7 @@ public class ExcelReaderTest {
     @Test
     public void testReadSheetByName() throws Exception {
         ExcelReader excelReader = ExcelReader.builder()
-                .sheetName(TEST_SHEET_NAME.toLowerCase())  // use lower to confirm match is case-insensitive.
+                .sheetName(TEST_SHEET_NAME.toLowerCase()) // use lower to confirm match is case-insensitive.
                 .build();
         File inputFile = getResourceFileObject(TEST_DATA_FILE);
 
@@ -157,82 +135,14 @@ public class ExcelReaderTest {
         assertEquals("", csvText, "expected empty csv text");
     }
 
-    // Test that some cells that only contain "whitespace" get trimmed to empty string
-    @Test
-    public void testTrimmingSpaces() throws Exception {
-        URL resourceUrl = getResourceFileUrl("spaces_data.xlsx");
-        ExcelReader excelReader = ExcelReader.builder().build();
-        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
-
-        // the first row is a header row, but every other row should have
-        //  and empty/blank value in the second cell
-        for (int i = 1; i < csvMatrix.length; i++) {
-            String[] row = csvMatrix[i];
-            assertEquals("", row[1], String.format("Expected empty string following cell '%s'", row[0]));
-        }
-    }
-
-    @Test
-    public void testDisablingTrimSpaces() throws Exception {
-        URL resourceUrl = getResourceFileUrl("spaces_data.xlsx");
-        ExcelReader excelReader = ExcelReader.builder()
-                .autoTrim(false)
-                .build();
-        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
-
-        // the first row is a header row, but every other row should have
-        //  and empty/blank value in the second cell
-        for (int i = 1; i < csvMatrix.length; i++) {
-            String[] row = csvMatrix[i];
-            assertNotEquals("", row[1], String.format("Expected non-empty string following cell '%s'", row[0]));
-        }
-    }
-
-    // read a worksheet where the last column only has whitespace.
-    //   in this case the column should not be counted.
-    @Test
-    public void testHandleExtraBlankColumns() throws Exception {
-        URL resourceUrl = getResourceFileUrl("spaces_data.xlsx");
-        ExcelReader excelReader = ExcelReader.builder().sheetName("LAST_COL_WHITESPACE").build();
-        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
-        assertEquals(1, csvMatrix[0].length, "mismatch of expected number of columns in csv output.");
-    }
-
     // Happy Path testcase reading an Excel file that is password protected.
     @Test
     public void testReadPasswordProtectedFile() throws Exception {
         URL resourceUrl = getResourceFileUrl("test_data_w_pswd_1234.xlsx");
         ExcelReader excelReader = ExcelReader.builder().password("1234").build();
-        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
-        assertEquals("aaa", csvMatrix[0][0]);
-        assertEquals("bbb", csvMatrix[0][1]);
-    }
-
-    // Test special case where a row without cells could
-    //   cause an ArrayIndexOutOfBoundsException
-    @Test
-    public void testBadRowRepro() throws Exception {
-        URL resourceUrl = getResourceFileUrl("repro.xlsx");
-        ExcelReader excelReader = ExcelReader.builder().build();
-        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
-        assertEquals("aaa", csvMatrix[0][0]);
-        assertEquals("bbb", csvMatrix[0][1]);
-        assertEquals("ccc", csvMatrix[2][0]);
-        assertEquals("ddd", csvMatrix[2][1]);
-    }
-
-    // If there are a bunch of empty blank rows after all the data
-    // has been read then they should get removed, regardless of skipEmptyRows value
-    // Cannot think of any reason they should remain (at present)
-    @Test
-    public void testExtraBlankRowsRepro() throws Exception {
-        URL resourceUrl = getResourceFileUrl("repro.xlsx");
-        ExcelReader excelReader = ExcelReader.builder()
-                .sheetName("ExtraBlankRowsAfterData")
-                .removeBlankRows(false)
-                .build();
-        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
-        assertEquals(2, csvMatrix.length, "mismatch expected row count");
+        String[][] dataMatrix = excelReader.convertToDataMatrix(resourceUrl);
+        assertEquals("aaa", dataMatrix[0][0]);
+        assertEquals("bbb", dataMatrix[0][1]);
     }
 
     @Test
@@ -242,8 +152,8 @@ public class ExcelReaderTest {
                 .sheetName("WithBlankColumns1")
                 .removeBlankColumns(true)
                 .build();
-        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
-        assertEquals(3, csvMatrix[0].length, "mismatch expected column count");
+        String[][] dataMatrix = excelReader.convertToDataMatrix(resourceUrl);
+        assertEquals(3, dataMatrix[0].length, "mismatch expected column count");
     }
 
     @Test
@@ -253,10 +163,9 @@ public class ExcelReaderTest {
                 .sheetName("WithBlankColumns2")
                 .removeBlankColumns(true)
                 .build();
-        String[][] csvMatrix = excelReader.convertToDataMatrix(resourceUrl);
-        assertEquals(1, csvMatrix[0].length, "mismatch expected column count");
+        String[][] dataMatrix = excelReader.convertToDataMatrix(resourceUrl);
+        assertEquals(1, dataMatrix[0].length, "mismatch expected column count");
     }
-
 
     @Nested
     class SavingCsvFileTests {
@@ -323,8 +232,8 @@ public class ExcelReaderTest {
             excelReader1.convertToCsvFile(inputFileUrl, testOutputFile1);
             excelReader2.convertToCsvFile(inputFileUrl, testOutputFile2);
 
-            String csvFileString1 =  FileUtils.readFileToString(testOutputFile1, StandardCharsets.UTF_8);
-            String csvFileString2 =  FileUtils.readFileToString(testOutputFile2, StandardCharsets.UTF_8);
+            String csvFileString1 = FileUtils.readFileToString(testOutputFile1, StandardCharsets.UTF_8);
+            String csvFileString2 = FileUtils.readFileToString(testOutputFile2, StandardCharsets.UTF_8);
 
             char expectedBom = '\uFEFF';
             // the file that had the bom flag turned on should have it as the first character
@@ -333,32 +242,6 @@ public class ExcelReaderTest {
             // now if remove this first bom character, then the 2 strings should be equal
             String trimmedCsvFileString2 = csvFileString2.substring(1);
             assertEquals(csvFileString1, trimmedCsvFileString2);
-        }
-    }
-
-    @Nested
-    class CharacterSanitizerTests {
-        @Test
-        public void testDefaultNoDiacriticsSanitization() throws Exception {
-            URL inputFileUrl = getResourceFileUrl("repro.xlsx");
-            String sheetName = "WithUnicode";
-
-            ExcelReader excelReader = ExcelReader.builder().sheetName(sheetName).build();
-            String[][] dataMatrix = excelReader.convertToDataMatrix(inputFileUrl);
-            assertEquals("Façade", dataMatrix[0][0]);
-        }
-
-        @Test
-        public void testDiacriticsSanitization() throws Exception {
-            URL inputFileUrl = getResourceFileUrl("repro.xlsx");
-            String sheetName = "WithUnicode";
-
-            ExcelReader excelReader = ExcelReader.builder()
-                    .sanitizeDiacritics(true)
-                    .sheetName(sheetName)
-                    .build();
-            String[][] dataMatrix = excelReader.convertToDataMatrix(inputFileUrl);
-            assertEquals("Facade", dataMatrix[0][0]);
         }
     }
 }

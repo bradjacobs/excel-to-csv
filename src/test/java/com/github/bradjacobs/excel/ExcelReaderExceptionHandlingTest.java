@@ -32,6 +32,10 @@ import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.api.TestInstance.Lifecycle;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+/**
+ * Test Cases explicitly for bad input error handling
+ * for the ExcelReader class.
+ */
 @TestInstance(Lifecycle.PER_CLASS)
 public class ExcelReaderExceptionHandlingTest {
     private static final Path VALID_TEST_INPUT_PATH = getResourceFilePath("test_data.xlsx");
@@ -207,7 +211,7 @@ public class ExcelReaderExceptionHandlingTest {
     }
 
     /**
-     * Junit run the executable and check that is throws the expected exception and msg.
+     * Junit run the executable and check that it throws the expected exception and msg.
      * @param executable executable
      * @param expectedException expectedException
      * @param expectedMessage expectedMessage
@@ -266,8 +270,8 @@ public class ExcelReaderExceptionHandlingTest {
         @ParameterizedTest
         @CsvSource({
                 "bad_password, Password incorrect",
-                ",no password was supplied",  // first param is null
-                "'',no password was supplied" // first param is empty string
+                ",no password was supplied",  // first param is null password
+                "'',no password was supplied" // first param is empty string password
         })
         public void invalidPasswordCheck(String password, String expectedMessageSubstring) {
             ExcelReader excelReader = ExcelReader.builder().password(password).build();
@@ -278,7 +282,6 @@ public class ExcelReaderExceptionHandlingTest {
         }
     }
 
-    // TODO - clean up this test and move to new home.
     @Test
     public void testSaveCsvOutputFileIllegalNullCharInPath() {
         File outFile = new File("aa().?aa_||._\u0000_bbb.csv");

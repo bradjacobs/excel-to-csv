@@ -3,7 +3,6 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -17,13 +16,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.Set;
-
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.DASHES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
 
 /**
  * Simple class that reads an Excel Worksheet
@@ -95,7 +88,7 @@ public class ExcelReader {
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
         try (inputStream; Workbook wb = WorkbookFactory.create(inputStream, password)) {
             Sheet sheet = getSheet(wb);
-            return excelSheetReader.convertToMatrixData(sheet);
+            return excelSheetReader.convertToDataMatrix(sheet);
         }
     }
 
@@ -176,34 +169,33 @@ public class ExcelReader {
      * @param builder builder
      * @return new ExcelSheetReader instance
      */
-    private static ExcelSheetReader createExcelSheetReader(Builder builder) {
-        // todo: fix constructor
-        return new ExcelSheetReader(
-                builder.autoTrim,
-                builder.removeBlankRows,
-                builder.removeBlankColumns,
-                builder.removeInvisibleCells,
-                builder.charSanitizeFlags);
+    protected ExcelSheetReader createExcelSheetReader(Builder builder) {
+        return ExcelSheetReader.builder()
+                .autoTrim(builder.autoTrim)
+                .removeBlankRows(builder.removeBlankRows)
+                .removeBlankColumns(builder.removeBlankColumns)
+                .removeInvisibleCells(builder.removeInvisibleCells)
+                .charSanitizeFlags(builder.charSanitizeFlags)
+                .build();
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder {
+    // this builder extends abstract class to allow any of the
+    //   ExcelSheetReader.Builder values to be set on this Builder as well.
+    public static class Builder extends ExcelSheetReader.AbstractSheetConfigBuilder<Builder> {
         private int sheetIndex = 0; // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name
-        private boolean autoTrim = true; // trim any leading/trailing whitespace
-        private boolean removeBlankRows = false; // remove blank lines when true
-        private boolean removeBlankColumns = false; // remove blank columns when true
-        private boolean removeInvisibleCells = false; // remove any rows/columns that are not visible
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
         private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains unicode.
-        private final Set<CharSanitizeFlag> charSanitizeFlags
-                = new HashSet<>(SpecialCharacterSanitizer.DEFAULT_FLAGS);
 
-        private Builder() {}
+        @Override
+        protected Builder self() {
+            return this;
+        }
 
         /**
          * Set with sheet of Excel file to read (defaults to '0', i.e. the first sheet)
@@ -228,42 +220,6 @@ public class ExcelReader {
         }
 
         /**
-         * Whether to remove any blank rows.
-         * @param removeBlankRows (defaults to false)
-         */
-        public Builder removeBlankRows(boolean removeBlankRows) {
-            this.removeBlankRows = removeBlankRows;
-            return this;
-        }
-
-        /**
-         * Whether to remove any blank columns.
-         * @param removeBlankColumns (defaults to false)
-         */
-        public Builder removeBlankColumns(boolean removeBlankColumns) {
-            this.removeBlankColumns = removeBlankColumns;
-            return this;
-        }
-
-        /**
-         * Whether to remove hidden rows/columns
-         * @param removeInvisibleCells (defaults to false)
-         */
-        public Builder removeInvisibleCells(boolean removeInvisibleCells) {
-            this.removeInvisibleCells = removeInvisibleCells;
-            return this;
-        }
-
-        /**
-         * Whether to trim whitespace on cell values
-         * @param autoTrim (defaults to true)
-         */
-        public Builder autoTrim(boolean autoTrim) {
-            this.autoTrim = autoTrim;
-            return this;
-        }
-
-        /**
          * Set how to handle quote/escaping string values to be CSV-compliant
          * @param quoteMode
          *  ALWAYS:  surround all values with quotes
@@ -281,33 +237,11 @@ public class ExcelReader {
 
         /**
          * Define a password to open the Excel file (if needed)
-         * @param password excel file password
+         * @param password excel fExcelReader.Buildeile password
          */
         public Builder password(String password) {
             // if user tries to set blank/empty string, then save as 'null'
             this.password = password != null && password.isEmpty() ? null : password;
-            return this;
-        }
-
-        public Builder sanitizeSpaces(boolean sanitizeSpaces) {
-            return setSanitizeFlag(SPACES, sanitizeSpaces);
-        }
-
-        public Builder sanitizeQuotes(boolean sanitizeQuotes) {
-            return setSanitizeFlag(QUOTES, sanitizeQuotes);
-        }
-
-        public Builder sanitizeDiacritics(boolean sanitizeDiacritics) {
-            return setSanitizeFlag(BASIC_DIACRITICS, sanitizeDiacritics);
-        }
-
-        public Builder sanitizeDashes(boolean sanitizeDashes) {
-            return setSanitizeFlag(DASHES, sanitizeDashes);
-        }
-
-        private Builder setSanitizeFlag(CharSanitizeFlag flag, boolean shouldAdd) {
-            if (shouldAdd) { this.charSanitizeFlags.add(flag); }
-            else { this.charSanitizeFlags.remove(flag); }
             return this;
         }
 

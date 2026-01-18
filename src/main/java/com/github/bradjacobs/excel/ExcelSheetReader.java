@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -19,6 +20,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.DASHES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
 
 // TODO javadocs
 public class ExcelSheetReader {
@@ -27,31 +32,25 @@ public class ExcelSheetReader {
     protected final boolean removeInvisibleCells;
     protected final CellValueReader cellValueReader;
 
-    // TODO - fix this constructor parameter mess
-    public ExcelSheetReader(
-            boolean autoTrim,
-            boolean removeBlankRows,
-            boolean removeBlankColumns,
-            boolean removeInvisibleCells,
-            Set<CharSanitizeFlag> charSanitizeFlags) {
-        this.removeBlankRows = removeBlankRows;
-        this.removeBlankColumns = removeBlankColumns;
-        this.removeInvisibleCells = removeInvisibleCells;
-        this.cellValueReader = new CellValueReader(autoTrim, charSanitizeFlags);
+    private ExcelSheetReader(Builder builder) {
+        this.removeBlankRows = builder.removeBlankRows;
+        this.removeBlankColumns = builder.removeBlankColumns;
+        this.removeInvisibleCells = builder.removeInvisibleCells;
+        this.cellValueReader = new CellValueReader(builder.autoTrim, builder.charSanitizeFlags);
     }
 
     /**
      * Create 2-D data matrix from the given Excel Sheet
      * @param sheet Excel Sheet
      * @return 2-D array representing CSV format
-     *   each row will have the same number of columns
+     * each row will have the same number of columns
      */
-    public String[][] convertToMatrixData(Sheet sheet)  {
-        List<String[]> excelListData = convertToMatrixDataList(sheet);
+    public String[][] convertToDataMatrix(Sheet sheet) {
+        List<String[]> excelListData = convertToDataMatrixList(sheet);
         return excelListData.toArray(new String[0][0]);
     }
 
-    public List<String[]> convertToMatrixDataList(Sheet sheet) {
+    public List<String[]> convertToDataMatrixList(Sheet sheet) {
         if (sheet == null) {
             throw new IllegalArgumentException("Sheet parameter cannot be null.");
         }
@@ -63,10 +62,10 @@ public class ExcelSheetReader {
         // get all the column (indexes) that are to be read
         int[] availableColumns = getAvailableColumns(sheet, maxColumn);
 
-        return convertToMatrixDataList(rowList, availableColumns);
+        return convertToDataMatrixList(rowList, availableColumns);
     }
 
-    protected List<String[]> convertToMatrixDataList(List<Row> rowList, int[] availableColumns) {
+    protected List<String[]> convertToDataMatrixList(List<Row> rowList, int[] availableColumns) {
         // if there are no available columns then bail early.
         if (availableColumns.length == 0) {
             return Collections.emptyList();
@@ -126,7 +125,7 @@ public class ExcelSheetReader {
                     //    the case and adjust accordingly.
                     for (int j = currentRowCellCount - 1; j >= maxColumn; j--) {
                         String cellValue = getCellValue(row.getCell(j));
-                        if (! cellValue.isEmpty()) {
+                        if (!cellValue.isEmpty()) {
                             break;
                         }
                         currentRowCellCount--;
@@ -141,7 +140,7 @@ public class ExcelSheetReader {
     /**
      * Gets the string representation of the value in the cell
      *   (where the cell value is what you "physically see" in the cell)
-     *  NOTE: dates & numbers should retain their original formatting.
+     * NOTE: dates & numbers should retain their original formatting.
      * @param cell excel cell
      * @return string representation of the cell.
      */
@@ -152,7 +151,7 @@ public class ExcelSheetReader {
     /**
      * Method to grab all the rows for the sheet ahead of time
      *   NOTE: some elements in the result list could be 'null'
-     *       (nulls are usually 'default unaltered rows')
+     *   (nulls are usually 'default unaltered rows')
      * @param sheet input Excel Sheet
      * @return list of rows
      */
@@ -200,8 +199,8 @@ public class ExcelSheetReader {
         }
 
         /**
-         * Consumes all the String[] rows read from the excel file
-         * ASSERT that all rows passed in will have the same length.
+         * Consumes all the String[] rows read from the Excel file
+         * _ASSERT_ that all rows passed in will have the same length.
          * @param row String[] row
          */
         @Override
@@ -210,7 +209,7 @@ public class ExcelSheetReader {
             if (this.removeBlankRows && isEmptyRow(row))
                 return;
 
-            // if removing blank columns, then track which columns contain values.
+            // if removing blank columns, then keep track which columns contain values.
             if (this.removeBlankColumns) {
                 if (columnsHaveDataArray == null) {
                     columnsHaveDataArray = new boolean[row.length];
@@ -235,7 +234,7 @@ public class ExcelSheetReader {
          * To be called after all rows have been added for any post-processing (if necessary)
          */
         public void finalizeRows() {
-            // remove any trailing blank rows (regardless of 'skipBlankRows' value)
+            // remove any trailing blank rows (regardless of 'removeBlankRows' value)
             while (!rowList.isEmpty() && isEmptyRow(rowList.get(rowList.size()-1))) {
                 rowList.remove(rowList.size()-1);
             }
@@ -284,5 +283,95 @@ public class ExcelSheetReader {
             }
         }
         return true;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    protected static abstract class AbstractSheetConfigBuilder<T extends AbstractSheetConfigBuilder<T>> {
+        protected boolean autoTrim = true;
+        protected boolean removeBlankRows = false;
+        protected boolean removeBlankColumns = false;
+        protected boolean removeInvisibleCells = false;
+        protected Set<CharSanitizeFlag> charSanitizeFlags
+                = new HashSet<>(SpecialCharacterSanitizer.DEFAULT_FLAGS);
+
+        protected abstract T self();
+
+        /**
+         * Whether to trim whitespace on cell values
+         * @param autoTrim (defaults to true)
+         */
+        public T autoTrim(boolean autoTrim) {
+            this.autoTrim = autoTrim;
+            return self();
+        }
+
+        /**
+         * Whether to remove any blank rows.
+         * @param removeBlankRows (defaults to false)
+         */
+        public T removeBlankRows(boolean removeBlankRows) {
+            this.removeBlankRows = removeBlankRows;
+            return self();
+        }
+
+        /**
+         * Whether to remove any blank columns.
+         * @param removeBlankColumns (defaults to false)
+         */
+        public T removeBlankColumns(boolean removeBlankColumns) {
+            this.removeBlankColumns = removeBlankColumns;
+            return self();
+        }
+
+        public T removeInvisibleCells(boolean removeInvisibleCells) {
+            this.removeInvisibleCells = removeInvisibleCells;
+            return self();
+        }
+
+        public T sanitizeSpaces(boolean sanitizeSpaces) {
+            return setSanitizeFlag(SPACES, sanitizeSpaces);
+        }
+
+        public T sanitizeQuotes(boolean sanitizeQuotes) {
+            return setSanitizeFlag(QUOTES, sanitizeQuotes);
+        }
+
+        public T sanitizeDiacritics(boolean sanitizeDiacritics) {
+            return setSanitizeFlag(BASIC_DIACRITICS, sanitizeDiacritics);
+        }
+
+        public T sanitizeDashes(boolean sanitizeDashes) {
+            return setSanitizeFlag(DASHES, sanitizeDashes);
+        }
+
+        private T setSanitizeFlag(SpecialCharacterSanitizer.CharSanitizeFlag flag, boolean shouldAdd) {
+            if (shouldAdd) {
+                this.charSanitizeFlags.add(flag);
+            }
+            else {
+                this.charSanitizeFlags.remove(flag);
+            }
+            return self();
+        }
+
+        // setting the entire Set of SpecialCharSanitizers has limited access.
+        protected T charSanitizeFlags(Set<SpecialCharacterSanitizer.CharSanitizeFlag> charSanitizeFlags) {
+            this.charSanitizeFlags =charSanitizeFlags;
+            return self();
+        }
+    }
+
+    public static class Builder extends AbstractSheetConfigBuilder<Builder> {
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        public ExcelSheetReader build() {
+            return new ExcelSheetReader(this);
+        }
     }
 }
