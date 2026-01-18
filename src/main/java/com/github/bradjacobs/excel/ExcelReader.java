@@ -133,9 +133,6 @@ public class ExcelReader {
             throw new IllegalArgumentException("The outputFile cannot be an existing directory.");
         }
 
-        // convert to absolute path and continue checks...
-        outputFile = outputFile.toAbsolutePath();
-
         // confirm output file has an allowed file extension
         String ext = FilenameUtils.getExtension(outputFile.toString());
         if (! ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase())) {
@@ -143,7 +140,7 @@ public class ExcelReader {
                     String.format("Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext));
         }
 
-        Path parentDirectory = outputFile.getParent();
+        Path parentDirectory = outputFile.toAbsolutePath().normalize().getParent();
         if (parentDirectory == null || !Files.isDirectory(parentDirectory)) {
             throw new IllegalArgumentException("Attempted to save CSV output file in a non-existent directory: " + outputFile);
         }
