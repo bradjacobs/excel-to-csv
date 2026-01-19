@@ -143,11 +143,19 @@ public class SpecialCharacterSanitizer {
             '\u2013', // en dash
             '\u2014', // em dash
             '\u2015', // horizontal bar
+            '\u2043', // hyphen bullet
             '\u207B', // superscript minus
             '\u208B', // subscript minus
             '\u2212', // minus sign
+            '\u23AF', // horizontal line extension
+            '\u23BA', // horizontal scan line-1
+            '\u23BB', // horizontal scan line-3
+            '\u23BC', // horizontal scan line-7
+            '\u23BD', // horizontal scan line-9
+            '\u23E4', // straightness
             '\u2500', // box drawing light horizontal line
             '\u2501', // box drawing heavy horizontal line
+            '\u268A', // monogram for yang
             '\u2796', // heavy minus sign
             '\u2E3A', // two-em dash
             '\u2E3B', // three-em dash
