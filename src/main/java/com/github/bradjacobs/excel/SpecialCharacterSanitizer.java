@@ -127,6 +127,10 @@ public class SpecialCharacterSanitizer {
             '\uFF02', // Fullwidth Quotation Mark
     };
 
+    // Only considering characters that look like a 'single horizontal line',
+    // such as dashes, hyphens, minus signs and so on.  Does _not_ include
+    // 'wavy' characters, tildes, vertical dashes, etc.
+    // The criteria for what qualifies as a dash here is obviously VERY subjective.
     private static final Character[] DASH_CHARS = {
             //'\u00AD', // soft hyphen (Note: include or not?  usually invisible)
             '\u02D7', // modifier letter minus sign
@@ -142,6 +146,8 @@ public class SpecialCharacterSanitizer {
             '\u207B', // superscript minus
             '\u208B', // subscript minus
             '\u2212', // minus sign
+            '\u2500', // box drawing light horizontal line
+            '\u2501', // box drawing heavy horizontal line
             '\u2796', // heavy minus sign
             '\u2E3A', // two-em dash
             '\u2E3B', // three-em dash
