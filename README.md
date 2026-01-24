@@ -52,7 +52,7 @@ String[][] dataMatrix = excelReader.convertToDataMatrix(new File("input.xlsx"));
 ExcelReader excelReader = ExcelReader.builder()
         .quoteMode(QuoteMode.LENIENT) // only quote values if necessary
         .sheetIndex(1) // grab the 2nd worksheet
-        .skipEmptyRows(true) // ignore any empty rows from the Excel worksheet
+        .removeBlankRows(true) // ignore any empty rows from the Excel worksheet
         .build();
 excelReader.convertToCsvFile(new File("input.xlsx"), new File("output.csv"));
 ```
