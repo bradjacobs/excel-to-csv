@@ -105,7 +105,7 @@ public class ExcelSheetReader {
         // call finalizeRows to handle any extra remove blank row/column logic
         stringArrayRowConsumer.finalizeRows();
 
-        // lastly return the all rows
+        // lastly return all the rows
         return stringArrayRowConsumer.getRows();
     }
 
@@ -160,12 +160,12 @@ public class ExcelSheetReader {
         //  (however doesn't seem to need for this when using row.getLastCellNum, which seems odd)
         int numOfRows = sheet.getLastRowNum() + 1;
 
-        Predicate<Row> rowFilterPredicate = removeInvisibleCells ?
+        Predicate<Row> visibleRowFilterPredicate = removeInvisibleCells ?
                 r -> r == null || !r.getZeroHeight() :
                 r -> true;
         return IntStream.range(0, numOfRows)
                 .mapToObj(sheet::getRow)
-                .filter(rowFilterPredicate)
+                .filter(visibleRowFilterPredicate)
                 .collect(Collectors.toList());
     }
 
@@ -176,10 +176,10 @@ public class ExcelSheetReader {
      * @return int array of column indices to be read
      */
     protected int[] getAvailableColumns(Sheet sheet, int maxColumn) {
-        IntPredicate intPredicate = removeInvisibleCells ?
+        IntPredicate visibleColumnFilterPredicate = removeInvisibleCells ?
                 idx -> !sheet.isColumnHidden(idx) :
                 idx -> true;
-        return IntStream.range(0, maxColumn).filter(intPredicate).toArray();
+        return IntStream.range(0, maxColumn).filter(visibleColumnFilterPredicate).toArray();
     }
 
     /**
@@ -190,8 +190,8 @@ public class ExcelSheetReader {
         private final List<String[]> rowList = new ArrayList<>();
         private final boolean removeBlankRows; // flag to remove blank rows
         private final boolean removeBlankColumns; // flag to remove blank columns
-        private boolean[] columnsHaveDataArray = null; // tracks which columns have a value
-        private int numberOfColumnsHaveData = 0; // tracks total number of columns that have non-blank value.
+        private boolean[] columnsWithDataFlags = null; // tracks which columns have a value
+        private int columnsWithDataCount = 0; // tracks total number of columns that have non-blank value.
 
         public StringArrayRowConsumer(boolean removeBlankRows, boolean removeBlankColumns) {
             this.removeBlankRows = removeBlankRows;
@@ -211,14 +211,14 @@ public class ExcelSheetReader {
 
             // if removing blank columns, then keep track which columns contain values.
             if (this.removeBlankColumns) {
-                if (columnsHaveDataArray == null) {
-                    columnsHaveDataArray = new boolean[row.length];
+                if (columnsWithDataFlags == null) {
+                    columnsWithDataFlags = new boolean[row.length];
                 }
-                if (numberOfColumnsHaveData < columnsHaveDataArray.length) {
-                    for (int i = 0; i < columnsHaveDataArray.length; i++) {
-                        if (!columnsHaveDataArray[i] && !row[i].isEmpty()) {
-                            columnsHaveDataArray[i] = true;
-                            numberOfColumnsHaveData++;
+                if (columnsWithDataCount < columnsWithDataFlags.length) {
+                    for (int i = 0; i < columnsWithDataFlags.length; i++) {
+                        if (!columnsWithDataFlags[i] && !row[i].isEmpty()) {
+                            columnsWithDataFlags[i] = true;
+                            columnsWithDataCount++;
                         }
                     }
                 }
@@ -242,28 +242,28 @@ public class ExcelSheetReader {
             // remove any blank columns (if necessary)
             if (removeBlankColumns &&
                     !rowList.isEmpty() &&
-                    columnsHaveDataArray != null &&
-                    numberOfColumnsHaveData < columnsHaveDataArray.length) {
-                rowList.replaceAll(new FilterColumnsOperator(columnsHaveDataArray, numberOfColumnsHaveData));
+                    columnsWithDataFlags != null &&
+                    columnsWithDataCount < columnsWithDataFlags.length) {
+                rowList.replaceAll(new FilterColumnsOperator(columnsWithDataFlags, columnsWithDataCount));
             }
         }
     }
 
     // Helper class to remove blank column(s) from each String[] row
     private static class FilterColumnsOperator implements UnaryOperator<String[]> {
-        private final boolean[] columnHasData;
+        private final boolean[] columnsWithDataFlags;
         private final int columnsWithDataCount;
 
-        public FilterColumnsOperator(boolean[] columnHasData, int columnsWithDataCount) {
-            this.columnHasData = columnHasData;
+        public FilterColumnsOperator(boolean[] columnsWithDataFlags, int columnsWithDataCount) {
+            this.columnsWithDataFlags = columnsWithDataFlags;
             this.columnsWithDataCount = columnsWithDataCount;
         }
 
         @Override
         public String[] apply(String[] row) {
             String[] filtered = new String[columnsWithDataCount];
-            for (int i = 0, idx = 0; i < columnHasData.length && i < row.length; i++) {
-                if (columnHasData[i]) {
+            for (int i = 0, idx = 0; i < columnsWithDataFlags.length && i < row.length; i++) {
+                if (columnsWithDataFlags[i]) {
                     filtered[idx++] = row[i];
                 }
             }
@@ -326,6 +326,11 @@ public class ExcelSheetReader {
             return self();
         }
 
+        /**
+         * Whether to prune out invisible cells.
+         *   invisible = cellHeight = 0 or cellWidth = 0
+         * @param removeInvisibleCells (defaults to false)
+         */
         public T removeInvisibleCells(boolean removeInvisibleCells) {
             this.removeInvisibleCells = removeInvisibleCells;
             return self();
