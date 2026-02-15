@@ -8,13 +8,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.IntPredicate;
-import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -25,7 +24,9 @@ import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitize
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
 
-// TODO javadocs
+/**
+ * Reads an Excel Sheet and returns a 2-D array of data.
+ */
 public class ExcelSheetReader {
     protected final boolean removeBlankRows;
     protected final boolean removeBlankColumns;
@@ -65,40 +66,22 @@ public class ExcelSheetReader {
         return convertToDataMatrixList(rowList, availableColumns);
     }
 
-    protected List<String[]> convertToDataMatrixList(List<Row> rowList, int[] availableColumns) {
+    protected List<String[]> convertToDataMatrixList(List<Row> rowList, int[] columnsToRead) {
         // if there are no available columns then bail early.
-        if (availableColumns.length == 0) {
+        if (columnsToRead.length == 0) {
             return Collections.emptyList();
         }
 
-        int totalColumnCount = availableColumns.length;
-        int lastColumnIndex = availableColumns[totalColumnCount-1];
+        final int columnCount = columnsToRead.length;
+        final int maxRequestedColumnIndex = columnsToRead[columnCount-1];
 
         StringArrayRowConsumer stringArrayRowConsumer =
                 new StringArrayRowConsumer(this.removeBlankRows, this.removeBlankColumns);
         // NOTE: avoid using "sheet.iterator" when looping through rows,
-        //   because it can bail out early when it encounters the first empty line
-        //   (even if there are more data rows remaining)
+        // because it can bail out early when it encounters the first empty line
+        // (even if there are more data rows remaining)
         for (Row row : rowList) {
-            String[] rowValues = new String[totalColumnCount];
-
-            // must check for null because a blank/empty row can (sometimes) be null.
-            int columnIndex = 0;
-            if (row != null) {
-                int rowColumnCount = Math.max(row.getLastCellNum(), 0);
-                int lastRowColumnIndex = Math.min(rowColumnCount-1, lastColumnIndex);
-
-                for (int availableColumn : availableColumns) {
-                    if (availableColumn > lastRowColumnIndex) {
-                        break;
-                    }
-                    rowValues[columnIndex++] = getCellValue(row.getCell(availableColumn));
-                }
-            }
-
-            while (columnIndex < totalColumnCount) {
-                rowValues[columnIndex++] = "";
-            }
+            String[] rowValues = toRowValues(row, columnsToRead, columnCount, maxRequestedColumnIndex);
             stringArrayRowConsumer.accept(rowValues);
         }
 
@@ -110,31 +93,69 @@ public class ExcelSheetReader {
     }
 
     /**
+     * Converts the given row into String[] of values.
+     * @param row excel sheet row
+     * @param columnsToRead columns to read
+     * @param columnCount column count
+     * @param maxRequestedColumnIndex max requested column index
+     * @return String[] of values
+     */
+    private String[] toRowValues(Row row,
+                                 int[] columnsToRead,
+                                 int columnCount,
+                                 int maxRequestedColumnIndex) {
+        String[] rowValues = new String[columnCount];
+        int columnIndex = 0;
+
+        // must check for null because a blank/empty row can (sometimes) be null.
+        if (row != null) {
+            int rowCellCount = Math.max(row.getLastCellNum(), 0);
+            int lastRowColumnIndex = Math.min(rowCellCount-1, maxRequestedColumnIndex);
+
+            for (int currentColumnToRead : columnsToRead) {
+                if (currentColumnToRead > lastRowColumnIndex) {
+                    break;
+                }
+                rowValues[columnIndex++] = getCellValue(row.getCell(currentColumnToRead));
+            }
+        }
+
+        if (columnIndex < columnCount) {
+            Arrays.fill(rowValues, columnIndex, columnCount, "");
+        }
+        return rowValues;
+    }
+
+    /**
      * Iterate through the rows to find the max column that contains a value
      * @param rowList list of rows for a sheet
      * @return max column
      */
     protected int getMaxColumn(List<Row> rowList) {
-        int maxColumn = 0;
+        int maxColumnCount = 0;
         for (Row row : rowList) {
-            if (row != null) {
-                int currentRowCellCount = row.getLastCellNum();
-                if (currentRowCellCount > maxColumn) {
-                    //  Sometimes a row is detected with more columns, but the 'extra'
-                    //    column values are actually blank.  Therefore, double check if this is
-                    //    the case and adjust accordingly.
-                    for (int j = currentRowCellCount - 1; j >= maxColumn; j--) {
-                        String cellValue = getCellValue(row.getCell(j));
-                        if (!cellValue.isEmpty()) {
-                            break;
-                        }
-                        currentRowCellCount--;
-                    }
-                    maxColumn = Math.max(maxColumn, currentRowCellCount);
-                }
+            if (row == null) {
+                continue;
             }
+
+            int currentRowCellCount = row.getLastCellNum();
+            if (currentRowCellCount <= maxColumnCount) {
+                continue;
+            }
+
+            //  Sometimes a row is detected with more columns, but the 'extra'
+            //    column values are actually blank.  Therefore, double check if this is
+            //    the case and adjust accordingly.
+            for (int j = currentRowCellCount - 1; j >= maxColumnCount; j--) {
+                String cellValue = getCellValue(row.getCell(j));
+                if (!cellValue.isEmpty()) {
+                    break;
+                }
+                currentRowCellCount--;
+            }
+            maxColumnCount = Math.max(maxColumnCount, currentRowCellCount);
         }
-        return maxColumn;
+        return maxColumnCount;
     }
 
     /**
@@ -160,13 +181,17 @@ public class ExcelSheetReader {
         //  (however doesn't seem to need for this when using row.getLastCellNum, which seems odd)
         int numOfRows = sheet.getLastRowNum() + 1;
 
-        Predicate<Row> visibleRowFilterPredicate = removeInvisibleCells ?
-                r -> r == null || !r.getZeroHeight() :
-                r -> true;
         return IntStream.range(0, numOfRows)
                 .mapToObj(sheet::getRow)
-                .filter(visibleRowFilterPredicate)
+                .filter(this::isRowVisible)
                 .collect(Collectors.toList());
+    }
+
+    protected boolean isRowVisible(Row row) {
+        if (!removeInvisibleCells) {
+            return true;
+        }
+        return row == null || !row.getZeroHeight();
     }
 
     /**
@@ -176,10 +201,13 @@ public class ExcelSheetReader {
      * @return int array of column indices to be read
      */
     protected int[] getAvailableColumns(Sheet sheet, int maxColumn) {
-        IntPredicate visibleColumnFilterPredicate = removeInvisibleCells ?
-                idx -> !sheet.isColumnHidden(idx) :
-                idx -> true;
-        return IntStream.range(0, maxColumn).filter(visibleColumnFilterPredicate).toArray();
+        if (!removeInvisibleCells) {
+            return IntStream.range(0, maxColumn).toArray();
+        }
+
+        return IntStream.range(0, maxColumn)
+                .filter(columnIndex -> !sheet.isColumnHidden(columnIndex))
+                .toArray();
     }
 
     /**
@@ -362,7 +390,7 @@ public class ExcelSheetReader {
             return self();
         }
 
-        // setting the entire Set of SpecialCharSanitizers has limited access.
+        // Ability to set the entire Set of SpecialCharSanitizers has limited access.
         protected T charSanitizeFlags(Set<SpecialCharacterSanitizer.CharSanitizeFlag> charSanitizeFlags) {
             this.charSanitizeFlags =charSanitizeFlags;
             return self();

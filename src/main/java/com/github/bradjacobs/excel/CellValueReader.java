@@ -17,6 +17,10 @@ public class CellValueReader {
         EXCEL_DATA_FORMATTER.setUseCachedValuesForFormulaCells(true);
     }
 
+    public static DataFormatter getDataFormatter() {
+        return EXCEL_DATA_FORMATTER;
+    }
+
     private final boolean autoTrim;
     private final SpecialCharacterSanitizer specialCharSanitizer;
 
@@ -45,13 +49,21 @@ public class CellValueReader {
         //    cellValue = "";
         //}
 
+        // return a sanitized version of the cell value which is trimmed (if configured)
+        // plus convert any special unicode characters (like nbsp or smart quotes),
+        // as necessary.
+        return sanitizeCellValue(cellValue);
+
+    }
+
+    public String sanitizeCellValue(String inputValue) {
         // if there are any certain special unicode characters (like nbsp or smart quotes),
         // replace w/ normal character equivalent
-        cellValue = specialCharSanitizer.sanitize(cellValue);
+        String resultValue = specialCharSanitizer.sanitize(inputValue);
 
         if (this.autoTrim) {
-            cellValue = cellValue.trim();
+            resultValue = resultValue.trim();
         }
-        return cellValue;
+        return resultValue;
     }
 }

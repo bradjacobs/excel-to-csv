@@ -146,6 +146,12 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 <details>
   <summary>Todo Item List... (Click To Expand)</summary>
 
+* Create an alternate implemenation utilizing POI's 'XSSFSheetXMLHandler' class
+  * preliminary results show it's a lot faster on really big files. 
+  * TBD how (or if) would integrate with existing code.
+* Create a new demo class that shows the 'bare bones basics' of how to read an Excel Sheet
+  * (without all the extra fluff that this project intoduces)
+* Create a new demo class that shows how to read an Excel Sheet and write it back out to a new file.
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
 * Integrate a real logger into the code.
@@ -154,6 +160,7 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 * Reorganize Excel Test data for Junit tests.
 * Add more unittests (particularly around cell format scenarios)
 * General Unittest cleanup
+* The pom.xml could use some cleanup and organization.
 </details>
 
 ## FinalThoughts

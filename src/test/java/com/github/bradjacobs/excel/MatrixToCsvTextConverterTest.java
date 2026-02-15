@@ -112,7 +112,7 @@ public class MatrixToCsvTextConverterTest {
             quoteTestInputList.add(testQuoteInput);
         }
 
-        // for simple string with spaces, expect it to _not_ be quoted in 'lenient mode'
+        // for simple string with spaces, expect it should _not_ be quoted in 'lenient mode'
         String withSpaces = "string with spaces";
         QuoteTestInput testQuoteInput = createExpectedQuotedTestInput(withSpaces);
         testQuoteInput.expectedValueMap.put(QuoteMode.LENIENT, withSpaces);
