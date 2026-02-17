@@ -23,6 +23,7 @@ import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitize
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -145,7 +146,7 @@ public class SpecialCharacterSanitizerTest {
     }
 
     @Test
-    public void validateNullParameter() {
+    public void validateNullFlagsParameter() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new SpecialCharacterSanitizer((Set<CharSanitizeFlag>) null);
         });
@@ -156,4 +157,12 @@ public class SpecialCharacterSanitizerTest {
         });
         assertEquals("Must provide non-null charSanitizeFlags.", exception2.getMessage());
     }
+
+    @Test
+    public void sanitizeNullString() {
+        // normal usage won't try to sanitize a 'null', but test for completeness.
+        String result = new SpecialCharacterSanitizer(SPACES).sanitize(null);
+        assertNull(result, "expected a 'null' to be sanitized to a 'null'");
+    }
+
 }

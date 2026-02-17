@@ -3,6 +3,8 @@
  */
 package com.github.bradjacobs.excel;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.Collection;
@@ -65,7 +67,7 @@ public class SpecialCharacterSanitizer {
      * @return sanitized version of the input string
      */
     public String sanitize(String input) {
-        if (input.isEmpty() || this.replacementMap.isEmpty()) {
+        if (StringUtils.isEmpty(input) || this.replacementMap.isEmpty()) {
             return input;
         }
         int length = input.length();
