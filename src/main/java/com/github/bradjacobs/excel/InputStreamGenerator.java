@@ -4,6 +4,7 @@
 package com.github.bradjacobs.excel;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +23,10 @@ public class InputStreamGenerator {
     // some websites require a userAgent value set.
     //    side:  seen a case where a userAgent with substring 'java' would fail  (empirical evidence)
     private static final String USER_AGENT_VALUE = "javaClient/" + System.getProperty("java.version");
+
+    public InputStream getInputStream(File inputFile) throws IOException {
+        return getInputStream(inputFile != null ? inputFile.toPath() : null);
+    }
 
     public InputStream getInputStream(Path inputFile) throws IOException {
         if (inputFile == null) {

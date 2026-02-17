@@ -3,11 +3,9 @@
  */
 package com.github.bradjacobs.excel;
 
+import com.github.bradjacobs.excel.ExcelSheetDataExtractor.AbstractSheetConfigBuilder;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +20,7 @@ import java.util.Set;
  * Simple class that reads an Excel Worksheet
  *   and will produce a CSV-equivalent
  */
-// todo: javadocs
+// todo: add more method javadocs
 public class ExcelReader {
     private final int sheetIndex;
     private final String sheetName;
@@ -32,7 +30,7 @@ public class ExcelReader {
     private final ExcelSheetReader excelSheetReader;
 
     private static final Set<String> ALLOWED_OUTPUT_FILE_EXTENSIONS = Set.of("csv", "txt", "");
-    private static final String BOM = "\uFEFF";
+    private static final String BOM = "\uFEFF"; // byte order marker for files with unicode.
 
     private final InputStreamGenerator inputStreamGenerator;
 
@@ -44,10 +42,6 @@ public class ExcelReader {
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         this.excelSheetReader = createExcelSheetReader(builder);
         this.inputStreamGenerator = new InputStreamGenerator();
-
-        // override the internal POI utils size limit to allow for 'bigger Excel files'
-        //   (as of POI version 5.2.0 the default value is 100_000_000)
-        org.apache.poi.util.IOUtils.setByteArrayMaxOverride(Integer.MAX_VALUE);
     }
 
     public void convertToCsvFile(Path excelFile, Path outputFile) throws IOException {
@@ -86,24 +80,12 @@ public class ExcelReader {
     }
 
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
-        try (inputStream; Workbook wb = WorkbookFactory.create(inputStream, password)) {
-            Sheet sheet = getSheet(wb);
-            return excelSheetReader.convertToDataMatrix(sheet);
-        }
-    }
-
-    private Sheet getSheet(Workbook wb) {
-        Sheet returnSheet;
         if (StringUtils.isNotEmpty(this.sheetName)) {
-            returnSheet = wb.getSheet(this.sheetName);
-            if (returnSheet == null) {
-                throw new IllegalArgumentException(String.format("Unable to find sheet with name: %s", this.sheetName));
-            }
+            return excelSheetReader.readExcelSheetData(inputStream, this.sheetName, this.password);
         }
         else {
-            returnSheet = wb.getSheetAt(this.sheetIndex);
+            return excelSheetReader.readExcelSheetData(inputStream, this.sheetIndex, this.password);
         }
-        return returnSheet;
     }
 
     /**
@@ -182,7 +164,7 @@ public class ExcelReader {
 
     // this builder extends abstract class to allow any of the
     //   ExcelSheetReader.Builder values to be set on this Builder as well.
-    public static class Builder extends ExcelSheetReader.AbstractSheetConfigBuilder<Builder> {
+    public static class Builder extends AbstractSheetConfigBuilder<Builder> {
         private int sheetIndex = 0; // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name
         private QuoteMode quoteMode = QuoteMode.NORMAL;

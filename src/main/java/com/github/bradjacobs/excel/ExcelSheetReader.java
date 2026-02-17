@@ -6,38 +6,76 @@ package com.github.bradjacobs.excel;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.DASHES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
-
 /**
  * Reads an Excel Sheet and returns a 2-D array of data.
  */
-public class ExcelSheetReader {
+public class ExcelSheetReader implements ExcelSheetDataExtractor {
     protected final boolean removeBlankRows;
     protected final boolean removeBlankColumns;
     protected final boolean removeInvisibleCells;
     protected final CellValueReader cellValueReader;
 
     private ExcelSheetReader(Builder builder) {
+        // override the internal POI utils size limit to allow for 'bigger Excel files'
+        //   (as of POI version 5.2.0 the default value is 100_000_000)
+        org.apache.poi.util.IOUtils.setByteArrayMaxOverride(Integer.MAX_VALUE);
+
         this.removeBlankRows = builder.removeBlankRows;
         this.removeBlankColumns = builder.removeBlankColumns;
         this.removeInvisibleCells = builder.removeInvisibleCells;
         this.cellValueReader = new CellValueReader(builder.autoTrim, builder.charSanitizeFlags);
+    }
+
+    @Override
+    public String[][] readExcelSheetData(InputStream is, int sheetIndex, String password) throws IOException {
+        // check negative before trying to read the file.
+        if (sheetIndex < 0) {
+            throw new IllegalArgumentException("SheetIndex cannot be negative");
+        }
+        Sheet sheet = getFileSheet(is, password, (w) -> w.getSheetAt(sheetIndex));
+        return convertToDataMatrix(sheet);
+    }
+
+    @Override
+    public String[][] readExcelSheetData(InputStream is, String sheetName, String password) throws IOException {
+        // Note: passing in a 'null' sheetName can cause NPE, but will be fixed in the next POI release.
+        //   https://github.com/apache/poi/commit/04f4c1fa7424f12b12f1e513950f9e7fa13c625d
+        Sheet sheet = getFileSheet(is, password, (w) -> w.getSheet(sheetName));
+        if (sheet == null) {
+            throw new IllegalArgumentException(String.format("Unable to find sheet with name: '%s'", sheetName));
+        }
+        return convertToDataMatrix(sheet);
+    }
+
+    /**
+     * Read in a specific Sheet from the Excel File input stream.
+     * @param inputStream inputStream of the excel file.
+     * @param password password (optional)
+     * @param sheetGrabberFunction function to grab the sheet from the workbook.
+     * @return sheet
+     */
+    private Sheet getFileSheet(InputStream inputStream,
+                               String password,
+                               Function<Workbook, Sheet> sheetGrabberFunction
+    ) throws IOException {
+        try (inputStream; Workbook wb = WorkbookFactory.create(inputStream, password)) {
+            return sheetGrabberFunction.apply(wb);
+        }
     }
 
     /**
@@ -77,9 +115,6 @@ public class ExcelSheetReader {
 
         StringArrayRowConsumer stringArrayRowConsumer =
                 new StringArrayRowConsumer(this.removeBlankRows, this.removeBlankColumns);
-        // NOTE: avoid using "sheet.iterator" when looping through rows,
-        // because it can bail out early when it encounters the first empty line
-        // (even if there are more data rows remaining)
         for (Row row : rowList) {
             String[] rowValues = toRowValues(row, columnsToRead, columnCount, maxRequestedColumnIndex);
             stringArrayRowConsumer.accept(rowValues);
@@ -315,86 +350,6 @@ public class ExcelSheetReader {
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    protected static abstract class AbstractSheetConfigBuilder<T extends AbstractSheetConfigBuilder<T>> {
-        protected boolean autoTrim = true;
-        protected boolean removeBlankRows = false;
-        protected boolean removeBlankColumns = false;
-        protected boolean removeInvisibleCells = false;
-        protected Set<CharSanitizeFlag> charSanitizeFlags
-                = new HashSet<>(SpecialCharacterSanitizer.DEFAULT_FLAGS);
-
-        protected abstract T self();
-
-        /**
-         * Whether to trim whitespace on cell values
-         * @param autoTrim (defaults to true)
-         */
-        public T autoTrim(boolean autoTrim) {
-            this.autoTrim = autoTrim;
-            return self();
-        }
-
-        /**
-         * Whether to remove any blank rows.
-         * @param removeBlankRows (defaults to false)
-         */
-        public T removeBlankRows(boolean removeBlankRows) {
-            this.removeBlankRows = removeBlankRows;
-            return self();
-        }
-
-        /**
-         * Whether to remove any blank columns.
-         * @param removeBlankColumns (defaults to false)
-         */
-        public T removeBlankColumns(boolean removeBlankColumns) {
-            this.removeBlankColumns = removeBlankColumns;
-            return self();
-        }
-
-        /**
-         * Whether to prune out invisible cells.
-         *   invisible = cellHeight = 0 or cellWidth = 0
-         * @param removeInvisibleCells (defaults to false)
-         */
-        public T removeInvisibleCells(boolean removeInvisibleCells) {
-            this.removeInvisibleCells = removeInvisibleCells;
-            return self();
-        }
-
-        public T sanitizeSpaces(boolean sanitizeSpaces) {
-            return setSanitizeFlag(SPACES, sanitizeSpaces);
-        }
-
-        public T sanitizeQuotes(boolean sanitizeQuotes) {
-            return setSanitizeFlag(QUOTES, sanitizeQuotes);
-        }
-
-        public T sanitizeDiacritics(boolean sanitizeDiacritics) {
-            return setSanitizeFlag(BASIC_DIACRITICS, sanitizeDiacritics);
-        }
-
-        public T sanitizeDashes(boolean sanitizeDashes) {
-            return setSanitizeFlag(DASHES, sanitizeDashes);
-        }
-
-        private T setSanitizeFlag(SpecialCharacterSanitizer.CharSanitizeFlag flag, boolean shouldAdd) {
-            if (shouldAdd) {
-                this.charSanitizeFlags.add(flag);
-            }
-            else {
-                this.charSanitizeFlags.remove(flag);
-            }
-            return self();
-        }
-
-        // Ability to set the entire Set of SpecialCharSanitizers has limited access.
-        protected T charSanitizeFlags(Set<SpecialCharacterSanitizer.CharSanitizeFlag> charSanitizeFlags) {
-            this.charSanitizeFlags =charSanitizeFlags;
-            return self();
-        }
     }
 
     public static class Builder extends AbstractSheetConfigBuilder<Builder> {
