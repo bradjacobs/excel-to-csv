@@ -79,6 +79,7 @@ public class ExcelReader {
         return convertToDataMatrix( inputStreamGenerator.getInputStream(excelUrl) );
     }
 
+
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
         if (StringUtils.isNotEmpty(this.sheetName)) {
             return excelSheetReader.readExcelSheetData(inputStream, this.sheetName, this.password);
@@ -149,13 +150,7 @@ public class ExcelReader {
      * @return new ExcelSheetReader instance
      */
     protected ExcelSheetReader createExcelSheetReader(Builder builder) {
-        return ExcelSheetReader.builder()
-                .autoTrim(builder.autoTrim)
-                .removeBlankRows(builder.removeBlankRows)
-                .removeBlankColumns(builder.removeBlankColumns)
-                .removeInvisibleCells(builder.removeInvisibleCells)
-                .charSanitizeFlags(builder.charSanitizeFlags)
-                .build();
+        return new ExcelSheetReader(builder.buildConfig());
     }
 
     public static Builder builder() {
@@ -164,7 +159,7 @@ public class ExcelReader {
 
     // this builder extends abstract class to allow any of the
     //   ExcelSheetReader.Builder values to be set on this Builder as well.
-    public static class Builder extends AbstractSheetConfigBuilder<Builder> {
+    public static class Builder extends AbstractSheetConfigBuilder<ExcelReader, Builder> {
         private int sheetIndex = 0; // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name
         private QuoteMode quoteMode = QuoteMode.NORMAL;
@@ -233,6 +228,7 @@ public class ExcelReader {
             return this;
         }
 
+        @Override
         public ExcelReader build() {
             return new ExcelReader(this);
         }

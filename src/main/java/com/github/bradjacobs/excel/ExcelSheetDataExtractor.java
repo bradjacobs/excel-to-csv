@@ -60,7 +60,7 @@ public interface ExcelSheetDataExtractor {
 
 
     // below is common code for sheet configuration builder
-    abstract class AbstractSheetConfigBuilder<T extends AbstractSheetConfigBuilder<T>> {
+    abstract class AbstractSheetConfigBuilder<T, B extends AbstractSheetConfigBuilder<T, B>> {
         protected boolean autoTrim = true;
         protected boolean removeBlankRows = false;
         protected boolean removeBlankColumns = false;
@@ -68,13 +68,13 @@ public interface ExcelSheetDataExtractor {
         protected Set<SpecialCharacterSanitizer.CharSanitizeFlag> charSanitizeFlags
                 = new HashSet<>(SpecialCharacterSanitizer.DEFAULT_FLAGS);
 
-        protected abstract T self();
+        protected abstract B self();
 
         /**
          * Whether to trim whitespace on cell values
          * @param autoTrim (defaults to true)
          */
-        public T autoTrim(boolean autoTrim) {
+        public B autoTrim(boolean autoTrim) {
             this.autoTrim = autoTrim;
             return self();
         }
@@ -83,7 +83,7 @@ public interface ExcelSheetDataExtractor {
          * Whether to remove any blank rows.
          * @param removeBlankRows (defaults to false)
          */
-        public T removeBlankRows(boolean removeBlankRows) {
+        public B removeBlankRows(boolean removeBlankRows) {
             this.removeBlankRows = removeBlankRows;
             return self();
         }
@@ -92,7 +92,7 @@ public interface ExcelSheetDataExtractor {
          * Whether to remove any blank columns.
          * @param removeBlankColumns (defaults to false)
          */
-        public T removeBlankColumns(boolean removeBlankColumns) {
+        public B removeBlankColumns(boolean removeBlankColumns) {
             this.removeBlankColumns = removeBlankColumns;
             return self();
         }
@@ -102,28 +102,28 @@ public interface ExcelSheetDataExtractor {
          *   invisible = cellHeight = 0 or cellWidth = 0
          * @param removeInvisibleCells (defaults to false)
          */
-        public T removeInvisibleCells(boolean removeInvisibleCells) {
+        public B removeInvisibleCells(boolean removeInvisibleCells) {
             this.removeInvisibleCells = removeInvisibleCells;
             return self();
         }
 
-        public T sanitizeSpaces(boolean sanitizeSpaces) {
+        public B sanitizeSpaces(boolean sanitizeSpaces) {
             return setSanitizeFlag(SPACES, sanitizeSpaces);
         }
 
-        public T sanitizeQuotes(boolean sanitizeQuotes) {
+        public B sanitizeQuotes(boolean sanitizeQuotes) {
             return setSanitizeFlag(QUOTES, sanitizeQuotes);
         }
 
-        public T sanitizeDiacritics(boolean sanitizeDiacritics) {
+        public B sanitizeDiacritics(boolean sanitizeDiacritics) {
             return setSanitizeFlag(BASIC_DIACRITICS, sanitizeDiacritics);
         }
 
-        public T sanitizeDashes(boolean sanitizeDashes) {
+        public B sanitizeDashes(boolean sanitizeDashes) {
             return setSanitizeFlag(DASHES, sanitizeDashes);
         }
 
-        private T setSanitizeFlag(SpecialCharacterSanitizer.CharSanitizeFlag flag, boolean shouldAdd) {
+        private B setSanitizeFlag(SpecialCharacterSanitizer.CharSanitizeFlag flag, boolean shouldAdd) {
             if (shouldAdd) {
                 this.charSanitizeFlags.add(flag);
             }
@@ -134,9 +134,20 @@ public interface ExcelSheetDataExtractor {
         }
 
         // Ability to set the entire Set of SpecialCharSanitizers has limited access.
-        protected T charSanitizeFlags(Set<SpecialCharacterSanitizer.CharSanitizeFlag> charSanitizeFlags) {
-            this.charSanitizeFlags =charSanitizeFlags;
+        protected B charSanitizeFlags(Set<SpecialCharacterSanitizer.CharSanitizeFlag> charSanitizeFlags) {
+            this.charSanitizeFlags = charSanitizeFlags;
             return self();
         }
+
+        protected SheetConfig buildConfig() {
+            return new SheetConfig(
+                    removeBlankRows,
+                    removeBlankColumns,
+                    removeInvisibleCells,
+                    autoTrim,
+                    charSanitizeFlags);
+        }
+
+        abstract public T build();
     }
 }

@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -25,20 +24,23 @@ import java.util.stream.IntStream;
  * Reads an Excel Sheet and returns a 2-D array of data.
  */
 public class ExcelSheetReader implements ExcelSheetDataExtractor {
-    protected final boolean removeBlankRows;
-    protected final boolean removeBlankColumns;
-    protected final boolean removeInvisibleCells;
+    protected final SheetConfig sheetConfig;
     protected final CellValueReader cellValueReader;
 
-    private ExcelSheetReader(Builder builder) {
+    // todo: still deciding if this constructor is ok or terrible.
+    protected ExcelSheetReader(SheetConfig sheetConfig) {
         // override the internal POI utils size limit to allow for 'bigger Excel files'
         //   (as of POI version 5.2.0 the default value is 100_000_000)
         org.apache.poi.util.IOUtils.setByteArrayMaxOverride(Integer.MAX_VALUE);
 
-        this.removeBlankRows = builder.removeBlankRows;
-        this.removeBlankColumns = builder.removeBlankColumns;
-        this.removeInvisibleCells = builder.removeInvisibleCells;
-        this.cellValueReader = new CellValueReader(builder.autoTrim, builder.charSanitizeFlags);
+        this.sheetConfig = sheetConfig;
+        this.cellValueReader = new CellValueReader(sheetConfig.isAutoTrim(), sheetConfig.getCharSanitizeFlags());
+    }
+
+    // interface for grabbing a specific sheet from the workbook.
+    @FunctionalInterface
+    private interface WorkbookSheetGrabber {
+        Sheet extractSheet(Workbook workbook);
     }
 
     @Override
@@ -66,15 +68,15 @@ public class ExcelSheetReader implements ExcelSheetDataExtractor {
      * Read in a specific Sheet from the Excel File input stream.
      * @param inputStream inputStream of the excel file.
      * @param password password (optional)
-     * @param sheetGrabberFunction function to grab the sheet from the workbook.
+     * @param workbookSheetGrabber function to grab the sheet from the workbook.
      * @return sheet
      */
     private Sheet getFileSheet(InputStream inputStream,
                                String password,
-                               Function<Workbook, Sheet> sheetGrabberFunction
+                               WorkbookSheetGrabber workbookSheetGrabber
     ) throws IOException {
         try (inputStream; Workbook wb = WorkbookFactory.create(inputStream, password)) {
-            return sheetGrabberFunction.apply(wb);
+            return workbookSheetGrabber.extractSheet(wb);
         }
     }
 
@@ -97,7 +99,7 @@ public class ExcelSheetReader implements ExcelSheetDataExtractor {
         // grab all the rows from the sheet
         List<Row> rowList = getRows(sheet);
         // first scan the rows to find the max column width
-        int maxColumn = getMaxColumn(rowList);
+        int maxColumn = getMaxColumn(sheet, rowList);
         // get all the column (indexes) that are to be read
         int[] availableColumns = getAvailableColumns(sheet, maxColumn);
 
@@ -114,7 +116,7 @@ public class ExcelSheetReader implements ExcelSheetDataExtractor {
         final int maxRequestedColumnIndex = columnsToRead[columnCount-1];
 
         StringArrayRowConsumer stringArrayRowConsumer =
-                new StringArrayRowConsumer(this.removeBlankRows, this.removeBlankColumns);
+                new StringArrayRowConsumer(sheetConfig.isRemoveBlankRows(), sheetConfig.isRemoveBlankColumns());
         for (Row row : rowList) {
             String[] rowValues = toRowValues(row, columnsToRead, columnCount, maxRequestedColumnIndex);
             stringArrayRowConsumer.accept(rowValues);
@@ -166,7 +168,7 @@ public class ExcelSheetReader implements ExcelSheetDataExtractor {
      * @param rowList list of rows for a sheet
      * @return max column
      */
-    protected int getMaxColumn(List<Row> rowList) {
+    protected int getMaxColumn(Sheet sheet, List<Row> rowList) {
         int maxColumnCount = 0;
         for (Row row : rowList) {
             if (row == null) {
@@ -184,7 +186,13 @@ public class ExcelSheetReader implements ExcelSheetDataExtractor {
             for (int j = currentRowCellCount - 1; j >= maxColumnCount; j--) {
                 String cellValue = getCellValue(row.getCell(j));
                 if (!cellValue.isEmpty()) {
-                    break;
+                    // if a new max column candidate has a value,
+                    // but the cell is invisible and configured to
+                    // ignore invisible cells, then should continue on.
+                    // todo: look for less kludgy way to solve this
+                    if (!sheetConfig.isRemoveInvisibleCells() || !sheet.isColumnHidden(j)) {
+                        break;
+                    }
                 }
                 currentRowCellCount--;
             }
@@ -223,7 +231,7 @@ public class ExcelSheetReader implements ExcelSheetDataExtractor {
     }
 
     protected boolean isRowVisible(Row row) {
-        if (!removeInvisibleCells) {
+        if (!sheetConfig.isRemoveInvisibleCells()) {
             return true;
         }
         return row == null || !row.getZeroHeight();
@@ -236,7 +244,7 @@ public class ExcelSheetReader implements ExcelSheetDataExtractor {
      * @return int array of column indices to be read
      */
     protected int[] getAvailableColumns(Sheet sheet, int maxColumn) {
-        if (!removeInvisibleCells) {
+        if (!sheetConfig.isRemoveInvisibleCells()) {
             return IntStream.range(0, maxColumn).toArray();
         }
 
@@ -352,14 +360,15 @@ public class ExcelSheetReader implements ExcelSheetDataExtractor {
         return new Builder();
     }
 
-    public static class Builder extends AbstractSheetConfigBuilder<Builder> {
+    public static class Builder extends AbstractSheetConfigBuilder<ExcelSheetReader, Builder> {
         @Override
         protected Builder self() {
             return this;
         }
 
+        @Override
         public ExcelSheetReader build() {
-            return new ExcelSheetReader(this);
+            return new ExcelSheetReader(this.buildConfig());
         }
     }
 }

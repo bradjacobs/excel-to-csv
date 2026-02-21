@@ -195,7 +195,7 @@ public class ExcelSheetReaderTest {
                     .removeBlankRows(false)
                     .build();
             String[][] dataMatrix = excelSheetReader.convertToDataMatrix(testSheet);
-            assertEquals(dataMatrix.length, 2, "Mismatch expected row count");
+            assertEquals(2, dataMatrix.length, "Mismatch expected row count");
         }
     }
 
@@ -256,7 +256,9 @@ public class ExcelSheetReaderTest {
                 "FirstLastRow",
                 "AllColumnHidden",
                 "FirstLastColumn",
-                "Multi"})
+                "Multi",
+                "LastValueInvisible",
+                "LongestRowInvisible"})
         public void testMissingRowsAndColumns(String sheetNamePrefix) {
             String testDataSheetName = sheetNamePrefix + INPUT_DATA_SHEET_SUFFIX;
             String expectedDataSheetName = sheetNamePrefix + EXPECTED_DATA_SHEET_SUFFIX;
