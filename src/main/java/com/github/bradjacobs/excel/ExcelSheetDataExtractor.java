@@ -6,6 +6,7 @@ package com.github.bradjacobs.excel;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,6 +30,9 @@ public interface ExcelSheetDataExtractor {
     default String[][] readExcelSheetData(Path excelFile, int sheetIndex) throws IOException {
         return readExcelSheetData(excelFile, sheetIndex, null);
     }
+    default String[][] readExcelSheetData(URL excelFileUrl, int sheetIndex) throws IOException {
+        return readExcelSheetData(inputStreamGenerator.getInputStream(excelFileUrl), sheetIndex, null);
+    }
     default String[][] readExcelSheetData(InputStream is, int sheetIndex) throws IOException {
         return readExcelSheetData(is, sheetIndex, null);
     }
@@ -46,6 +50,9 @@ public interface ExcelSheetDataExtractor {
     }
     default String[][] readExcelSheetData(Path excelFile, String sheetName) throws IOException {
         return readExcelSheetData(excelFile, sheetName, null);
+    }
+    default String[][] readExcelSheetData(URL excelFileUrl, String sheetName) throws IOException {
+        return readExcelSheetData(inputStreamGenerator.getInputStream(excelFileUrl), sheetName, null);
     }
     default String[][] readExcelSheetData(InputStream is, String sheetName) throws IOException {
         return readExcelSheetData(is, sheetName, null);
