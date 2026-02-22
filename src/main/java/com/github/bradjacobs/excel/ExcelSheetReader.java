@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
 /**
  * Reads an Excel Sheet and returns a 2-D array of data.
  */
-public class ExcelSheetReader implements ExcelSheetDataExtractor {
+public class ExcelSheetReader extends AbstractExcelSheetReader {
     protected final SheetConfig sheetConfig;
     protected final CellValueReader cellValueReader;
 

@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.ExcelSheetDataExtractor.AbstractSheetConfigBuilder;
+import com.github.bradjacobs.excel.AbstractExcelSheetReader.AbstractSheetConfigBuilder;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
