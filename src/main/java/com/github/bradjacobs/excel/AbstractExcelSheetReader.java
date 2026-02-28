@@ -21,6 +21,12 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetDataExtracto
     protected static final InputStreamGenerator inputStreamGenerator = new InputStreamGenerator();
     private static final String DEFAULT_PASSWORD = null;
 
+    public AbstractExcelSheetReader() {
+        // override the internal POI utils size limit to allow for 'bigger Excel files'
+        //   (as of POI version 5.2.0 the default value is 100_000_000)
+        org.apache.poi.util.IOUtils.setByteArrayMaxOverride(Integer.MAX_VALUE);
+    }
+
     // Variations of reading Excel Sheet via sheet Index.
     @Override
     public String[][] readExcelSheetData(File excelFile, int sheetIndex) throws IOException {
@@ -51,6 +57,11 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetDataExtracto
     public String[][] readExcelSheetData(Path excelFile, int sheetIndex, String password) throws IOException {
         return readExcelSheetData(inputStreamGenerator.getInputStream(excelFile), sheetIndex, password);
     }
+
+    // Subclasses implement the core extraction logic:
+    @Override
+    public abstract String[][] readExcelSheetData(InputStream is, int sheetIndex, String password) throws IOException;
+
 
     // Variations of reading Excel Sheet via sheet name.
     @Override
@@ -84,9 +95,6 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetDataExtracto
     }
 
     // Subclasses implement the core extraction logic:
-    @Override
-    public abstract String[][] readExcelSheetData(InputStream is, int sheetIndex, String password) throws IOException;
-
     @Override
     public abstract String[][] readExcelSheetData(InputStream is, String sheetName, String password) throws IOException;
 
