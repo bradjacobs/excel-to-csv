@@ -117,7 +117,37 @@ Known Cell Data Formatting Issues include (but not limited to) the following:
 Searching on the web can yield alternate solutions that require less code.  However, they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well
 
 <details>
-  <summary>Example Alternate Implementation... (Click To Expand)</summary>
+  <summary>Example Alternate Implementation 1... (Click To Expand)</summary>
+
+An example of a simpler way to read an Excel file without the extra code in this project is below:<br><br>
+Additional explanations about the code can be found in [SimplePoiExampleExcelReader.java](src/main/java/com/github/bradjacobs/excel/demo/SimplePoiExampleExcelReader.java)
+
+```java
+public List<List<String>> readBasicSheet(Path excelFile) throws IOException {
+  DataFormatter formatter = new DataFormatter(true);
+  formatter.setUseCachedValuesForFormulaCells(true);
+
+  try (Workbook workbook = WorkbookFactory.create(excelFile.toFile())) {
+    Sheet sheet = workbook.getSheetAt(0); // read first sheet
+    return IntStream.rangeClosed(0, sheet.getLastRowNum())
+            .mapToObj(rowIndex -> {
+              Row row = sheet.getRow(rowIndex);
+              if (row == null) {
+                return List.<String>of();
+              }
+              return IntStream.range(0, row.getLastCellNum())
+                      .mapToObj(colIndex ->
+                              formatter.formatCellValue(row.getCell(colIndex)).trim())
+                      .collect(Collectors.toList());
+            })
+            .collect(Collectors.toList());
+  }
+}
+```
+</details>
+<br>
+<details>
+  <summary>Example Alternate Implementation 2... (Click To Expand)</summary>
 
 From a [StackOverflow Post](https://stackoverflow.com/questions/40283179/how-to-convert-xlsx-file-to-csv), [OrangeDog](https://stackoverflow.com/users/476716/orangedog) points out there is an easier way to get CSV text, which would look something ike this:
 ```java
@@ -149,9 +179,6 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 * Create an alternate implemenation utilizing POI's 'XSSFSheetXMLHandler' class
   * preliminary results show it's a lot faster on really big files. 
   * TBD how (or if) would integrate with existing code.
-* Create a new demo class that shows the 'bare bones basics' of how to read an Excel Sheet
-  * (without all the extra fluff that this project intoduces)
-* Create a new demo class that shows how to read an Excel Sheet and write it back out to a new file.
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
 * Integrate a real logger into the code.
