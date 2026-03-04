@@ -4,8 +4,12 @@
 package com.github.bradjacobs.excel;
 
 import com.github.bradjacobs.excel.AbstractExcelSheetReader.AbstractSheetConfigBuilder;
+import com.github.bradjacobs.excel.advanced.AdvancedExcelSheetReader;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.poifs.filesystem.FileMagic;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,18 +20,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 
+import static org.apache.poi.extractor.ExtractorFactory.OOXML_PACKAGE;
+import static org.apache.poi.poifs.crypt.Decryptor.DEFAULT_POIFS_ENTRY;
+
 /**
  * Simple class that reads an Excel Worksheet
  *   and will produce a CSV-equivalent
  */
 // todo: add more method javadocs
+// todo: address circular dependencies
 public class ExcelReader {
     private final int sheetIndex;
     private final String sheetName;
     private final String password; // 'null' == no password
     private final boolean saveUnicodeFileWithBom;
+    private final boolean useAdvancedReader;
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
-    private final ExcelSheetReader excelSheetReader;
+    private final ExcelSheetDataExtractor excelSheetReader;
+    private final ExcelSheetDataExtractor advancedExcelSheetReader;
 
     private static final Set<String> ALLOWED_OUTPUT_FILE_EXTENSIONS = Set.of("csv", "txt", "");
     private static final String BOM = "\uFEFF"; // byte order marker for files with unicode.
@@ -39,8 +49,11 @@ public class ExcelReader {
         this.sheetName = builder.sheetName;
         this.password = builder.password;
         this.saveUnicodeFileWithBom = builder.saveUnicodeFileWithBom;
+        this.useAdvancedReader = builder.useAdvancedReader;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
-        this.excelSheetReader = createExcelSheetReader(builder);
+        SheetConfig sheetConfig = builder.buildConfig();
+        this.excelSheetReader = new ExcelSheetReader(sheetConfig);
+        this.advancedExcelSheetReader = new AdvancedExcelSheetReader(sheetConfig);
         this.inputStreamGenerator = new InputStreamGenerator();
     }
 
@@ -79,14 +92,16 @@ public class ExcelReader {
         return convertToDataMatrix( inputStreamGenerator.getInputStream(excelUrl) );
     }
 
-
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
-        if (StringUtils.isNotEmpty(this.sheetName)) {
-            return excelSheetReader.readExcelSheetData(inputStream, this.sheetName, this.password);
-        }
-        else {
-            return excelSheetReader.readExcelSheetData(inputStream, this.sheetIndex, this.password);
-        }
+        final boolean advancedMode = this.useAdvancedReader && isOOXMLStream(inputStream);
+        final boolean hasSheetName = StringUtils.isNotEmpty(this.sheetName);
+        final ExcelSheetDataExtractor reader = advancedMode
+                ? advancedExcelSheetReader
+                : excelSheetReader;
+
+        return hasSheetName
+                ? reader.readExcelSheetData(inputStream, this.sheetName, this.password)
+                : reader.readExcelSheetData(inputStream, this.sheetIndex, this.password);
     }
 
     /**
@@ -144,13 +159,28 @@ public class ExcelReader {
         return false;
     }
 
-    /**
-     * Creates an ExcelSheetReader based on the builder configuration.
-     * @param builder builder
-     * @return new ExcelSheetReader instance
-     */
-    protected ExcelSheetReader createExcelSheetReader(Builder builder) {
-        return new ExcelSheetReader(builder.buildConfig());
+    private boolean isOOXMLStream(InputStream inputStream) throws IOException {
+        InputStream markableInputStream = FileMagic.prepareToCheckMagic(inputStream);
+        FileMagic fileMagic = FileMagic.valueOf(markableInputStream);
+        if (FileMagic.OOXML == fileMagic) {
+            return true;
+        }
+        else if (FileMagic.OLE2 == fileMagic) {
+            try {
+                // Read the first part of the stream to see if it is an OOXML
+                // that is password protected (vs an older .xls file) Then reset the stream.
+                markableInputStream.mark(1024*100);
+                POIFSFileSystem poifs = new POIFSFileSystem(CloseShieldInputStream.wrap(markableInputStream));
+                if (poifs.getRoot().hasEntryCaseInsensitive(DEFAULT_POIFS_ENTRY) ||
+                        poifs.getRoot().hasEntryCaseInsensitive(OOXML_PACKAGE)) {
+                    return true;
+                }
+            }
+            finally {
+                markableInputStream.reset();
+            }
+        }
+        return false;
     }
 
     public static Builder builder() {
@@ -165,6 +195,7 @@ public class ExcelReader {
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
         private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains unicode.
+        private boolean useAdvancedReader = true; // use the advanced reader (if possible)
 
         @Override
         protected Builder self() {
@@ -225,6 +256,15 @@ public class ExcelReader {
          */
         public Builder saveUnicodeFileWithBom(boolean saveUnicodeFileWithBom) {
             this.saveUnicodeFileWithBom = saveUnicodeFileWithBom;
+            return this;
+        }
+
+        /**
+         * Toggle using the advanced reader
+         *   (typically only used for testing convenience)
+         */
+        public Builder useAdvancedReader(boolean useAdvancedReader) {
+            this.useAdvancedReader = useAdvancedReader;
             return this;
         }
 

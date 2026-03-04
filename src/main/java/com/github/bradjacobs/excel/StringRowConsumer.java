@@ -79,6 +79,10 @@ public class StringRowConsumer implements Consumer<List<String>> {
         this.removeBlankColumns = removeBlankColumns;
     }
 
+    public int getRowCount() {
+        return rows.size();
+    }
+
     /**
      * Consumes all the String value rows read from the Excel file.
      */

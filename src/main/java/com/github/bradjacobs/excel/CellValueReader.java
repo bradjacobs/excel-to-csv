@@ -32,7 +32,7 @@ public class CellValueReader {
     /**
      * Gets the string representation of the value in the cell
      *   (where the cell value is what you "physically see" in the cell)
-     *  NOTE: dates & numbers should retain their original formatting.
+     * NOTE: dates and numbers should retain their original formatting.
      * @param cell excel cell
      * @return string representation of the cell.
      */
