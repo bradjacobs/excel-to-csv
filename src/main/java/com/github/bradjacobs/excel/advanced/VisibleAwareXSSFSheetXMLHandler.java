@@ -51,7 +51,7 @@ class VisibleAwareXSSFSheetXMLHandler extends XSSFSheetXMLHandler {
             return;
         }
 
-        int rowNumber1Based = Integer.parseInt(attributes.getValue(ATTR_ROW_NUMBER));
+        int rowNumber1Based = getIntAttribute(attributes, ATTR_ROW_NUMBER);
         sheetContext.addHiddenRow(rowNumber1Based - 1);
     }
 
@@ -61,8 +61,8 @@ class VisibleAwareXSSFSheetXMLHandler extends XSSFSheetXMLHandler {
             return;
         }
 
-        int min1Based = Integer.parseInt(attributes.getValue(ATTR_MIN));
-        int max1Based = Integer.parseInt(attributes.getValue(ATTR_MAX));
+        int min1Based = getIntAttribute(attributes, ATTR_MIN);
+        int max1Based = getIntAttribute(attributes, ATTR_MAX);
 
         // Columns are 1-based in XML, convert to 0-based index
         for (int col1Based = min1Based; col1Based <= max1Based; col1Based++) {
@@ -78,5 +78,13 @@ class VisibleAwareXSSFSheetXMLHandler extends XSSFSheetXMLHandler {
     private boolean isHidden(Attributes attributes) {
         String hiddenAttr = attributes.getValue(ATTR_HIDDEN);
         return "1".equals(hiddenAttr) || "true".equalsIgnoreCase(hiddenAttr);
+    }
+
+    private int getIntAttribute(Attributes attributes, String attrName) {
+        String value = attributes.getValue(attrName);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing required attribute: " + attrName);
+        }
+        return Integer.parseInt(value);
     }
 }
