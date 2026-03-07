@@ -44,8 +44,8 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetDataExtracto
     }
 
     @Override
-    public String[][] readExcelSheetData(InputStream is, int sheetIndex) throws IOException {
-        return readExcelSheetData(is, sheetIndex, DEFAULT_PASSWORD);
+    public String[][] readExcelSheetData(InputStream inputStream, int sheetIndex) throws IOException {
+        return readExcelSheetData(inputStream, sheetIndex, DEFAULT_PASSWORD);
     }
 
     @Override
@@ -60,7 +60,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetDataExtracto
 
     // Subclasses implement the core extraction logic:
     @Override
-    public abstract String[][] readExcelSheetData(InputStream is, int sheetIndex, String password) throws IOException;
+    public abstract String[][] readExcelSheetData(InputStream inputStream, int sheetIndex, String password) throws IOException;
 
 
     // Variations of reading Excel Sheet via sheet name.
@@ -80,8 +80,8 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetDataExtracto
     }
 
     @Override
-    public String[][] readExcelSheetData(InputStream is, String sheetName) throws IOException {
-        return readExcelSheetData(is, sheetName, DEFAULT_PASSWORD);
+    public String[][] readExcelSheetData(InputStream inputStream, String sheetName) throws IOException {
+        return readExcelSheetData(inputStream, sheetName, DEFAULT_PASSWORD);
     }
 
     @Override
@@ -96,7 +96,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetDataExtracto
 
     // Subclasses implement the core extraction logic:
     @Override
-    public abstract String[][] readExcelSheetData(InputStream is, String sheetName, String password) throws IOException;
+    public abstract String[][] readExcelSheetData(InputStream inputStream, String sheetName, String password) throws IOException;
 
 
     // below is common code for sheet configuration builder

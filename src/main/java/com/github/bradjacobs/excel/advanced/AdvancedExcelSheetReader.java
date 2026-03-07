@@ -46,14 +46,14 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
     }
 
     @Override
-    public String[][] readExcelSheetData(InputStream excelInputStream, int sheetIndex, String password) throws IOException {
+    public String[][] readExcelSheetData(InputStream inputStream, int sheetIndex, String password) throws IOException {
         validateSheetIndex(sheetIndex);
-        return readExcelSheetData(excelInputStream, password, reader -> fetchSheetInputStream(reader, sheetIndex));
+        return readExcelSheetData(inputStream, password, reader -> fetchSheetInputStream(reader, sheetIndex));
     }
 
     @Override
-    public String[][] readExcelSheetData(InputStream excelInputStream, String sheetName, String password) throws IOException {
-        return readExcelSheetData(excelInputStream, password, reader -> fetchSheetInputStream(reader, sheetName));
+    public String[][] readExcelSheetData(InputStream inputStream, String sheetName, String password) throws IOException {
+        return readExcelSheetData(inputStream, password, reader -> fetchSheetInputStream(reader, sheetName));
     }
 
     private void validateSheetIndex(int sheetIndex) {

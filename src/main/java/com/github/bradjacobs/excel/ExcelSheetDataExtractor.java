@@ -16,17 +16,17 @@ public interface ExcelSheetDataExtractor {
     String[][] readExcelSheetData(File excelFile, int sheetIndex) throws IOException;
     String[][] readExcelSheetData(Path excelFile, int sheetIndex) throws IOException;
     String[][] readExcelSheetData(URL excelFileUrl, int sheetIndex) throws IOException;
-    String[][] readExcelSheetData(InputStream is, int sheetIndex) throws IOException;
+    String[][] readExcelSheetData(InputStream inputStream, int sheetIndex) throws IOException;
     String[][] readExcelSheetData(File excelFile, int sheetIndex, String password) throws IOException;
     String[][] readExcelSheetData(Path excelFile, int sheetIndex, String password) throws IOException;
-    String[][] readExcelSheetData(InputStream is, int sheetIndex, String password) throws IOException;
+    String[][] readExcelSheetData(InputStream inputStream, int sheetIndex, String password) throws IOException;
 
     // Variations of reading Excel Sheet via sheet name.
     String[][] readExcelSheetData(File excelFile, String sheetName) throws IOException;
     String[][] readExcelSheetData(Path excelFile, String sheetName) throws IOException;
     String[][] readExcelSheetData(URL excelFileUrl, String sheetName) throws IOException;
-    String[][] readExcelSheetData(InputStream is, String sheetName) throws IOException;
+    String[][] readExcelSheetData(InputStream inputStream, String sheetName) throws IOException;
     String[][] readExcelSheetData(File excelFile, String sheetName, String password) throws IOException;
     String[][] readExcelSheetData(Path excelFile, String sheetName, String password) throws IOException;
-    String[][] readExcelSheetData(InputStream is, String sheetName, String password) throws IOException;
+    String[][] readExcelSheetData(InputStream inputStream, String sheetName, String password) throws IOException;
 }
