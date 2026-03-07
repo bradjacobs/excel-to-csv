@@ -193,7 +193,7 @@ public class StringRowConsumerTest {
         }
 
 
-        // beginning blanks reows are to be kept,
+        // beginning blanks rows are to be kept,
         //   if not configured to remove blank rows.
         @Test
         public void retainFirstlankRows() {
