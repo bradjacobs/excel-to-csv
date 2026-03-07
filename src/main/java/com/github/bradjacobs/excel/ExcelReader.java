@@ -106,15 +106,20 @@ public class ExcelReader {
 
     /**
      * Write the CSV data string out to a file.
-     * @param csvString CSV data
+     * @param csvContent CSV data
      * @param outputFile destination file.
      */
-    private void writeCsvToFile(String csvString, Path outputFile) throws IOException {
+    private void writeCsvToFile(String csvContent, Path outputFile) throws IOException {
+        String contentToWrite = prepareCsvContentForWriting(csvContent);
+        Files.writeString(outputFile, contentToWrite, StandardCharsets.UTF_8);
+    }
+
+    private String prepareCsvContentForWriting(String csvContent) {
         // prepend the 'bom' so that unicode characters will render correctly
-        if (this.saveUnicodeFileWithBom && containsUnicode(csvString)) {
-            csvString = BOM + csvString;
+        if (saveUnicodeFileWithBom && containsUnicode(csvContent)) {
+            return BOM + csvContent;
         }
-        Files.writeString(outputFile, csvString, StandardCharsets.UTF_8);
+        return csvContent;
     }
 
     /**
