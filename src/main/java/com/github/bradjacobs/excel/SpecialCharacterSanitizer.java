@@ -39,7 +39,7 @@ public class SpecialCharacterSanitizer {
     public static final Set<CharSanitizeFlag> DEFAULT_FLAGS = Set.of(SPACES, QUOTES);
     private static final Character SPACE_CHAR = ' ';
 
-    private final Map<Character,Character> replacementMap;
+    private final Map<Character, Character> replacementMap;
 
     public SpecialCharacterSanitizer() {
         this(DEFAULT_FLAGS);
@@ -53,35 +53,40 @@ public class SpecialCharacterSanitizer {
         if (charSanitizeFlags == null) {
             throw new IllegalArgumentException("Must provide non-null charSanitizeFlags.");
         }
-
-        this.replacementMap = new HashMap<>();
-        for (CharSanitizeFlag charSanitizeFlag : charSanitizeFlags) {
-            this.replacementMap.putAll(FLAG_REPLACEMENT_LOOKUP_MAP.get(charSanitizeFlag));
-        }
+        this.replacementMap = buildReplacementMap(charSanitizeFlags);
     }
 
     /**
      * Replaces 'special characters' with the basic ascii counterpart
      * Works with spaces, quotes, and/or diacritic characters (i.e. 'é' -> 'e')
+     *
      * @param input string to sanitize
      * @return sanitized version of the input string
      */
     public String sanitize(String input) {
-        if (StringUtils.isEmpty(input) || this.replacementMap.isEmpty()) {
+        if (StringUtils.isEmpty(input) || replacementMap.isEmpty()) {
             return input;
         }
+
         int length = input.length();
         StringBuilder sb = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
             char inputCharacter = input.charAt(i);
-            if (this.replacementMap.containsKey(inputCharacter)) {
-                sb.append(this.replacementMap.get(inputCharacter));
-            }
-            else {
-                sb.append(inputCharacter);
-            }
+            Character replacementCharacter = replacementMap.get(inputCharacter);
+            sb.append(replacementCharacter != null ? replacementCharacter : inputCharacter);
         }
         return sb.toString();
+    }
+
+    /**
+     * Generate replacement map for the given charSanitizeFlags.
+     */
+    private static Map<Character, Character> buildReplacementMap(Collection<CharSanitizeFlag> charSanitizeFlags) {
+        Map<Character, Character> map = new HashMap<>();
+        for (CharSanitizeFlag charSanitizeFlag : charSanitizeFlags) {
+            map.putAll(FLAG_REPLACEMENT_LOOKUP_MAP.get(charSanitizeFlag));
+        }
+        return map;
     }
 
     //
@@ -167,12 +172,12 @@ public class SpecialCharacterSanitizer {
     };
 
     private static final
-        Map<CharSanitizeFlag, Map<Character,Character>> FLAG_REPLACEMENT_LOOKUP_MAP
+    Map<CharSanitizeFlag, Map<Character, Character>> FLAG_REPLACEMENT_LOOKUP_MAP
             = Map.of(
                     SPACES, generateSpaceReplacementMap(),
                     QUOTES, generateQuoteReplacementMap(),
                     DASHES, generateDashReplacementMap(),
-                    BASIC_DIACRITICS, generateBasicDiacriticsCharReplacementMap()
+                    BASIC_DIACRITICS, generateBasicDiacriticsReplacementMap()
     );
 
     private static Map<Character,Character> generateSpaceReplacementMap() {
@@ -209,14 +214,15 @@ public class SpecialCharacterSanitizer {
     /**
      * Creates a lookup replacement map for characters with accents
      * to the 'normal looking' counterpart.
-     *   Examples:  'é' -> 'e', 'Ç' -> 'C', 'ö' -> 'o'
+     * Examples:  'é' -> 'e', 'Ç' -> 'C', 'ö' -> 'o'
      * NOTE1: this only considers replacement characters that are in
-     *  the basic/extended ascii range < 255
+     * the basic/extended ascii range < 255
      * NOTE2: this does not replace most characters that have 'hooks' or 'slashes'
+     *
      * @return Map of diacritics character to its replacement value
      */
-    private static Map<Character,Character> generateBasicDiacriticsCharReplacementMap() {
-        Map<Character,Character> replacementMap = new LinkedHashMap<>();
+    private static Map<Character, Character> generateBasicDiacriticsReplacementMap() {
+        Map<Character, Character> replacementMap = new LinkedHashMap<>();
         Pattern pattern = Pattern.compile("\\p{M}");
 
         for (char c = 0; c < Character.MAX_VALUE; c++) {
@@ -224,7 +230,7 @@ public class SpecialCharacterSanitizer {
             String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
             String output = pattern.matcher(normalized).replaceAll("");
 
-            if (! input.equals(output) && output.length() == 1) {
+            if (!input.equals(output) && output.length() == 1) {
                 char outChar = output.charAt(0);
                 if (outChar < 255 && outChar != SPACE_CHAR) {
                     replacementMap.put(c, outChar);
