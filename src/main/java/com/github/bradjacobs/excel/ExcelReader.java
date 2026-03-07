@@ -170,21 +170,10 @@ public class ExcelReader {
         if (FileMagic.OOXML == fileMagic) {
             return true;
         }
-        else if (FileMagic.OLE2 == fileMagic) {
-            try {
-                // Read the first part of the stream to see if it is an OOXML
-                // that is password protected (vs an older .xls file) Then reset the stream.
-                markableInputStream.mark(1024*100);
-                POIFSFileSystem poifs = new POIFSFileSystem(CloseShieldInputStream.wrap(markableInputStream));
-                if (poifs.getRoot().hasEntryCaseInsensitive(DEFAULT_POIFS_ENTRY) ||
-                        poifs.getRoot().hasEntryCaseInsensitive(OOXML_PACKAGE)) {
-                    return true;
-                }
-            }
-            finally {
-                markableInputStream.reset();
-            }
-        }
+
+        // TODO
+        //   add check if file is OLE2 + password protected.
+        //   (original code to check had bug and was removed)
         return false;
     }
 
