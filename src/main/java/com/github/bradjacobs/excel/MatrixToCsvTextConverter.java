@@ -21,16 +21,16 @@ import static com.github.bradjacobs.excel.QuoteMode.NORMAL;
  * combine to be final csv text string.
  */
 public class MatrixToCsvTextConverter {
-    // a string that has a character below this ascii value should be quoted.  (Normal Mode)
+    // a string that has a character below this ascii value should be quoted. (Normal Mode)
     private static final int NORMAL_CRITERIA_MINIMUM = 45;
 
-    // a string with any of these explicit characters should be quoted.  (Lenient Mode)
+    // a string with any of these explicit characters should be quoted. (Lenient Mode)
     private static final Set<Character> MINIMAL_QUOTE_CHARACTERS =
             new HashSet<>(Set.of('"', ',', '\t', '\r', '\n'));
 
     private static final String NEW_LINE = System.lineSeparator();
 
-    private final Predicate<String> shouldQuoteRule;
+    private final Predicate<String> quoteRule;
 
     /**
      * Constructor
@@ -40,7 +40,7 @@ public class MatrixToCsvTextConverter {
         if (quoteMode == null) {
             throw new IllegalArgumentException("QuoteMode cannot be null.");
         }
-        this.shouldQuoteRule = QUOTE_RULE_MAP.get(quoteMode);
+        this.quoteRule = QUOTE_RULE_MAP.get(quoteMode);
     }
 
     /**
@@ -64,11 +64,9 @@ public class MatrixToCsvTextConverter {
             }
             for (int i = 0; i < columnCount; i++) {
                 String cellValue = rowData[i];
-                if (shouldQuoteRule.test(cellValue)) {
+                if (quoteRule.test(cellValue)) {
                     // must first escape double quotes
-                    if (cellValue.contains("\"")) {
-                        cellValue = Strings.CS.replace(cellValue, "\"", "\"\"");
-                    }
+                    cellValue = escapeDoubleQuotes(cellValue);
                     sb.append('\"').append(cellValue).append('\"');
                 }
                 else {
@@ -84,13 +82,20 @@ public class MatrixToCsvTextConverter {
         return sb.toString();
     }
 
+    private String escapeDoubleQuotes(String value) {
+        if (value.contains("\"")) {
+            return Strings.CS.replace(value, "\"", "\"\"");
+        }
+        return value;
+    }
+
     /**
      * checks if data matrix array is empty
      * @param dataMatrix dataMatrix
      * @return true if dataMatrix is considered 'empty'
      */
     private boolean isEmptyDataMatrix(String[][] dataMatrix) {
-        return (dataMatrix == null || dataMatrix.length == 0 || dataMatrix[0].length == 0);
+        return dataMatrix == null || dataMatrix.length == 0 || dataMatrix[0].length == 0;
     }
 
     // Below is the logic if a value should be quoted, depending on the quoteMode.
@@ -100,13 +105,13 @@ public class MatrixToCsvTextConverter {
     private static final Predicate<String> NEVER_QUOTE_RULE = s -> false;
     private static final Predicate<String> ALWAYS_QUOTE_RULE = s -> !StringUtils.isEmpty(s);
     private static final Predicate<String> NORMAL_QUOTE_RULE = new CharRulePredicate(IS_LOW_ASCII_CHAR);
-    private static final Predicate<String> MIN_QUOTE_RULE = new CharRulePredicate(IS_MIN_CHAR);
+    private static final Predicate<String> LENIENT_QUOTE_RULE = new CharRulePredicate(IS_MIN_CHAR);
 
     private static final Map<QuoteMode, Predicate<String>> QUOTE_RULE_MAP = Map.of(
             NEVER, NEVER_QUOTE_RULE,
             ALWAYS, ALWAYS_QUOTE_RULE,
             NORMAL, NORMAL_QUOTE_RULE,
-            LENIENT, MIN_QUOTE_RULE
+            LENIENT, LENIENT_QUOTE_RULE
     );
 
     private static class CharRulePredicate implements Predicate<String> {
