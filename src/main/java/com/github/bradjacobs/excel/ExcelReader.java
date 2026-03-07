@@ -251,7 +251,7 @@ public class ExcelReader {
          */
         public Builder password(String password) {
             // if user tries to set blank/empty string, then save as 'null'
-            this.password = password != null && password.isEmpty() ? null : password;
+            this.password = StringUtils.isNotEmpty(password) ? password : null;
             return this;
         }
 
