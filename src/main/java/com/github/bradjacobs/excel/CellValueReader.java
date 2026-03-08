@@ -57,6 +57,9 @@ public class CellValueReader {
     }
 
     public String sanitizeCellValue(String inputValue) {
+        if (inputValue == null) {
+            return "";
+        }
         // if there are any certain special unicode characters (like nbsp or smart quotes),
         // replace w/ normal character equivalent
         String resultValue = specialCharSanitizer.sanitize(inputValue);

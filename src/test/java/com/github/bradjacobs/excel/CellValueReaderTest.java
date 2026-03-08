@@ -60,6 +60,15 @@ public class CellValueReaderTest {
         assertEquals("", result, "mismatch expected cell value");
     }
 
+    // the advanced implementation can pass in a null to
+    //   this method, so ensure it's handled correctly.
+    @Test
+    public void sanitizeCellNullValue() {
+        CellValueReader cellValueReader = new CellValueReader(true, Set.of(QUOTES));
+        String result = cellValueReader.sanitizeCellValue(null);
+        assertEquals("", result, "mismatch expected cell value");
+    }
+
     @Test
     public void formulaConversion() {
         // note: this is a semi-poor representation of a true Excel Formula cell.
