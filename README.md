@@ -103,7 +103,13 @@ Known Cell Data Formatting Issues include (but not limited to) the following:
 <details>
   <summary>(Click To Expand...)</summary>
 
-* Any cells with 'error values' (#NAME?, #VALUE!, etc) will appear in the output CSV file (this is expected)
+* _Sometimes_ simple numeric values will be returned in a decimal format.
+  * i.e. expected "7", but got "7.0"
+  * usually due from how the file was saved.  'Resaving' in Excel can sometimes fix.
+* Advanced parser will throw an exception if encounters a cell without a CellReference
+  * a poi-examples class [XLSX2CSV.java](https://github.com/apache/poi/blob/trunk/poi-examples/src/main/java/org/apache/poi/examples/xssf/eventusermodel/XLSX2CSV.java) shows a proposed solution, but it only works in a handful of cases.
+  * rather than throw an exception the code could be change to provide a 'best guess' of which column the value belongs.
+* Any cells with 'error values' (#NAME?, #VALUE!, etc) will appear in the output CSV file (this _IS_ expected)
 * Certain Linked or Embedded Objects typically render as "#VALUE!" (Pictures, Stock, Geography, etc.)
 * Special or Custom Formats may sometimes render incorrectly.
   * most often noticed with date, time, or numeric values.

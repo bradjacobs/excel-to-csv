@@ -3,6 +3,7 @@ package com.github.bradjacobs.excel.advanced;
 import com.github.bradjacobs.excel.CellValueReader;
 import com.github.bradjacobs.excel.SheetConfig;
 import com.github.bradjacobs.excel.StringRowConsumer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
@@ -53,8 +54,22 @@ class SpecialSheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     @Override
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
+        if (StringUtils.isEmpty(cellReference)) {
+            // todo: just throw an exception if missing cellRefernce
+            //    other online 'solutions' show a way to manully track the column index,
+            //    but it seems to often be incorrect and would write cell data in incorret column.
+            throw new IllegalStateException(
+                    "Unable to parse Excel Sheet. " +
+                            "A cell value was encountered without a cellReference.  " +
+                            "See 'Known Issues' for more details.");
+        }
         CellAddress cellAddress = new CellAddress(cellReference);
         cell(cellAddress.getRow(), cellAddress.getColumn(), formattedValue, comment);
+    }
+
+    protected void cell(int rowNum, int columnIndex, String formattedValue, XSSFComment comment) {
+        fillMissingColumnsUpTo(columnIndex);
+        currentRowValues.add(sanitizeCellValue(formattedValue));
     }
 
     protected void fillMissingRows(int rowNum) {
@@ -76,10 +91,6 @@ class SpecialSheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         return true;
     }
 
-    protected void cell(int rowNum, int columnIndex, String formattedValue, XSSFComment comment) {
-        fillMissingColumnsUpTo(columnIndex);
-        currentRowValues.add(sanitizeCellValue(formattedValue));
-    }
 
     protected void fillMissingColumnsUpTo(int columnIndex) {
         // fill in any blanks between values in a row (if necessary)
