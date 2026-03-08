@@ -58,7 +58,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
 
     private void validateSheetIndex(int sheetIndex) {
         if (sheetIndex < 0) {
-            throw new IllegalArgumentException("SheetIndex cannot be negative");
+            throw new IllegalArgumentException("Sheet Index cannot be negative");
         }
     }
 
@@ -113,7 +113,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
     ) throws IOException, InvalidFormatException {
         InputStream inputStream = fetchSheetInputStream(reader, (si, sn) -> sheetIndex == si);
         if (inputStream == null) {
-            throw new IllegalArgumentException(String.format("SheetIndex '%d' is an out of bounds.", sheetIndex));
+            throw new IllegalArgumentException(String.format("Sheet index '%d' is out of range.", sheetIndex));
         }
         return inputStream;
     }
