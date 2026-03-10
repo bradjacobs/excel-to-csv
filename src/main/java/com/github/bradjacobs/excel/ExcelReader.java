@@ -6,10 +6,8 @@ package com.github.bradjacobs.excel;
 import com.github.bradjacobs.excel.AbstractExcelSheetReader.AbstractSheetConfigBuilder;
 import com.github.bradjacobs.excel.advanced.AdvancedExcelSheetReader;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,9 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
-
-import static org.apache.poi.extractor.ExtractorFactory.OOXML_PACKAGE;
-import static org.apache.poi.poifs.crypt.Decryptor.DEFAULT_POIFS_ENTRY;
 
 /**
  * Simple class that reads an Excel Worksheet
