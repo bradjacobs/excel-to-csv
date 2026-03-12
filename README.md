@@ -126,7 +126,7 @@ Searching on the web can yield alternate solutions that require less code.  Howe
   <summary>Example Alternate Implementation 1... (Click To Expand)</summary>
 
 An example of a simpler way to read an Excel file without the extra code in this project is below:<br><br>
-Additional explanations about the code can be found in [SimplePoiExampleExcelReader.java](src/main/java/com/github/bradjacobs/excel/demo/SimplePoiExampleExcelReader.java)
+Additional explanations about the code can be found in [SimplePoiExampleExcelReader.java](src/main/java/com/github/bradjacobs/excel/examples/SimplePoiExampleExcelReader.java)
 
 ```java
 public List<List<String>> readBasicSheet(Path excelFile) throws IOException {

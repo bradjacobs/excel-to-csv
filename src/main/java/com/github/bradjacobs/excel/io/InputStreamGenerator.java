@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in 'LICENSE' file.
  */
-package com.github.bradjacobs.excel;
+package com.github.bradjacobs.excel.io;
 
 import java.io.BufferedInputStream;
 import java.io.File;

@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in 'LICENSE' file.
  */
-package com.github.bradjacobs.excel;
+package com.github.bradjacobs.excel.csv;
 
 import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Test;

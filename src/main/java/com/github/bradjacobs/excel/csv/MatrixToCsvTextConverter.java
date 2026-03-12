@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in 'LICENSE' file.
  */
-package com.github.bradjacobs.excel;
+package com.github.bradjacobs.excel.csv;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import static com.github.bradjacobs.excel.QuoteMode.ALWAYS;
-import static com.github.bradjacobs.excel.QuoteMode.LENIENT;
-import static com.github.bradjacobs.excel.QuoteMode.NEVER;
-import static com.github.bradjacobs.excel.QuoteMode.NORMAL;
+import static com.github.bradjacobs.excel.csv.QuoteMode.ALWAYS;
+import static com.github.bradjacobs.excel.csv.QuoteMode.LENIENT;
+import static com.github.bradjacobs.excel.csv.QuoteMode.NEVER;
+import static com.github.bradjacobs.excel.csv.QuoteMode.NORMAL;
 
 /**
  * Given a 2-D string array, escape each value to make csv-compatible and

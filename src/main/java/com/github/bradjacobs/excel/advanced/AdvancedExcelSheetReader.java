@@ -1,7 +1,7 @@
 package com.github.bradjacobs.excel.advanced;
 
 import com.github.bradjacobs.excel.AbstractExcelSheetReader;
-import com.github.bradjacobs.excel.SheetConfig;
+import com.github.bradjacobs.excel.config.SheetConfig;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;

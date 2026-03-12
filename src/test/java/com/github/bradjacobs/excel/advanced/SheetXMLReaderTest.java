@@ -1,6 +1,6 @@
 package com.github.bradjacobs.excel.advanced;
 
-import com.github.bradjacobs.excel.SheetConfig;
+import com.github.bradjacobs.excel.config.SheetConfig;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Row;

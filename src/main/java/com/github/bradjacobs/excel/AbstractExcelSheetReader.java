@@ -3,6 +3,9 @@
  */
 package com.github.bradjacobs.excel;
 
+import com.github.bradjacobs.excel.config.SheetConfig;
+import com.github.bradjacobs.excel.io.InputStreamGenerator;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +19,7 @@ import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitize
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
 import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
 
-abstract public class AbstractExcelSheetReader implements ExcelSheetDataExtractor {
+abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
     protected static final InputStreamGenerator inputStreamGenerator = new InputStreamGenerator();
     private static final String DEFAULT_PASSWORD = null;

@@ -5,6 +5,10 @@ package com.github.bradjacobs.excel;
 
 import com.github.bradjacobs.excel.AbstractExcelSheetReader.AbstractSheetConfigBuilder;
 import com.github.bradjacobs.excel.advanced.AdvancedExcelSheetReader;
+import com.github.bradjacobs.excel.config.SheetConfig;
+import com.github.bradjacobs.excel.csv.MatrixToCsvTextConverter;
+import com.github.bradjacobs.excel.csv.QuoteMode;
+import com.github.bradjacobs.excel.io.InputStreamGenerator;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.poifs.filesystem.FileMagic;
@@ -31,8 +35,8 @@ public class ExcelReader {
     private final boolean saveUnicodeFileWithBom;
     private final boolean useAdvancedReader;
     private final MatrixToCsvTextConverter matrixToCsvTextConverter;
-    private final ExcelSheetDataExtractor excelSheetReader;
-    private final ExcelSheetDataExtractor advancedExcelSheetReader;
+    private final ExcelSheetReader excelSheetReader;
+    private final ExcelSheetReader advancedExcelSheetReader;
 
     private static final Set<String> ALLOWED_OUTPUT_FILE_EXTENSIONS = Set.of("csv", "txt", "");
     private static final String BOM = "\uFEFF"; // byte order marker for files with unicode.
@@ -47,7 +51,7 @@ public class ExcelReader {
         this.useAdvancedReader = builder.useAdvancedReader;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         SheetConfig sheetConfig = builder.buildConfig();
-        this.excelSheetReader = new ExcelSheetReader(sheetConfig);
+        this.excelSheetReader = new StandardExcelSheetReader(sheetConfig);
         this.advancedExcelSheetReader = new AdvancedExcelSheetReader(sheetConfig);
         this.inputStreamGenerator = new InputStreamGenerator();
     }
@@ -90,7 +94,7 @@ public class ExcelReader {
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
         final boolean advancedMode = this.useAdvancedReader && isOOXMLStream(inputStream);
         final boolean hasSheetName = StringUtils.isNotEmpty(this.sheetName);
-        final ExcelSheetDataExtractor reader = advancedMode
+        final ExcelSheetReader reader = advancedMode
                 ? advancedExcelSheetReader
                 : excelSheetReader;
 

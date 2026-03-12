@@ -1,4 +1,6 @@
-package com.github.bradjacobs.excel;
+package com.github.bradjacobs.excel.config;
+
+import com.github.bradjacobs.excel.SpecialCharacterSanitizer;
 
 import java.util.Collections;
 import java.util.Set;

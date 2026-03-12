@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
+import com.github.bradjacobs.excel.csv.QuoteMode;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
