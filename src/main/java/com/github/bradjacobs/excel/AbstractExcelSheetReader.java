@@ -151,27 +151,27 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
         }
 
         public B sanitizeSpaces(boolean sanitizeSpaces) {
-            return setSanitizeFlag(SPACES, sanitizeSpaces);
+            return setSanitizeType(SPACES, sanitizeSpaces);
         }
 
         public B sanitizeQuotes(boolean sanitizeQuotes) {
-            return setSanitizeFlag(QUOTES, sanitizeQuotes);
+            return setSanitizeType(QUOTES, sanitizeQuotes);
         }
 
         public B sanitizeDiacritics(boolean sanitizeDiacritics) {
-            return setSanitizeFlag(BASIC_DIACRITICS, sanitizeDiacritics);
+            return setSanitizeType(BASIC_DIACRITICS, sanitizeDiacritics);
         }
 
         public B sanitizeDashes(boolean sanitizeDashes) {
-            return setSanitizeFlag(DASHES, sanitizeDashes);
+            return setSanitizeType(DASHES, sanitizeDashes);
         }
 
-        private B setSanitizeFlag(SpecialCharacterSanitizer.SanitizeType flag, boolean shouldAdd) {
+        private B setSanitizeType(SpecialCharacterSanitizer.SanitizeType type, boolean shouldAdd) {
             if (shouldAdd) {
-                this.sanitizeTypes.add(flag);
+                this.sanitizeTypes.add(type);
             }
             else {
-                this.sanitizeTypes.remove(flag);
+                this.sanitizeTypes.remove(type);
             }
             return self();
         }
