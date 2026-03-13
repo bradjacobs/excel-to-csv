@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.QUOTES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -46,8 +46,8 @@ public class CellValueReaderTest {
 
     @Test
     public void withDiacriticsSet() {
-        Set<SpecialCharacterSanitizer.CharSanitizeFlag> flagSet = Set.of(BASIC_DIACRITICS);
-        CellValueReader cellValueReader = new CellValueReader(true, flagSet);
+        Set<SpecialCharacterSanitizer.SanitizeType> typeSet = Set.of(BASIC_DIACRITICS);
+        CellValueReader cellValueReader = new CellValueReader(true, typeSet);
         Cell cell = createMockStringCell("Façade");
         String result = cellValueReader.getCellValue(cell);
         assertEquals("Facade", result, "mismatch expected cell value");
@@ -84,12 +84,12 @@ public class CellValueReaderTest {
     }
 
     @Test
-    public void nullSanitizeFlags() {
-        // sanitize flags parameter must be non-null
+    public void nullSanitizeTypes() {
+        // sanitize types parameter must be non-null
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new CellValueReader(true, null);
         });
-        assertEquals("Must provide non-null charSanitizeFlags.", exception.getMessage(), "Mismatch exception message");
+        assertEquals("Must provide non-null sanitizeTypes.", exception.getMessage(), "Mismatch exception message");
     }
 
     /**

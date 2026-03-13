@@ -14,10 +14,10 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.DASHES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.SPACES;
 
 abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
@@ -108,7 +108,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
         protected boolean removeBlankRows = false;
         protected boolean removeBlankColumns = false;
         protected boolean removeInvisibleCells = false;
-        protected Set<SpecialCharacterSanitizer.CharSanitizeFlag> charSanitizeFlags
+        protected Set<SpecialCharacterSanitizer.SanitizeType> sanitizeTypes
                 = new HashSet<>(SpecialCharacterSanitizer.DEFAULT_FLAGS);
 
         protected abstract B self();
@@ -166,19 +166,13 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
             return setSanitizeFlag(DASHES, sanitizeDashes);
         }
 
-        private B setSanitizeFlag(SpecialCharacterSanitizer.CharSanitizeFlag flag, boolean shouldAdd) {
+        private B setSanitizeFlag(SpecialCharacterSanitizer.SanitizeType flag, boolean shouldAdd) {
             if (shouldAdd) {
-                this.charSanitizeFlags.add(flag);
+                this.sanitizeTypes.add(flag);
             }
             else {
-                this.charSanitizeFlags.remove(flag);
+                this.sanitizeTypes.remove(flag);
             }
-            return self();
-        }
-
-        // Ability to set the entire Set of SpecialCharSanitizers has limited access.
-        protected B charSanitizeFlags(Set<SpecialCharacterSanitizer.CharSanitizeFlag> charSanitizeFlags) {
-            this.charSanitizeFlags = charSanitizeFlags;
             return self();
         }
 
@@ -188,7 +182,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
                     removeBlankColumns,
                     removeInvisibleCells,
                     autoTrim,
-                    charSanitizeFlags);
+                    sanitizeTypes);
         }
 
         abstract public T build();

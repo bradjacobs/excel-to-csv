@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
+import com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,10 +18,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.DASHES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.SPACES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -146,16 +146,16 @@ public class SpecialCharacterSanitizerTest {
     }
 
     @Test
-    public void validateNullFlagsParameter() {
+    public void validateNullTypesParameter() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new SpecialCharacterSanitizer((Set<CharSanitizeFlag>) null);
+            new SpecialCharacterSanitizer((Set<SanitizeType>) null);
         });
-        assertEquals("Must provide non-null charSanitizeFlags.", exception.getMessage());
+        assertEquals("Must provide non-null sanitizeTypes.", exception.getMessage());
 
         Exception exception2 = assertThrows(IllegalArgumentException.class, () -> {
-            new SpecialCharacterSanitizer((CharSanitizeFlag[]) null);
+            new SpecialCharacterSanitizer((SpecialCharacterSanitizer.SanitizeType[]) null);
         });
-        assertEquals("Must provide non-null charSanitizeFlags.", exception2.getMessage());
+        assertEquals("Must provide non-null sanitizeTypes.", exception2.getMessage());
     }
 
     @Test

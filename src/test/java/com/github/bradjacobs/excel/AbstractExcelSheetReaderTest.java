@@ -3,7 +3,6 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
 import com.github.bradjacobs.excel.util.TestExcelFileSheetUtils;
 import com.github.bradjacobs.excel.util.TestResourceUtil;
 import org.junit.jupiter.api.Nested;
@@ -20,10 +19,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.DASHES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.SPACES;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -263,7 +262,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class SanitizeTests {
         private final List<Arguments> sanitizeCases = Arrays.asList(
-                // flagType, originalValue, sanitizedValue, isDefaultEnabled
+                // sanitizeType, originalValue, sanitizedValue, isDefaultEnabled
                 arguments(named("nbsp-spaces", SPACES), "aa\u00a0bb", "aa bb", true),
                 arguments(named("doubleSmart-quotes", QUOTES), "with_“x”_val", "with_\"x\"_val", true),
                 arguments(named("singleSmart-quotes", QUOTES), "‘hi’", "'hi'", true),
@@ -274,7 +273,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         @ParameterizedTest
         @FieldSource("sanitizeCases")
         public void sanitizeSheet(
-                CharSanitizeFlag flag,
+                SpecialCharacterSanitizer.SanitizeType type,
                 String origValue,
                 String sanitizedValue,
                 boolean isDefaultEnabled,
@@ -283,8 +282,8 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
             Path testFile = TestExcelFileSheetUtils.createSingleCellExcelFile(tempDir, origValue);
 
             // create readers set to both enabled and disabled
-            T enabledSheetReader = createSanitizeSheetReader(flag, true);
-            T disabledSheetReader = createSanitizeSheetReader(flag, false);
+            T enabledSheetReader = createSanitizeSheetReader(type, true);
+            T disabledSheetReader = createSanitizeSheetReader(type, false);
 
             // ensure that each reader returns correct expected value.
             String[][] enabledMatrix = enabledSheetReader.readExcelSheetData(testFile, 0);
@@ -301,9 +300,9 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
             }
         }
 
-        private T createSanitizeSheetReader(CharSanitizeFlag flag, boolean enabled) {
+        private T createSanitizeSheetReader(SpecialCharacterSanitizer.SanitizeType type, boolean enabled) {
             B builder = createBuilder();
-            switch (flag) {
+            switch (type) {
                 case SPACES:
                     return builder.sanitizeSpaces(enabled).build();
                 case QUOTES:
@@ -313,7 +312,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
                 case BASIC_DIACRITICS:
                     return builder.sanitizeDiacritics(enabled).build();
                 default:
-                    throw new IllegalArgumentException("Unabled CharSanitizeFlag: " + flag);
+                    throw new IllegalArgumentException("Unhandled SanitizeType: " + type);
             }
         }
     }

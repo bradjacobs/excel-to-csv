@@ -11,19 +11,19 @@ public class SheetConfig {
     private final boolean removeBlankColumns;
     private final boolean removeInvisibleCells;
     private final boolean autoTrim;
-    private final Set<SpecialCharacterSanitizer.CharSanitizeFlag> charSanitizeFlags;
+    private final Set<SpecialCharacterSanitizer.SanitizeType> sanitizeTypes;
 
     public SheetConfig(
             boolean removeBlankRows,
             boolean removeBlankColumns,
             boolean removeInvisibleCells,
             boolean autoTrim,
-            Set<SpecialCharacterSanitizer.CharSanitizeFlag> charSanitizeFlags) {
+            Set<SpecialCharacterSanitizer.SanitizeType> sanitizeTypes) {
         this.removeBlankRows = removeBlankRows;
         this.removeBlankColumns = removeBlankColumns;
         this.removeInvisibleCells = removeInvisibleCells;
         this.autoTrim = autoTrim;
-        this.charSanitizeFlags = Collections.unmodifiableSet(charSanitizeFlags);
+        this.sanitizeTypes = Collections.unmodifiableSet(sanitizeTypes);
     }
 
     public boolean isRemoveBlankRows() {
@@ -42,7 +42,7 @@ public class SheetConfig {
         return autoTrim;
     }
 
-    public Set<SpecialCharacterSanitizer.CharSanitizeFlag> getCharSanitizeFlags() {
-        return charSanitizeFlags;
+    public Set<SpecialCharacterSanitizer.SanitizeType> getCharSanitizeFlags() {
+        return sanitizeTypes;
     }
 }

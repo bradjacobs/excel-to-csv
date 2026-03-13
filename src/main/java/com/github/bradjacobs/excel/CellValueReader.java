@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag;
+import com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 
@@ -24,9 +24,9 @@ public class CellValueReader {
     private final boolean autoTrim;
     private final SpecialCharacterSanitizer specialCharSanitizer;
 
-    public CellValueReader(boolean autoTrim, Set<CharSanitizeFlag> charSanitizeFlags) {
+    public CellValueReader(boolean autoTrim, Set<SanitizeType> sanitizeTypes) {
         this.autoTrim = autoTrim;
-        this.specialCharSanitizer = new SpecialCharacterSanitizer(charSanitizeFlags);
+        this.specialCharSanitizer = new SpecialCharacterSanitizer(sanitizeTypes);
     }
 
     /**

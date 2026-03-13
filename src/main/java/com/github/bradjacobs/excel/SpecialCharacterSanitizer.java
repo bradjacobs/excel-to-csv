@@ -14,10 +14,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.DASHES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.CharSanitizeFlag.SPACES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.SPACES;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -28,7 +28,7 @@ import static java.util.stream.Collectors.toMap;
 public class SpecialCharacterSanitizer {
 
     // enums to define the types of sanitizations to perform
-    public enum CharSanitizeFlag {
+    public enum SanitizeType {
         SPACES, // replace special space characters with normal space 0x20 (note '\n','\r','\t' are _NOT_ considered)
         QUOTES, // replace special quotes (like smart quotes) with normal single/double quote character
         DASHES, // replace special dashes with basic dash '-' character
@@ -36,7 +36,7 @@ public class SpecialCharacterSanitizer {
     }
 
     // by default, handle spaces and quotes
-    public static final Set<CharSanitizeFlag> DEFAULT_FLAGS = Set.of(SPACES, QUOTES);
+    public static final Set<SanitizeType> DEFAULT_FLAGS = Set.of(SPACES, QUOTES);
     private static final Character SPACE_CHAR = ' ';
 
     private final Map<Character, Character> replacementMap;
@@ -45,15 +45,15 @@ public class SpecialCharacterSanitizer {
         this(DEFAULT_FLAGS);
     }
 
-    public SpecialCharacterSanitizer(CharSanitizeFlag... charSanitizeFlags) {
-        this(charSanitizeFlags != null ? Arrays.asList(charSanitizeFlags) : null);
+    public SpecialCharacterSanitizer(SanitizeType... sanitizeTypes) {
+        this(sanitizeTypes != null ? Arrays.asList(sanitizeTypes) : null);
     }
 
-    public SpecialCharacterSanitizer(Collection<CharSanitizeFlag> charSanitizeFlags) {
-        if (charSanitizeFlags == null) {
-            throw new IllegalArgumentException("Must provide non-null charSanitizeFlags.");
+    public SpecialCharacterSanitizer(Collection<SanitizeType> sanitizeTypes) {
+        if (sanitizeTypes == null) {
+            throw new IllegalArgumentException("Must provide non-null sanitizeTypes.");
         }
-        this.replacementMap = buildReplacementMap(charSanitizeFlags);
+        this.replacementMap = buildReplacementMap(sanitizeTypes);
     }
 
     /**
@@ -81,10 +81,10 @@ public class SpecialCharacterSanitizer {
     /**
      * Generate replacement map for the given charSanitizeFlags.
      */
-    private static Map<Character, Character> buildReplacementMap(Collection<CharSanitizeFlag> charSanitizeFlags) {
+    private static Map<Character, Character> buildReplacementMap(Collection<SanitizeType> sanitizeTypes) {
         Map<Character, Character> map = new HashMap<>();
-        for (CharSanitizeFlag charSanitizeFlag : charSanitizeFlags) {
-            map.putAll(FLAG_REPLACEMENT_LOOKUP_MAP.get(charSanitizeFlag));
+        for (SanitizeType sanitizeType : sanitizeTypes) {
+            map.putAll(FLAG_REPLACEMENT_LOOKUP_MAP.get(sanitizeType));
         }
         return map;
     }
@@ -172,7 +172,7 @@ public class SpecialCharacterSanitizer {
     };
 
     private static final
-    Map<CharSanitizeFlag, Map<Character, Character>> FLAG_REPLACEMENT_LOOKUP_MAP
+    Map<SanitizeType, Map<Character, Character>> FLAG_REPLACEMENT_LOOKUP_MAP
             = Map.of(
                     SPACES, generateSpaceReplacementMap(),
                     QUOTES, generateQuoteReplacementMap(),
