@@ -1,3 +1,6 @@
+/*
+ * This file is subject to the terms and conditions defined in 'LICENSE' file.
+ */
 package com.github.bradjacobs.excel.util;
 
 import org.apache.commons.io.IOUtils;
