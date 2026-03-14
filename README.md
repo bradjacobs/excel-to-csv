@@ -182,14 +182,15 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 <details>
   <summary>Todo Item List... (Click To Expand)</summary>
 
-* Put a more legitimate project version in the pom.xml
-* Consider making a 'release version' or something that can be referenced via maven dependency
+* Refactor and update ExcelSheetReaderFactory with builder, to make easier if just want the data matrix from a sheet.
+  * Needs to be better coordinated with the current builders on the impl classes. 
+* General Unittest cleanup and add more tests (ongoing)
 * Integrate a real logger into the code.
 * Address any of the "Known Cell Data Issues" (above) if possible
 * Add more JavaDocs
+* Put a more legitimate project version in the pom.xml
+* Consider making a 'release version' or something that can be referenced via maven dependency
 * Reorganize Excel Test data for Junit tests.
-* Add more unittests (particularly around cell format scenarios)
-* General Unittest cleanup
 * The pom.xml could use some cleanup and organization.
 </details>
 

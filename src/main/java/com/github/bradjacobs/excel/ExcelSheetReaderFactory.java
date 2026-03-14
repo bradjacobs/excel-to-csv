@@ -8,6 +8,9 @@ import com.github.bradjacobs.excel.api.ExcelSheetReader;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.standard.StandardExcelSheetReader;
 
+// TODO - refactor to make this easier to call.
+//   like use builder pattern so caller doesn't need
+//   to deal with making the full SheetConfig.
 public class ExcelSheetReaderFactory {
 
     public enum ReaderType {
