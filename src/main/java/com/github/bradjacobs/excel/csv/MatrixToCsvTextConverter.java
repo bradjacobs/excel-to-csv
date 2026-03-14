@@ -21,13 +21,9 @@ import static com.github.bradjacobs.excel.csv.QuoteMode.NORMAL;
  * combine to be final csv text string.
  */
 public class MatrixToCsvTextConverter {
-    // a string that has a character below this ascii value should be quoted. (Normal Mode)
-    private static final int NORMAL_CRITERIA_MINIMUM = 45;
-
-    // a string with any of these explicit characters should be quoted. (Lenient Mode)
-    private static final Set<Character> MINIMAL_QUOTE_CHARACTERS =
+    private static final int NORMAL_QUOTE_ASCII_THRESHOLD = 45;
+    private static final Set<Character> LENIENT_QUOTE_CHARACTERS =
             new HashSet<>(Set.of('"', ',', '\t', '\r', '\n'));
-
     private static final String NEW_LINE = System.lineSeparator();
 
     private final Predicate<String> quoteRule;
@@ -98,14 +94,36 @@ public class MatrixToCsvTextConverter {
         return dataMatrix == null || dataMatrix.length == 0 || dataMatrix[0].length == 0;
     }
 
-    // Below is the logic if a value should be quoted, depending on the quoteMode.
-    private static final Predicate<Character> IS_LOW_ASCII_CHAR = c -> c < NORMAL_CRITERIA_MINIMUM;
-    private static final Predicate<Character> IS_MIN_CHAR = MINIMAL_QUOTE_CHARACTERS::contains;
+    /**
+     * Check if any characters in the given string match the character predicate.
+     * @param value input string
+     * @param characterRule Predicate used to test each charcter in the string.
+     * @return true if there is at least one character match.
+     */
+    private static boolean containsMatchingCharacter(String value, Predicate<Character> characterRule) {
+        if (StringUtils.isEmpty(value)) {
+            return false;
+        }
 
-    private static final Predicate<String> NEVER_QUOTE_RULE = s -> false;
-    private static final Predicate<String> ALWAYS_QUOTE_RULE = s -> !StringUtils.isEmpty(s);
-    private static final Predicate<String> NORMAL_QUOTE_RULE = new CharRulePredicate(IS_LOW_ASCII_CHAR);
-    private static final Predicate<String> LENIENT_QUOTE_RULE = new CharRulePredicate(IS_MIN_CHAR);
+        for (int i = 0; i < value.length(); i++) {
+            if (characterRule.test(value.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static final Predicate<Character> IS_LOW_ASCII_CHAR =
+            character -> character < NORMAL_QUOTE_ASCII_THRESHOLD;
+    private static final Predicate<Character> IS_LENIENT_QUOTE_CHARACTER =
+            LENIENT_QUOTE_CHARACTERS::contains;
+
+    private static final Predicate<String> NEVER_QUOTE_RULE = value -> false;
+    private static final Predicate<String> ALWAYS_QUOTE_RULE = value -> !StringUtils.isEmpty(value);
+    private static final Predicate<String> NORMAL_QUOTE_RULE =
+            value -> containsMatchingCharacter(value, IS_LOW_ASCII_CHAR);
+    private static final Predicate<String> LENIENT_QUOTE_RULE =
+            value -> containsMatchingCharacter(value, IS_LENIENT_QUOTE_CHARACTER);
 
     private static final Map<QuoteMode, Predicate<String>> QUOTE_RULE_MAP = Map.of(
             NEVER, NEVER_QUOTE_RULE,
@@ -113,24 +131,4 @@ public class MatrixToCsvTextConverter {
             NORMAL, NORMAL_QUOTE_RULE,
             LENIENT, LENIENT_QUOTE_RULE
     );
-
-    private static class CharRulePredicate implements Predicate<String> {
-        private final Predicate<Character> charPredicate;
-        public CharRulePredicate(Predicate<Character> charPredicate) {
-            this.charPredicate = charPredicate;
-        }
-
-        @Override
-        public boolean test(String value) {
-            if (StringUtils.isEmpty(value)) {
-                return false;
-            }
-            for (int i = 0; i < value.length(); i++) {
-                if (charPredicate.test(value.charAt(i))) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
 }
