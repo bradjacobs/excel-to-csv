@@ -3,8 +3,8 @@
  */
 package com.github.bradjacobs.excel.core;
 
-import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.api.ExcelSheetReader;
+import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.util.TestExcelFileSheetUtils;
 import com.github.bradjacobs.excel.util.TestResourceUtil;
 import org.junit.jupiter.api.Nested;

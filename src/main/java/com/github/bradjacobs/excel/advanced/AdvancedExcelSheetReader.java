@@ -3,8 +3,8 @@
  */
 package com.github.bradjacobs.excel.advanced;
 
-import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
 import com.github.bradjacobs.excel.config.SheetConfig;
+import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -33,7 +33,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
     /**
      * Constructor
      */
-    // TODO - change to be not public to enforce the builder.
+    // TODO: Maybe change constructor to non-public
     public AdvancedExcelSheetReader(SheetConfig config) {
         this.sheetConfig = config;
     }

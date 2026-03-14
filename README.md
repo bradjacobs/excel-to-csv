@@ -182,8 +182,6 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 <details>
   <summary>Todo Item List... (Click To Expand)</summary>
 
-* Refactor and update ExcelSheetReaderFactory with builder, to make easier if just want the data matrix from a sheet.
-  * Needs to be better coordinated with the current builders on the impl classes. 
 * General Unittest cleanup and add more tests (ongoing)
 * Integrate a real logger into the code.
 * Address any of the "Known Cell Data Issues" (above) if possible

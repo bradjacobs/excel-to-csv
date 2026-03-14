@@ -3,9 +3,9 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.core.AbstractExcelSheetReader.AbstractSheetConfigBuilder;
-import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.api.ExcelSheetReader;
+import com.github.bradjacobs.excel.config.SheetConfig;
+import com.github.bradjacobs.excel.core.AbstractExcelSheetReader.AbstractSheetConfigBuilder;
 import com.github.bradjacobs.excel.csv.MatrixToCsvTextConverter;
 import com.github.bradjacobs.excel.csv.QuoteMode;
 import com.github.bradjacobs.excel.io.InputStreamGenerator;

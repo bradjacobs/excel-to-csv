@@ -3,9 +3,9 @@
  */
 package com.github.bradjacobs.excel.advanced;
 
+import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.CellValueReader;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
-import com.github.bradjacobs.excel.config.SheetConfig;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.SharedStrings;
 import org.apache.poi.xssf.model.StylesTable;
