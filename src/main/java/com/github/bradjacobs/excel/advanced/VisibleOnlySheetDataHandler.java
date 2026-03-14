@@ -7,7 +7,7 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 /**
  * SpecialSheetHandler that only processes visible rows and columns.
  */
-class VisibleOnlySpecialSheetHandler extends SpecialSheetHandler {
+class VisibleOnlySheetDataHandler extends SheetDataHandler {
 
     private final SheetContext sheetContext;
 
@@ -16,7 +16,7 @@ class VisibleOnlySpecialSheetHandler extends SpecialSheetHandler {
      */
     private int lastProcessedRowIndex = -1;
 
-    public VisibleOnlySpecialSheetHandler(
+    public VisibleOnlySheetDataHandler(
             SheetConfig sheetConfig,
             StringRowConsumer stringRowConsumer,
             SheetContext sheetContext) {

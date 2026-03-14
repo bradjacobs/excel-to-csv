@@ -14,7 +14,7 @@ import java.util.List;
 // todo: some of the logic is a little squirrely,
 //   but want to first confirm all edge cases work correctly
 //   and unittests are in place before doing refactor.
-class SpecialSheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
+class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     protected static final String EMPTY_CELL = "";
 
     private static final String EXCEL_ERROR_PREFIX = "ERROR:#";
@@ -26,7 +26,7 @@ class SpecialSheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     protected final List<String> currentRowValues = new ArrayList<>();
 
-    public SpecialSheetHandler(SheetConfig sheetConfig, StringRowConsumer stringRowConsumer) {
+    public SheetDataHandler(SheetConfig sheetConfig, StringRowConsumer stringRowConsumer) {
         this.sheetConfig = sheetConfig;
         this.cellValueReader = new CellValueReader(
                 sheetConfig.isAutoTrim(),
