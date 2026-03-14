@@ -421,9 +421,9 @@ public class StringRowConsumerTest {
 
     /**
      *
-     * @param consumer
-     * @param input
-     * @param expected
+     * @param consumer consumer
+     * @param input actual matrix output
+     * @param expected expected matrix output
      */
     private void runConsumerTest(StringRowConsumer consumer, String[][] input, String[][] expected) {
         for (String[] inputRow : input) {

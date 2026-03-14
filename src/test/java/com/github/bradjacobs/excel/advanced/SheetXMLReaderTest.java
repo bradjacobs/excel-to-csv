@@ -244,7 +244,7 @@ class SheetXMLReaderTest {
     }
 
     private static InputStream firstSheetStream(XSSFReader reader) throws IOException, InvalidFormatException {
-        XSSFReader.SheetIterator it = (XSSFReader.SheetIterator) reader.getSheetIterator();
+        XSSFReader.SheetIterator it = reader.getSheetIterator();
         assertTrue(it.hasNext(), "workbook must contain at least one sheet");
         return it.next();
     }

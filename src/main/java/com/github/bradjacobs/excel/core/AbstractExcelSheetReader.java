@@ -131,7 +131,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
         protected boolean removeBlankRows = false;
         protected boolean removeBlankColumns = false;
         protected boolean removeInvisibleCells = false;
-        protected Set<SanitizeType> sanitizeTypes
+        protected final Set<SanitizeType> sanitizeTypes
                 = new HashSet<>(SpecialCharacterSanitizer.DEFAULT_FLAGS);
 
         protected abstract B self();

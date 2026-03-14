@@ -97,7 +97,7 @@ public class MatrixToCsvTextConverter {
     /**
      * Check if any characters in the given string match the character predicate.
      * @param value input string
-     * @param characterRule Predicate used to test each charcter in the string.
+     * @param characterRule Predicate used to test each character in the string.
      * @return true if there is at least one character match.
      */
     private static boolean containsMatchingCharacter(String value, Predicate<Character> characterRule) {

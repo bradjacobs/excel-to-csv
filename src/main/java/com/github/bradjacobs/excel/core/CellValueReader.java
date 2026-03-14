@@ -50,7 +50,7 @@ public class CellValueReader {
         //}
 
         // return a sanitized version of the cell value which is trimmed (if configured)
-        // plus convert any special unicode characters (like nbsp or smart quotes),
+        // plus convert any special Unicode characters (like nbsp or smart quotes),
         // as necessary.
         return sanitizeCellValue(cellValue);
 
@@ -60,7 +60,7 @@ public class CellValueReader {
         if (inputValue == null) {
             return "";
         }
-        // if there are any certain special unicode characters (like nbsp or smart quotes),
+        // if there are any certain special Unicode characters (like nbsp or smart quotes),
         // replace w/ normal character equivalent
         String resultValue = specialCharSanitizer.sanitize(inputValue);
 

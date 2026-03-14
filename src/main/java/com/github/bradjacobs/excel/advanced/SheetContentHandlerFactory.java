@@ -13,8 +13,6 @@ import org.xml.sax.ContentHandler;
 
 /**
  * Creates the appropriate sheet ContentHandler implementation based on SheetConfig.
- *
- * Keeping this logic in a separate class reduces branching and constructor complexity in SheetXMLReader.
  */
 final class SheetContentHandlerFactory {
 

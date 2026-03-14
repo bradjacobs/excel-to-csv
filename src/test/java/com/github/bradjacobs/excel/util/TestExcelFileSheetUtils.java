@@ -67,7 +67,7 @@ public class TestExcelFileSheetUtils {
     /**
      * Create a test Excel file that contains 1 sheet with 1 cell value.
      *   NOTE: assume that test @TempDir will automatically handle file clean up.
-     * @param tempDir temp directory where the excel file should live
+     * @param tempDir temp directory where the Excel file should live
      * @param cellValue value to set for cell
      * @return Excel Sheet
      */

@@ -144,7 +144,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
     class BlankRowTests {
         /**
          * Compare the diff of row counts with
-         *  removeBlankRows = true vs false
+         *  removeBlankRows = true vs. false
          */
         @Test
         public void removeBlankRows() throws IOException {
@@ -187,7 +187,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
     class BlankColumnTests {
         /**
          * Compare the diff of column counts with
-         *  removeBlankColumns = true vs false
+         *  removeBlankColumns = true vs. false
          */
         @Test
         public void removeBlankColumns() throws IOException {
@@ -224,7 +224,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
          * The HiddenCellsDataFile contains multiple sheets in set of 2.
          *     (TestDataSheet, ExpectedResultsDataSheet)
          * where the ExpectedResultsDataSheet represents what the
-         * data should look like if were to remove/ignore the 'hidden data'
+         * data should look like if it were to remove/ignore the 'hidden data'
          * from the TestDataSheet
          * @param sheetNamePrefix sheetPrefix
          */

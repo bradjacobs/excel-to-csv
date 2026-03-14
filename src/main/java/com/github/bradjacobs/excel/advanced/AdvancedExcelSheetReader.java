@@ -156,7 +156,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
                 resultSheetInputStream = currentSheetStream;
             }
             else {
-                // close the stream stream if it's a non-matching sheet.
+                // close the stream if it's a non-matching sheet.
                 currentSheetStream.close();
             }
             sheetIndex++;
@@ -167,7 +167,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
 
     /**
      * Handle any input stream preprocessing. Such as decrypting
-     * the stream if password protected and ensuring it's a supported OOXML type..
+     * the stream if password protected and ensuring it's a supported OOXML type.
      */
     private InputStream preprocessFileInputStream(InputStream is, String password) throws IOException {
         InputStream resultStream = FileMagic.prepareToCheckMagic(is);

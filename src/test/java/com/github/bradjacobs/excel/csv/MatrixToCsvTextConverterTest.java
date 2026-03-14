@@ -81,7 +81,7 @@ public class MatrixToCsvTextConverterTest {
     @Test
     public void invalidNullQuoteMode() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            MatrixToCsvTextConverter converter = new MatrixToCsvTextConverter(null);
+            new MatrixToCsvTextConverter(null);
         });
         assertEquals("QuoteMode cannot be null.", exception.getMessage());
     }

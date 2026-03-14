@@ -136,7 +136,7 @@ public class ExcelReaderTest {
         assertEquals("", csvText, "expected empty csv text");
     }
 
-    // Happy Path testcase reading an Excel file that is password protected.
+    // Happy Path testcase reading an Excel file that is password-protected.
     @Test
     public void testReadPasswordProtectedFile() throws Exception {
         URL resourceUrl = getResourceFileUrl("test_data_w_pswd_1234.xlsx");
@@ -147,7 +147,7 @@ public class ExcelReaderTest {
     }
 
     @Test
-    public void testFilterBlankCoumns() throws Exception {
+    public void testFilterBlankColumns() throws Exception {
         URL resourceUrl = getResourceFileUrl("repro.xlsx");
         ExcelReader excelReader = ExcelReader.builder()
                 .sheetName("WithBlankColumns1")
@@ -158,7 +158,7 @@ public class ExcelReaderTest {
     }
 
     @Test
-    public void testFilterFirstBlankCoumns() throws Exception {
+    public void testFilterFirstBlankColumns() throws Exception {
         URL resourceUrl = getResourceFileUrl("repro.xlsx");
         ExcelReader excelReader = ExcelReader.builder()
                 .sheetName("WithBlankColumns2")
@@ -201,7 +201,7 @@ public class ExcelReaderTest {
         }
 
         // if the output csv file saved does NOT have any unicode,
-        //  then the 'SaveUnicodeFileWithBom' flag should have no effect.
+        //  then the 'saveUnicodeFileWithBom' flag should have no effect.
         @Test
         public void testBomFlagWithoutUnicode(@TempDir Path tempDir) throws Exception {
             File testOutputFile1 = tempDir.resolve("test_bom_flag_off.csv").toFile();
