@@ -14,7 +14,7 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 import java.util.ArrayList;
 import java.util.List;
 
-// todo: some of the logic is a little squirrely,
+// todo: some of the logic is a little squirrelly,
 //   but want to first confirm all edge cases work correctly
 //   and unittests are in place before doing refactor.
 class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
@@ -58,7 +58,7 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     @Override
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
         if (StringUtils.isEmpty(cellReference)) {
-            // todo: just throw an exception if missing cellRefernce
+            // todo: just throw an exception if missing cellReference
             //    other online 'solutions' show a way to manually track the column index,
             //    but it seems to often be incorrect and would write cell data in incorrect column.
             throw new IllegalStateException(
@@ -108,7 +108,7 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     }
 
     /**
-     * remove the first part of error string to be consistent
+     * remove the first part of an error string to be consistent
      * with the behavior of reading cell values from Cell/Row/Sheet objects
      */
     private String removeExcelErrorPrefix(String input) {
