@@ -33,6 +33,26 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
         org.apache.poi.util.IOUtils.setByteArrayMaxOverride(Integer.MAX_VALUE);
     }
 
+    @Override
+    public String[][] readExcelSheetData(File excelFile) throws IOException {
+        return readExcelSheetData(excelFile, 0);
+    }
+
+    @Override
+    public String[][] readExcelSheetData(Path excelFile) throws IOException {
+        return readExcelSheetData(excelFile, 0);
+    }
+
+    @Override
+    public String[][] readExcelSheetData(URL excelFileUrl) throws IOException {
+        return readExcelSheetData(excelFileUrl, 0);
+    }
+
+    @Override
+    public String[][] readExcelSheetData(InputStream inputStream) throws IOException {
+        return readExcelSheetData(inputStream, 0);
+    }
+
     // Variations of reading Excel Sheet via sheet Index.
     @Override
     public String[][] readExcelSheetData(File excelFile, int sheetIndex) throws IOException {

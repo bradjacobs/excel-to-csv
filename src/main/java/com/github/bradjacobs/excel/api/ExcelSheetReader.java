@@ -11,7 +11,13 @@ import java.nio.file.Path;
 
 // todo javadocs
 public interface ExcelSheetReader {
-    
+
+    // Variations of reading the 'first sheet' of an Excel file.
+    String[][] readExcelSheetData(File excelFile) throws IOException;
+    String[][] readExcelSheetData(Path excelFile) throws IOException;
+    String[][] readExcelSheetData(URL excelFileUrl) throws IOException;
+    String[][] readExcelSheetData(InputStream inputStream) throws IOException;
+
     // Variations of reading Excel Sheet via sheet Index.
     String[][] readExcelSheetData(File excelFile, int sheetIndex) throws IOException;
     String[][] readExcelSheetData(Path excelFile, int sheetIndex) throws IOException;
