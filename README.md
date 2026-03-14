@@ -182,6 +182,8 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 <details>
   <summary>Todo Item List... (Click To Expand)</summary>
 
+* DATE BUG: The 'AdvancedExcelSheetReader' (which is now set by default) can produce incorrect dates if the workbook's "date1904" value is true.
+  * believe this is a rare case, but have seen with an .xlsx file.
 * General Unittest cleanup and add more tests (ongoing)
 * Integrate a real logger into the code.
 * Address any of the "Known Cell Data Issues" (above) if possible
