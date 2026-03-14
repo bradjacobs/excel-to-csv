@@ -3,8 +3,8 @@
  */
 package com.github.bradjacobs.excel.advanced;
 
-import com.github.bradjacobs.excel.CellValueReader;
-import com.github.bradjacobs.excel.StringRowConsumer;
+import com.github.bradjacobs.excel.core.CellValueReader;
+import com.github.bradjacobs.excel.core.StringRowConsumer;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.SharedStrings;
@@ -20,9 +20,7 @@ final class SheetContentHandlerFactory {
 
     private static final boolean FORMULAS_NOT_RESULTS = false;
 
-    private SheetContentHandlerFactory() {
-        // utility class
-    }
+    private SheetContentHandlerFactory() {}
 
     static ContentHandler create(
             SheetConfig sheetConfig,

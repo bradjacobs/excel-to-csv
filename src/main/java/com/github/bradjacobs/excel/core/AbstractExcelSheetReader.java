@@ -1,8 +1,9 @@
 /*
  * This file is subject to the terms and conditions defined in 'LICENSE' file.
  */
-package com.github.bradjacobs.excel;
+package com.github.bradjacobs.excel.core;
 
+import com.github.bradjacobs.excel.api.ExcelSheetReader;
 import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.io.InputStreamGenerator;
@@ -178,7 +179,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
             return self();
         }
 
-        protected SheetConfig buildConfig() {
+        public SheetConfig buildConfig() {
             return new SheetConfig(
                     removeBlankRows,
                     removeBlankColumns,

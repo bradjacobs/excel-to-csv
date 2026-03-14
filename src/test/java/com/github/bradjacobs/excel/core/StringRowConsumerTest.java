@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in 'LICENSE' file.
  */
-package com.github.bradjacobs.excel;
+package com.github.bradjacobs.excel.core;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

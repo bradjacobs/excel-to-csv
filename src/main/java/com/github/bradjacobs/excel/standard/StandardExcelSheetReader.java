@@ -1,9 +1,12 @@
 /*
  * This file is subject to the terms and conditions defined in 'LICENSE' file.
  */
-package com.github.bradjacobs.excel;
+package com.github.bradjacobs.excel.standard;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
+import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
+import com.github.bradjacobs.excel.core.CellValueReader;
+import com.github.bradjacobs.excel.core.StringRowConsumer;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -24,7 +27,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
     protected final CellValueReader cellValueReader;
 
     // todo: still deciding if this constructor is ok or terrible.
-    protected StandardExcelSheetReader(SheetConfig sheetConfig) {
+    public StandardExcelSheetReader(SheetConfig sheetConfig) {
         this.sheetConfig = sheetConfig;
         this.cellValueReader = new CellValueReader(sheetConfig.isAutoTrim(), sheetConfig.getCharSanitizeFlags());
     }
@@ -103,7 +106,10 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         final int columnCount = columnsToRead.length;
         final int maxRequestedColumnIndex = columnsToRead[columnCount-1];
 
-        StringRowConsumer stringRowConsumer = StringRowConsumer.of(sheetConfig.isRemoveBlankRows(), sheetConfig.isRemoveBlankColumns());
+        StringRowConsumer stringRowConsumer =
+                StringRowConsumer.of(
+                        sheetConfig.isRemoveBlankRows(),
+                        sheetConfig.isRemoveBlankColumns());
 
         for (Row row : rowList) {
             List<String> rowValuesList = toRowValues(row, columnsToRead, maxRequestedColumnIndex);

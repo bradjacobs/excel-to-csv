@@ -182,10 +182,6 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 <details>
   <summary>Todo Item List... (Click To Expand)</summary>
 
-* Create an alternate implemenation utilizing POI's 'XSSFSheetXMLHandler' class
-  * preliminary results show it's a lot faster on really big files. 
-  * TBD how (or if) would integrate with existing code.
-* Refactor classes to address circular dependencies between packages
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
 * Integrate a real logger into the code.

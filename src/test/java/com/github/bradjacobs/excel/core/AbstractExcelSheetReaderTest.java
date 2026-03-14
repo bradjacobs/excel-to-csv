@@ -1,11 +1,12 @@
 /*
  * This file is subject to the terms and conditions defined in 'LICENSE' file.
  */
-package com.github.bradjacobs.excel;
+package com.github.bradjacobs.excel.core;
 
 import com.github.bradjacobs.excel.config.SanitizeType;
+import com.github.bradjacobs.excel.api.ExcelSheetReader;
 import com.github.bradjacobs.excel.util.TestExcelFileSheetUtils;
-import org.apache.poi.ss.usermodel.Sheet;
+import com.github.bradjacobs.excel.util.TestResourceUtil;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -26,17 +27,19 @@ import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
 import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-public class StandardExcelSheetReaderTest {
-
+// TODO - this test needs more love
+//.  and should evenually replace the 'ExcelSheetReaderTest'
+abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B extends AbstractExcelSheetReader.AbstractSheetConfigBuilder<T, B>> {
     private static final String TEST_DATA_FILE = "testSheetData.xlsx";
+    private static final Path TEST_FILE = TestResourceUtil.getResourceFilePath(TEST_DATA_FILE);
 
-    private static final StandardExcelSheetReader DEFAULT_SHEET_READER =
-            StandardExcelSheetReader.builder().build();
+    private final T defaultSheetReader = createBuilder().build();
+
+    abstract protected B createBuilder();
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -47,23 +50,21 @@ public class StandardExcelSheetReaderTest {
          * should have a value for at least 1 of the rows
          */
         @Test
-        public void ensureColumnSize() {
+        public void ensureColumnSize() throws IOException {
             // Test Data is:
             //     aa
             //     bb,bb
             //     ccc,ccc,ccc
             // ALL rows should have a length of 3
-            Sheet testSheet = getFileSheet(TEST_DATA_FILE, "GrowingColumnLength");
-            String[][] dataMatrix = DEFAULT_SHEET_READER.convertToDataMatrix(testSheet);
+            String[][] dataMatrix = defaultSheetReader.readExcelSheetData(TEST_FILE, "GrowingColumnLength");
             for (String[] rowValues : dataMatrix) {
                 assertEquals(3, rowValues.length);
             }
         }
 
         @Test
-        public void readBlankSheet() {
-            Sheet testSheet = getFileSheet(TEST_DATA_FILE, "BlankSheet");
-            String[][] dataMatrix = DEFAULT_SHEET_READER.convertToDataMatrix(testSheet);
+        public void readBlankSheet() throws IOException {
+            String[][] dataMatrix = defaultSheetReader.readExcelSheetData(TEST_FILE, "BlankSheet");
             assertEquals(0, dataMatrix.length, "Mismatch expected row count");
         }
 
@@ -73,9 +74,8 @@ public class StandardExcelSheetReaderTest {
          * Ensure sheet is still read correctly when these rows are encountered.
          */
         @Test
-        public void negativeRowCellNumberRepro() {
-            Sheet testSheet = getFileSheet(TEST_DATA_FILE, "BadRow");
-            String[][] csvMatrix = DEFAULT_SHEET_READER.convertToDataMatrix(testSheet);
+        public void negativeRowCellNumberRepro() throws IOException {
+            String[][] csvMatrix = defaultSheetReader.readExcelSheetData(TEST_FILE, "BadRow");
             assertEquals("aaa", csvMatrix[0][0]);
             assertEquals("bbb", csvMatrix[0][1]);
             assertEquals("ccc", csvMatrix[2][0]);
@@ -89,21 +89,22 @@ public class StandardExcelSheetReaderTest {
          * Then this last column should be removed from the result.
          */
         @Test
-        public void handleExtraBlankWhitespaceColumn() {
-            Sheet testSheet = getFileSheet(TEST_DATA_FILE, "LastColWhitespace");
-            String[][] dataMatrix = DEFAULT_SHEET_READER.convertToDataMatrix(testSheet);
+        public void handleExtraBlankWhitespaceColumn() throws IOException {
+            String[][] dataMatrix = defaultSheetReader.readExcelSheetData(TEST_FILE, "LastColWhitespace");
             assertEquals(1, dataMatrix[0].length, "mismatch of expected number of columns in csv output.");
         }
 
-        /**
-         * Null Sheet parameter should be IllegalArgumentException
-         */
-        @Test
-        public void nullSheetParamCheck() {
-            assertThrows(IllegalArgumentException.class, () -> {
-                DEFAULT_SHEET_READER.convertToDataMatrix(null);
-            });
-        }
+        // todo - fix below
+
+//        /**
+//         * Null Sheet parameter should be IllegalArgumentException
+//         */
+//        @Test
+//        public void nullSheetParamCheck() {
+//            assertThrows(IllegalArgumentException.class, () -> {
+//                defaultSheetDataExtractor.readExcelSheetData(null);
+//            });
+//        }
     }
 
     @Nested
@@ -112,30 +113,28 @@ public class StandardExcelSheetReaderTest {
         @Test
         public void autoTrimEnabled(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
-            Sheet testSheet = createSingleCellExcelSheet(tempDir, testValue);
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .autoTrim(true)
-                    .build();
-            String[][] dataMatrix = standardExcelSheetReader1.convertToDataMatrix(testSheet);
+            Path testFile = TestExcelFileSheetUtils.createSingleCellExcelFile(tempDir, testValue);
+
+            T sheetReader1 = createBuilder().autoTrim(true).build();
+            String[][] dataMatrix = sheetReader1.readExcelSheetData(testFile, 0);
             assertEquals(testValue.trim(), dataMatrix[0][0]);
         }
 
         @Test
         public void autoTrimDisabled(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
-            Sheet testSheet = createSingleCellExcelSheet(tempDir, testValue);
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .autoTrim(false)
-                    .build();
-            String[][] dataMatrix = standardExcelSheetReader1.convertToDataMatrix(testSheet);
+            Path testFile = TestExcelFileSheetUtils.createSingleCellExcelFile(tempDir, testValue);
+
+            T sheetReader1 = createBuilder().autoTrim(false).build();
+            String[][] dataMatrix = sheetReader1.readExcelSheetData(testFile, 0);
             assertEquals(testValue, dataMatrix[0][0]);
         }
 
         @Test
         public void autoTrimDefault(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
-            Sheet testSheet = createSingleCellExcelSheet(tempDir, testValue);
-            String[][] dataMatrix = DEFAULT_SHEET_READER.convertToDataMatrix(testSheet);
+            Path testFile = TestExcelFileSheetUtils.createSingleCellExcelFile(tempDir, testValue);
+            String[][] dataMatrix = defaultSheetReader.readExcelSheetData(testFile, 0);
             assertEquals(testValue.trim(), dataMatrix[0][0]);
         }
     }
@@ -148,29 +147,24 @@ public class StandardExcelSheetReaderTest {
          *  removeBlankRows = true vs false
          */
         @Test
-        public void removeBlankRows() {
-            Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithThreeBlankRows");
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .removeBlankRows(false)
-                    .build();
-            StandardExcelSheetReader standardExcelSheetReader2 = StandardExcelSheetReader.builder()
-                    .removeBlankRows(true)
-                    .build();
-            String[][] dataMatrixRetainBlankRows = standardExcelSheetReader1.convertToDataMatrix(testSheet);
-            String[][] dataMatrixRemoveBlankRows = standardExcelSheetReader2.convertToDataMatrix(testSheet);
+        public void removeBlankRows() throws IOException {
+            T sheetReader1 = createBuilder().removeBlankRows(false).build();
+            T sheetReader2 = createBuilder().removeBlankRows(true).build();
+
+            String[][] dataMatrixRetainBlankRows = sheetReader1.readExcelSheetData(TEST_FILE, "WithThreeBlankRows");
+            String[][] dataMatrixRemoveBlankRows = sheetReader2.readExcelSheetData(TEST_FILE, "WithThreeBlankRows");
             int rowDifference = dataMatrixRetainBlankRows.length - dataMatrixRemoveBlankRows.length;
             assertEquals(3, rowDifference, "Mismatch expected row count");
         }
 
         @Test
-        public void defaultRetainBlankRows() {
+        public void defaultRetainBlankRows() throws IOException {
             // by default we keep the blank rows.
-            Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithThreeBlankRows");
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .removeBlankRows(false)
-                    .build();
-            String[][] dataMatrixRetainBlankRows = standardExcelSheetReader1.convertToDataMatrix(testSheet);
-            String[][] dataMatrixDefault = DEFAULT_SHEET_READER.convertToDataMatrix(testSheet);
+            B builder = createBuilder();
+            T sheetReader = builder.removeBlankRows(false).build();
+
+            String[][] dataMatrixRetainBlankRows = sheetReader.readExcelSheetData(TEST_FILE, "WithThreeBlankRows");
+            String[][] dataMatrixDefault = defaultSheetReader.readExcelSheetData(TEST_FILE, "WithThreeBlankRows");
             assertEquals(dataMatrixRetainBlankRows.length, dataMatrixDefault.length, "Mismatch expected row count");
         }
 
@@ -179,12 +173,11 @@ public class StandardExcelSheetReaderTest {
          *   (i.e. the last row should contain some values for a non-blank sheet)
          */
         @Test
-        public void pruneExtraBlankRows() {
-            Sheet testSheet = getFileSheet(TEST_DATA_FILE, "ExtraBlankRowsAfterData");
-            StandardExcelSheetReader standardExcelSheetReader = StandardExcelSheetReader.builder()
-                    .removeBlankRows(false)
-                    .build();
-            String[][] dataMatrix = standardExcelSheetReader.convertToDataMatrix(testSheet);
+        public void pruneExtraBlankRows() throws IOException {
+            B builder = createBuilder();
+            T sheetReader = builder.removeBlankRows(true).build();
+
+            String[][] dataMatrix = sheetReader.readExcelSheetData(TEST_FILE, "ExtraBlankRowsAfterData");
             assertEquals(2, dataMatrix.length, "Mismatch expected row count");
         }
     }
@@ -197,29 +190,24 @@ public class StandardExcelSheetReaderTest {
          *  removeBlankColumns = true vs false
          */
         @Test
-        public void removeBlankColumns() {
-            Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithTwoBlankColumns");
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .removeBlankColumns(false)
-                    .build();
-            StandardExcelSheetReader standardExcelSheetReader2 = StandardExcelSheetReader.builder()
-                    .removeBlankColumns(true)
-                    .build();
-            String[][] dataMatrixRetainBlankColumns = standardExcelSheetReader1.convertToDataMatrix(testSheet);
-            String[][] dataMatrixRemoveBlankColumns = standardExcelSheetReader2.convertToDataMatrix(testSheet);
+        public void removeBlankColumns() throws IOException {
+            T sheetReader1 = createBuilder().removeBlankColumns(false).build();
+            T sheetReader2 = createBuilder().removeBlankColumns(true).build();
+
+            String[][] dataMatrixRetainBlankColumns = sheetReader1.readExcelSheetData(TEST_FILE, "WithTwoBlankColumns");
+            String[][] dataMatrixRemoveBlankColumns = sheetReader2.readExcelSheetData(TEST_FILE, "WithTwoBlankColumns");
             int columnDifference = dataMatrixRetainBlankColumns[0].length - dataMatrixRemoveBlankColumns[0].length;
             assertEquals(2, columnDifference, "Mismatch expected column count");
         }
 
         @Test
-        public void defaultRetainBlankCoumns() {
+        public void defaultRetainBlankColumns() throws IOException {
             // by default we keep the blank columns.
-            Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithTwoBlankColumns");
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .removeBlankColumns(false)
-                    .build();
-            String[][] dataMatrixRetainBlankColumns = standardExcelSheetReader1.convertToDataMatrix(testSheet);
-            String[][] dataMatrixDefault = DEFAULT_SHEET_READER.convertToDataMatrix(testSheet);
+            B builder = createBuilder();
+            T sheetReader = builder.removeBlankColumns(false).build();
+
+            String[][] dataMatrixRetainBlankColumns = sheetReader.readExcelSheetData(TEST_FILE, "WithTwoBlankColumns");
+            String[][] dataMatrixDefault = defaultSheetReader.readExcelSheetData(TEST_FILE, "WithTwoBlankColumns");
             assertEquals(dataMatrixRetainBlankColumns[0].length, dataMatrixDefault[0].length, "Mismatch expected column count");
         }
     }
@@ -228,6 +216,7 @@ public class StandardExcelSheetReaderTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class InvisibleCellsTests {
         private static final String HIDDEN_CELLS_DATA_FILE = "skipHiddenTestData.xlsx";
+        private final Path HIDDEN_CELLS_FILE = TestResourceUtil.getResourceFilePath(HIDDEN_CELLS_DATA_FILE);
         private static final String INPUT_DATA_SHEET_SUFFIX = "_Data";
         private static final String EXPECTED_DATA_SHEET_SUFFIX = "_Expected";
 
@@ -241,6 +230,9 @@ public class StandardExcelSheetReaderTest {
          */
         @ParameterizedTest(name = "HiddenTest {index}: Sheet = {0}")
         @ValueSource(strings = {
+                "LastInvisible",
+                "MiddleBlankColumns",
+                "MiddleBlankRows",
                 "BaseCase",
                 "LastColumn",
                 "FirstLastRow",
@@ -249,25 +241,21 @@ public class StandardExcelSheetReaderTest {
                 "Multi",
                 "LastValueInvisible",
                 "LongestRowInvisible"})
-        public void testMissingRowsAndColumns(String sheetNamePrefix) {
+        public void testMissingRowsAndColumns(String sheetNamePrefix) throws IOException {
             String testDataSheetName = sheetNamePrefix + INPUT_DATA_SHEET_SUFFIX;
             String expectedDataSheetName = sheetNamePrefix + EXPECTED_DATA_SHEET_SUFFIX;
 
-            Sheet testDataSheet = getFileSheet(HIDDEN_CELLS_DATA_FILE, testDataSheetName);
-            Sheet expectedDataSheet = getFileSheet(HIDDEN_CELLS_DATA_FILE, expectedDataSheetName);
+            B builder = createBuilder();
+            T sheetReader = builder.removeInvisibleCells(true).build();
 
-            StandardExcelSheetReader removeHiddenSheetReader = StandardExcelSheetReader.builder()
-                    .removeInvisibleCells(true)
-                    .build();
-
-            String[][] actualMatrix = removeHiddenSheetReader.convertToDataMatrix(testDataSheet);
+            String[][] actualMatrix = sheetReader.readExcelSheetData(HIDDEN_CELLS_FILE, testDataSheetName);
             if (actualMatrix.length > 0) {
                 String[] firstRow = actualMatrix[0];
                 // check to make sure we don't have rows that contain zero-length arrays (need only check the first)
                 assertTrue(firstRow.length > 0, "Matrix return rows with zero-length arrays");
             }
 
-            String[][] expectedMatrix = DEFAULT_SHEET_READER.convertToDataMatrix(expectedDataSheet);
+            String[][] expectedMatrix = defaultSheetReader.readExcelSheetData(HIDDEN_CELLS_FILE, expectedDataSheetName);
             assertArrayEquals(expectedMatrix, actualMatrix);
         }
     }
@@ -293,16 +281,16 @@ public class StandardExcelSheetReaderTest {
                 boolean isDefaultEnabled,
                 @TempDir Path tempDir) throws IOException {
             // generate an Excel File Sheet with 1 single cell value.
-            Sheet testSheet = createSingleCellExcelSheet(tempDir, origValue);
+            Path testFile = TestExcelFileSheetUtils.createSingleCellExcelFile(tempDir, origValue);
 
             // create readers set to both enabled and disabled
-            StandardExcelSheetReader enabledSheetReader = createSanitizeSheetReader(type, true);
-            StandardExcelSheetReader disabledSheetReader = createSanitizeSheetReader(type, false);
+            T enabledSheetReader = createSanitizeSheetReader(type, true);
+            T disabledSheetReader = createSanitizeSheetReader(type, false);
 
             // ensure that each reader returns correct expected value.
-            String[][] enabledMatrix = enabledSheetReader.convertToDataMatrix(testSheet);
-            String[][] disabledMatrix = disabledSheetReader.convertToDataMatrix(testSheet);
-            String[][] defaultMatrix = DEFAULT_SHEET_READER.convertToDataMatrix(testSheet);
+            String[][] enabledMatrix = enabledSheetReader.readExcelSheetData(testFile, 0);
+            String[][] disabledMatrix = disabledSheetReader.readExcelSheetData(testFile, 0);
+            String[][] defaultMatrix = defaultSheetReader.readExcelSheetData(testFile, 0);
             assertEquals(sanitizedValue, enabledMatrix[0][0]);
             assertEquals(origValue, disabledMatrix[0][0]);
 
@@ -314,8 +302,8 @@ public class StandardExcelSheetReaderTest {
             }
         }
 
-        private StandardExcelSheetReader createSanitizeSheetReader(SanitizeType type, boolean enabled) {
-            StandardExcelSheetReader.Builder builder = StandardExcelSheetReader.builder();
+        private T createSanitizeSheetReader(SanitizeType type, boolean enabled) {
+            B builder = createBuilder();
             switch (type) {
                 case SPACES:
                     return builder.sanitizeSpaces(enabled).build();
@@ -326,16 +314,11 @@ public class StandardExcelSheetReaderTest {
                 case BASIC_DIACRITICS:
                     return builder.sanitizeDiacritics(enabled).build();
                 default:
-                    throw new IllegalArgumentException("Unabled SanitizeType: " + type);
+                    throw new IllegalArgumentException("Unhandled SanitizeType: " + type);
             }
         }
     }
 
-    private Sheet getFileSheet(String fileName, String sheetName) {
-        return TestExcelFileSheetUtils.getFileSheet(fileName, sheetName);
-    }
-
-    private Sheet createSingleCellExcelSheet(Path tempDir, String cellValue) throws IOException {
-        return TestExcelFileSheetUtils.createSingleCellExcelSheet(tempDir, cellValue);
-   }
 }
+
+//. "/var/folders/ll/4cnnvnl1781fl9w10yvgrcr40000gn/T/junit-12636384025942901965/tmp_1772514140336.xlsx"

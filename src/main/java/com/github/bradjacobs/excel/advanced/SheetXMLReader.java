@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.advanced;
 
-import com.github.bradjacobs.excel.StringRowConsumer;
+import com.github.bradjacobs.excel.core.StringRowConsumer;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import org.apache.poi.util.XMLHelper;
 import org.apache.poi.xssf.model.SharedStrings;

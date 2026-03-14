@@ -3,9 +3,9 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.AbstractExcelSheetReader.AbstractSheetConfigBuilder;
-import com.github.bradjacobs.excel.advanced.AdvancedExcelSheetReader;
+import com.github.bradjacobs.excel.core.AbstractExcelSheetReader.AbstractSheetConfigBuilder;
 import com.github.bradjacobs.excel.config.SheetConfig;
+import com.github.bradjacobs.excel.api.ExcelSheetReader;
 import com.github.bradjacobs.excel.csv.MatrixToCsvTextConverter;
 import com.github.bradjacobs.excel.csv.QuoteMode;
 import com.github.bradjacobs.excel.io.InputStreamGenerator;
@@ -22,12 +22,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 
+import static com.github.bradjacobs.excel.ExcelSheetReaderFactory.ReaderType.ADVANCED;
+import static com.github.bradjacobs.excel.ExcelSheetReaderFactory.ReaderType.STANDARD;
+
 /**
  * Simple class that reads an Excel Worksheet
  *   and will produce a CSV-equivalent
  */
 // todo: add more method javadocs
-// todo: address circular dependencies
 public class ExcelReader {
     private final int sheetIndex;
     private final String sheetName;
@@ -51,8 +53,8 @@ public class ExcelReader {
         this.useAdvancedReader = builder.useAdvancedReader;
         this.matrixToCsvTextConverter = new MatrixToCsvTextConverter(builder.quoteMode);
         SheetConfig sheetConfig = builder.buildConfig();
-        this.excelSheetReader = new StandardExcelSheetReader(sheetConfig);
-        this.advancedExcelSheetReader = new AdvancedExcelSheetReader(sheetConfig);
+        this.excelSheetReader = createSheetReader(STANDARD, sheetConfig);
+        this.advancedExcelSheetReader = createSheetReader(ADVANCED, sheetConfig);
         this.inputStreamGenerator = new InputStreamGenerator();
     }
 
@@ -101,6 +103,12 @@ public class ExcelReader {
         return hasSheetName
                 ? reader.readExcelSheetData(inputStream, this.sheetName, this.password)
                 : reader.readExcelSheetData(inputStream, this.sheetIndex, this.password);
+    }
+
+    private static ExcelSheetReader createSheetReader(
+            ExcelSheetReaderFactory.ReaderType readerType,
+            SheetConfig sheetConfig) {
+        return ExcelSheetReaderFactory.create(readerType, sheetConfig);
     }
 
     /**
