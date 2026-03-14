@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
+import com.github.bradjacobs.excel.config.SanitizeType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.Normalizer;
@@ -14,10 +15,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.DASHES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.SPACES;
+import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.config.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -26,14 +27,6 @@ import static java.util.stream.Collectors.toMap;
  *   or convert special space characters (i.e. NBSP characters) to normal spaces.
  */
 public class SpecialCharacterSanitizer {
-
-    // enums to define the types of sanitizations to perform
-    public enum SanitizeType {
-        SPACES, // replace special space characters with normal space 0x20 (note '\n','\r','\t' are _NOT_ considered)
-        QUOTES, // replace special quotes (like smart quotes) with normal single/double quote character
-        DASHES, // replace special dashes with basic dash '-' character
-        BASIC_DIACRITICS // replace basic diacritics (e.g. 'é' -> 'e').  Not every possibility is considered
-    }
 
     // by default, handle spaces and quotes
     public static final Set<SanitizeType> DEFAULT_FLAGS = Set.of(SPACES, QUOTES);

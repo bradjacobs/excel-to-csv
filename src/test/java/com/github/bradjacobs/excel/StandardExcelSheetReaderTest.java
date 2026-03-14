@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType;
+import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.util.TestExcelFileSheetUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.jupiter.api.Nested;
@@ -20,10 +20,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.DASHES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.SPACES;
+import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.config.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -287,7 +287,7 @@ public class StandardExcelSheetReaderTest {
         @ParameterizedTest
         @FieldSource("sanitizeCases")
         public void sanitizeSheet(
-                SpecialCharacterSanitizer.SanitizeType type,
+                SanitizeType type,
                 String origValue,
                 String sanitizedValue,
                 boolean isDefaultEnabled,

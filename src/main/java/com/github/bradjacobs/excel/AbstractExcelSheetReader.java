@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
+import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.io.InputStreamGenerator;
 
@@ -14,10 +15,11 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.DASHES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.SPACES;
+import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.config.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
+
 
 abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
@@ -108,7 +110,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
         protected boolean removeBlankRows = false;
         protected boolean removeBlankColumns = false;
         protected boolean removeInvisibleCells = false;
-        protected Set<SpecialCharacterSanitizer.SanitizeType> sanitizeTypes
+        protected Set<SanitizeType> sanitizeTypes
                 = new HashSet<>(SpecialCharacterSanitizer.DEFAULT_FLAGS);
 
         protected abstract B self();
@@ -166,7 +168,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
             return setSanitizeType(DASHES, sanitizeDashes);
         }
 
-        private B setSanitizeType(SpecialCharacterSanitizer.SanitizeType type, boolean shouldAdd) {
+        private B setSanitizeType(SanitizeType type, boolean shouldAdd) {
             if (shouldAdd) {
                 this.sanitizeTypes.add(type);
             }

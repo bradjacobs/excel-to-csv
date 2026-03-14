@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType;
+import com.github.bradjacobs.excel.config.SanitizeType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,10 +18,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.DASHES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.QUOTES;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.SPACES;
+import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.config.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -153,7 +153,7 @@ public class SpecialCharacterSanitizerTest {
         assertEquals("Must provide non-null sanitizeTypes.", exception.getMessage());
 
         Exception exception2 = assertThrows(IllegalArgumentException.class, () -> {
-            new SpecialCharacterSanitizer((SpecialCharacterSanitizer.SanitizeType[]) null);
+            new SpecialCharacterSanitizer((SanitizeType[]) null);
         });
         assertEquals("Must provide non-null sanitizeTypes.", exception2.getMessage());
     }

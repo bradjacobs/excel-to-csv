@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel;
 
+import com.github.bradjacobs.excel.config.SanitizeType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
@@ -11,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.SpecialCharacterSanitizer.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -46,7 +47,7 @@ public class CellValueReaderTest {
 
     @Test
     public void withDiacriticsSet() {
-        Set<SpecialCharacterSanitizer.SanitizeType> typeSet = Set.of(BASIC_DIACRITICS);
+        Set<SanitizeType> typeSet = Set.of(BASIC_DIACRITICS);
         CellValueReader cellValueReader = new CellValueReader(true, typeSet);
         Cell cell = createMockStringCell("Façade");
         String result = cellValueReader.getCellValue(cell);
