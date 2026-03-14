@@ -1,7 +1,7 @@
 package com.github.bradjacobs.excel.advanced;
 
-import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.StringRowConsumer;
+import com.github.bradjacobs.excel.config.SheetConfig;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
 /**

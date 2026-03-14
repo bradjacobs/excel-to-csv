@@ -2,9 +2,6 @@ package com.github.bradjacobs.excel;
 
 import com.github.bradjacobs.excel.advanced.AdvancedExcelSheetReader;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class AdvancedStandardExcelSheetReaderTest extends AbstractExcelSheetReaderTest<AdvancedExcelSheetReader, AdvancedExcelSheetReader.Builder> {
 
     @Override
