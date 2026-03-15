@@ -3,8 +3,10 @@
  */
 package com.github.bradjacobs.excel.advanced;
 
+import com.github.bradjacobs.excel.advanced.datewindowing.DateWindowingDataFormatter;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.XMLHelper;
 import org.apache.poi.xssf.model.SharedStrings;
 import org.apache.poi.xssf.model.StylesTable;
@@ -17,21 +19,21 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
 class SheetXMLReader extends XMLFilterImpl {
-
     private final SheetConfig sheetConfig;
     private final StringRowConsumer stringRowConsumer;
 
     public SheetXMLReader(
             SheetConfig sheetConfig,
             SharedStrings sharedStrings,
-            StylesTable styles) throws ParserConfigurationException, SAXException {
+            StylesTable styles,
+            boolean uses1904DateWindowing) throws ParserConfigurationException, SAXException {
         this.sheetConfig = sheetConfig;
         this.stringRowConsumer = StringRowConsumer.of(
                 sheetConfig.isRemoveBlankRows(),
                 sheetConfig.isRemoveBlankColumns()
         );
-
-        XMLReader reader = createSheetXmlReader(sharedStrings, styles);
+        DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
+        XMLReader reader = createXmlReader(sharedStrings, styles, dataFormatter);
         setParent(reader);
     }
 
@@ -45,9 +47,10 @@ class SheetXMLReader extends XMLFilterImpl {
         return this.stringRowConsumer.generateMatrix();
     }
 
-    private XMLReader createSheetXmlReader(
+    private XMLReader createXmlReader(
             SharedStrings sharedStrings,
-            StylesTable styles
+            StylesTable styles,
+            DataFormatter dataFormatter
     ) throws SAXException, ParserConfigurationException {
         XMLReader parser = XMLHelper.newXMLReader();
         parser.setContentHandler(
@@ -55,7 +58,8 @@ class SheetXMLReader extends XMLFilterImpl {
                         sheetConfig,
                         stringRowConsumer,
                         sharedStrings,
-                        styles
+                        styles,
+                        dataFormatter
                 )
         );
         return parser;

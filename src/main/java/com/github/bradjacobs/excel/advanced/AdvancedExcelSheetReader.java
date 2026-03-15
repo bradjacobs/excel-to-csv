@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel.advanced;
 
+import com.github.bradjacobs.excel.advanced.datewindowing.WorkbookPropsHandler;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -20,6 +21,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -83,28 +85,19 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
             // But preliminary testing shows setting readOnly to be ~ 25% SLOWER!
             //reader.setUseReadOnlySharedStringsTable(true);
 
+            SheetXMLReader sheetXmlReader = createSheetXMLReader(reader);
+
             // get the inputStream for the specific sheet of interest
             try (InputStream sheetInputStream = sheetStreamProvider.fetch(reader)) {
-                SharedStrings sharedStrings = reader.getSharedStringsTable();
-                StylesTable styles = reader.getStylesTable();
                 // actually parse the sheetInputStream for the data
-                return parseSheetData(sheetInputStream, sharedStrings, styles);
+                InputSource sheetSource = new InputSource(sheetInputStream);
+                sheetXmlReader.parse(sheetSource);
+                return sheetXmlReader.getSheetData();
             }
         }
         catch (OpenXML4JException | ParserConfigurationException | SAXException e) {
             throw new IOException("Failed to read Excel sheet data: " + e.getMessage(), e);
         }
-    }
-
-    private String[][] parseSheetData(
-            InputStream sheetInputStream,
-            SharedStrings sharedStrings,
-            StylesTable styles
-    ) throws IOException, SAXException, ParserConfigurationException {
-        InputSource sheetSource = new InputSource(sheetInputStream);
-        SheetXMLReader parser = new SheetXMLReader(this.sheetConfig, sharedStrings, styles);
-        parser.parse(sheetSource);
-        return parser.getSheetData();
     }
 
     /**
@@ -163,6 +156,21 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         }
 
         return resultSheetInputStream;
+    }
+
+    private SheetXMLReader createSheetXMLReader(XSSFReader reader)
+            throws IOException, InvalidFormatException, ParserConfigurationException, SAXException {
+
+        SharedStrings sharedStrings = reader.getSharedStringsTable();
+        StylesTable styles = reader.getStylesTable();
+
+        WorkbookPropsHandler workbookPropsHandler =
+                new WorkbookPropsHandler();
+        try (InputStream workbookData = reader.getWorkbookData()) {
+            SAXParserFactory.newInstance().newSAXParser().parse(workbookData, workbookPropsHandler);
+        }
+        boolean uses1904DateWindowing = workbookPropsHandler.uses1904DateWindowing();
+        return new SheetXMLReader(this.sheetConfig, sharedStrings, styles, uses1904DateWindowing);
     }
 
     /**

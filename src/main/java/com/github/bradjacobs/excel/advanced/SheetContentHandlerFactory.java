@@ -4,8 +4,8 @@
 package com.github.bradjacobs.excel.advanced;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.core.CellValueReader;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.SharedStrings;
 import org.apache.poi.xssf.model.StylesTable;
@@ -24,7 +24,8 @@ final class SheetContentHandlerFactory {
             SheetConfig sheetConfig,
             StringRowConsumer stringRowConsumer,
             SharedStrings sharedStrings,
-            StylesTable styles
+            StylesTable styles,
+            DataFormatter dataFormatter
     ) {
         if (sheetConfig.isRemoveInvisibleCells()) {
             SheetContext sheetContext = new SheetContext();
@@ -36,7 +37,7 @@ final class SheetContentHandlerFactory {
                             stringRowConsumer,
                             sheetContext
                     ),
-                    CellValueReader.getDataFormatter(),
+                    dataFormatter,
                     FORMULAS_NOT_RESULTS,
                     sheetContext
             );
@@ -49,7 +50,7 @@ final class SheetContentHandlerFactory {
                         sheetConfig,
                         stringRowConsumer
                 ),
-                CellValueReader.getDataFormatter(),
+                dataFormatter,
                 FORMULAS_NOT_RESULTS
         );
     }

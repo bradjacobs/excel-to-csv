@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 // TODO - this test needs more love
-//.  and should evenually replace the 'ExcelSheetReaderTest'
+//.  and should eventually replace the 'ExcelSheetReaderTest'
 abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B extends AbstractExcelSheetReader.AbstractSheetConfigBuilder<T, B>> {
     private static final String TEST_DATA_FILE = "testSheetData.xlsx";
     private static final Path TEST_FILE = TestResourceUtil.getResourceFilePath(TEST_DATA_FILE);
@@ -93,18 +93,6 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
             String[][] dataMatrix = defaultSheetReader.readExcelSheetData(TEST_FILE, "LastColWhitespace");
             assertEquals(1, dataMatrix[0].length, "mismatch of expected number of columns in csv output.");
         }
-
-        // todo - fix below
-
-//        /**
-//         * Null Sheet parameter should be IllegalArgumentException
-//         */
-//        @Test
-//        public void nullSheetParamCheck() {
-//            assertThrows(IllegalArgumentException.class, () -> {
-//                defaultSheetDataExtractor.readExcelSheetData(null);
-//            });
-//        }
     }
 
     @Nested
@@ -319,6 +307,25 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         }
     }
 
-}
+    /**
+     *   By default the DataFormatter uses 'false' for 1904DateWindowing.
+     * And this is often correct for most files.  However, if encounter
+     * a Excel workbook where 1904DateWindowing is true, then the
+     * default behavior will cause dates to be formatted incorrectly.
+     *   This test is to verify bug fix where the date values
+     * would be incorrect for the 'AdvancedExcelSheetReader' class.
+     */
+    @Test
+    public void test1904Windowing() throws IOException {
+        Path Date1904File = TestResourceUtil.getResourceFilePath("date1904.xlsx");
 
-//. "/var/folders/ll/4cnnvnl1781fl9w10yvgrcr40000gn/T/junit-12636384025942901965/tmp_1772514140336.xlsx"
+        T sheetReader = createBuilder().build();
+        String[][] dataMatrix = sheetReader.readExcelSheetData(Date1904File, 0);
+
+        // check the values in column B
+        assertEquals("Due Date", dataMatrix[0][1]);
+        assertEquals("TBD", dataMatrix[1][1]);
+        assertEquals("3/15/08", dataMatrix[2][1]);
+        assertEquals("4/30/08", dataMatrix[3][1]);
+    }
+}
