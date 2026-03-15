@@ -26,6 +26,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
     protected static final InputStreamGenerator inputStreamGenerator = new InputStreamGenerator();
     private static final String DEFAULT_PASSWORD = null;
+    private static final int FIRST_SHEET_INDEX = 0;
 
     public AbstractExcelSheetReader() {
         // override the internal POI utils size limit to allow for 'bigger Excel files'
@@ -35,22 +36,22 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
     @Override
     public String[][] readExcelSheetData(File excelFile) throws IOException {
-        return readExcelSheetData(excelFile, 0);
+        return readExcelSheetData(excelFile, FIRST_SHEET_INDEX);
     }
 
     @Override
     public String[][] readExcelSheetData(Path excelFile) throws IOException {
-        return readExcelSheetData(excelFile, 0);
+        return readExcelSheetData(excelFile, FIRST_SHEET_INDEX);
     }
 
     @Override
     public String[][] readExcelSheetData(URL excelFileUrl) throws IOException {
-        return readExcelSheetData(excelFileUrl, 0);
+        return readExcelSheetData(excelFileUrl, FIRST_SHEET_INDEX);
     }
 
     @Override
     public String[][] readExcelSheetData(InputStream inputStream) throws IOException {
-        return readExcelSheetData(inputStream, 0);
+        return readExcelSheetData(inputStream, FIRST_SHEET_INDEX);
     }
 
     // Variations of reading Excel Sheet via sheet Index.
