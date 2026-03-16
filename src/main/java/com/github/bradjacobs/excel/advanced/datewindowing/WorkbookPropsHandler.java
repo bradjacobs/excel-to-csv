@@ -6,7 +6,7 @@ package com.github.bradjacobs.excel.advanced.datewindowing;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class WorkbookPropsHandler extends DefaultHandler {
+class WorkbookPropsHandler extends DefaultHandler {
 
     private static final String WORKBOOK_PROPERTIES_ELEMENT = "workbookPr";
     private static final String DATE_1904_ATTRIBUTE = "date1904";

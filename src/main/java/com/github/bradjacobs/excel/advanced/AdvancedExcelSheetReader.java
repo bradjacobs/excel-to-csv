@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.advanced;
 
-import com.github.bradjacobs.excel.advanced.datewindowing.WorkbookPropsHandler;
+import com.github.bradjacobs.excel.advanced.datewindowing.Date1904Util;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -163,13 +163,8 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
 
         SharedStrings sharedStrings = reader.getSharedStringsTable();
         StylesTable styles = reader.getStylesTable();
+        boolean uses1904DateWindowing = Date1904Util.is1904DateWindowing(reader);
 
-        WorkbookPropsHandler workbookPropsHandler =
-                new WorkbookPropsHandler();
-        try (InputStream workbookData = reader.getWorkbookData()) {
-            SAXParserFactory.newInstance().newSAXParser().parse(workbookData, workbookPropsHandler);
-        }
-        boolean uses1904DateWindowing = workbookPropsHandler.uses1904DateWindowing();
         return new SheetXMLReader(this.sheetConfig, sharedStrings, styles, uses1904DateWindowing);
     }
 
