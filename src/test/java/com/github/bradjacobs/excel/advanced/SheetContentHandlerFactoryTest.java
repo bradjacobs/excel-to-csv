@@ -6,6 +6,7 @@ package com.github.bradjacobs.excel.advanced;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.CellValueReader;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.SharedStrings;
 import org.apache.poi.xssf.model.StylesTable;
@@ -21,6 +22,8 @@ import static org.mockito.Mockito.mock;
 // TODO - this class was AI-generated
 //   need to walk through and clean up as needed.
 class SheetContentHandlerFactoryTest {
+
+    private static final DataFormatter DATA_FORMATTER = new DataFormatter(true);
 
     @Test
     void create_whenRemoveInvisibleCellsEnabled_returnsVisibleAwareHandler() {
@@ -41,7 +44,7 @@ class SheetContentHandlerFactoryTest {
                 rowConsumer,
                 sharedStrings,
                 styles,
-                CellValueReader.getDataFormatter()
+                DATA_FORMATTER
         );
 
         assertNotNull(handler);
@@ -67,7 +70,7 @@ class SheetContentHandlerFactoryTest {
                 rowConsumer,
                 sharedStrings,
                 styles,
-                CellValueReader.getDataFormatter()
+                DATA_FORMATTER
         );
 
         assertNotNull(handler);

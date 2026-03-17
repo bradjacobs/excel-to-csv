@@ -7,6 +7,7 @@ import com.github.bradjacobs.excel.api.ExcelSheetReader;
 import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.util.TestExcelFileSheetUtils;
 import com.github.bradjacobs.excel.util.TestResourceUtil;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -16,7 +17,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.FieldSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +31,7 @@ import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
 import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -328,4 +333,47 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         assertEquals("3/15/08", dataMatrix[2][1]);
         assertEquals("4/30/08", dataMatrix[3][1]);
     }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class ErrorHandlingTests {
+        @Test
+        public void nullInputStream() {
+            Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
+                T sheetReader = createBuilder().build();
+                sheetReader.readExcelSheetData((InputStream)null, 0);
+            });
+        }
+
+        @Test
+        public void negativeSheetIndex() throws IOException {
+            Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
+                T sheetReader = createBuilder().build();
+                // fake inputStream, but expect the negative index to be detected first.
+                InputStream inputStream = new ByteArrayInputStream("fake".getBytes(StandardCharsets.UTF_8));
+                sheetReader.readExcelSheetData(inputStream, -2);
+            });
+        }
+
+        @Test
+        public void nullSheetName() throws IOException {
+            Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
+                T sheetReader = createBuilder().build();
+                // fake inputStream, but expect the negative index to be detected first.
+                InputStream inputStream = new ByteArrayInputStream("fake".getBytes(StandardCharsets.UTF_8));
+                sheetReader.readExcelSheetData(inputStream, null);
+            });
+        }
+
+        @Test
+        public void emptySheetName() throws IOException {
+            Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
+                T sheetReader = createBuilder().build();
+                // fake inputStream, but expect the negative index to be detected first.
+                InputStream inputStream = new ByteArrayInputStream("fake".getBytes(StandardCharsets.UTF_8));
+                sheetReader.readExcelSheetData(inputStream, "");
+            });
+        }
+    }
+
 }

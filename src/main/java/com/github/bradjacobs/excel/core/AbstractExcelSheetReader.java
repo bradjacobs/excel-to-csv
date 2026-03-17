@@ -7,6 +7,7 @@ import com.github.bradjacobs.excel.api.ExcelSheetReader;
 import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.io.InputStreamGenerator;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,8 +88,17 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
     // Subclasses implement the core extraction logic:
     @Override
-    public abstract String[][] readExcelSheetData(InputStream inputStream, int sheetIndex, String password) throws IOException;
+    public String[][] readExcelSheetData(InputStream inputStream, int sheetIndex, String password) throws IOException {
+        if (sheetIndex < 0) {
+            throw new IllegalArgumentException("Sheet Index cannot be negative");
+        }
+        if (inputStream == null) {
+            throw new IllegalArgumentException("InputStream cannot be null");
+        }
+        return readSheet(inputStream, sheetIndex, password);
+    }
 
+    protected abstract String[][] readSheet(InputStream inputStream, int sheetIndex, String password) throws IOException;
 
     // Variations of reading Excel Sheet via sheet name.
     @Override
@@ -123,7 +133,17 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
     // Subclasses implement the core extraction logic:
     @Override
-    public abstract String[][] readExcelSheetData(InputStream inputStream, String sheetName, String password) throws IOException;
+    public String[][] readExcelSheetData(InputStream inputStream, String sheetName, String password) throws IOException {
+        if (StringUtils.isEmpty(sheetName)) {
+            throw new IllegalArgumentException("Sheet Name cannot be empty");
+        }
+        if (inputStream == null) {
+            throw new IllegalArgumentException("InputStream cannot be null");
+        }
+        return readSheet(inputStream, sheetName, password);
+    }
+
+    protected abstract String[][] readSheet(InputStream inputStream, String sheetName, String password) throws IOException;
 
 
     // below is common code for sheet configuration builder

@@ -174,14 +174,11 @@ public class ExcelReader {
     private boolean isOOXMLStream(InputStream inputStream) throws IOException {
         InputStream markableInputStream = FileMagic.prepareToCheckMagic(inputStream);
         FileMagic fileMagic = FileMagic.valueOf(markableInputStream);
-        if (FileMagic.OOXML == fileMagic) {
-            return true;
-        }
+        return FileMagic.OOXML == fileMagic;
 
         // TODO
         //   add check if file is OLE2 + password protected.
         //   (original code to check had bug and was removed)
-        return false;
     }
 
     public static Builder builder() {

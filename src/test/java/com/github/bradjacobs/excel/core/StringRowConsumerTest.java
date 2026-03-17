@@ -10,6 +10,7 @@ import org.junit.jupiter.api.TestInstance;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StringRowConsumerTest {
 
@@ -431,6 +432,7 @@ public class StringRowConsumerTest {
         }
         String[][] resultMatrix = consumer.generateMatrix();
         assertArrayEquals(expected, resultMatrix, "Mismatch expected 2D String array comparison");
+        assertEquals(resultMatrix.length, consumer.getRowCount());
     }
 
     private StringRowConsumer createBasicConsumer() {

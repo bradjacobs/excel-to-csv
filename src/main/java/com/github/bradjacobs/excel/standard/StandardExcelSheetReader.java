@@ -39,19 +39,13 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
     }
 
     @Override
-    public String[][] readExcelSheetData(InputStream inputStream, int sheetIndex, String password) throws IOException {
-        // check negative before trying to read the file.
-        if (sheetIndex < 0) {
-            throw new IllegalArgumentException("SheetIndex cannot be negative");
-        }
+    protected String[][] readSheet(InputStream inputStream, int sheetIndex, String password) throws IOException {
         Sheet sheet = getFileSheet(inputStream, password, (w) -> w.getSheetAt(sheetIndex));
         return convertToDataMatrix(sheet);
     }
 
     @Override
-    public String[][] readExcelSheetData(InputStream inputStream, String sheetName, String password) throws IOException {
-        // Note: passing in a 'null' sheetName can cause NPE, but will be fixed in the next POI release.
-        //   https://github.com/apache/poi/commit/04f4c1fa7424f12b12f1e513950f9e7fa13c625d
+    protected String[][] readSheet(InputStream inputStream, String sheetName, String password) throws IOException {
         Sheet sheet = getFileSheet(inputStream, password, (w) -> w.getSheet(sheetName));
         if (sheet == null) {
             throw new IllegalArgumentException(String.format("Unable to find sheet with name: '%s'", sheetName));

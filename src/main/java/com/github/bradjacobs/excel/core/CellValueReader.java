@@ -17,10 +17,6 @@ public class CellValueReader {
         EXCEL_DATA_FORMATTER.setUseCachedValuesForFormulaCells(true);
     }
 
-    public static DataFormatter getDataFormatter() {
-        return EXCEL_DATA_FORMATTER;
-    }
-
     private final boolean autoTrim;
     private final SpecialCharacterSanitizer specialCharSanitizer;
 
