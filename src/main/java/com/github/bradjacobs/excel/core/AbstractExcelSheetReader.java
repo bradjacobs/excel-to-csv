@@ -145,6 +145,13 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
     protected abstract String[][] readSheet(InputStream inputStream, String sheetName, String password) throws IOException;
 
+    // common exception with message to use if sheet name was not found.
+    protected static class SheetNotFoundException extends IllegalArgumentException {
+        public SheetNotFoundException(String sheetName) {
+            super(String.format("Excel sheet not found: '%s'", sheetName));
+        }
+    }
+
 
     // below is common code for sheet configuration builder
     abstract public static class AbstractSheetConfigBuilder<T, B extends AbstractSheetConfigBuilder<T, B>> {

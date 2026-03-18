@@ -374,6 +374,15 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
                 sheetReader.readExcelSheetData(inputStream, "");
             });
         }
+
+        @Test
+        public void unknownSheetName() throws IOException {
+            Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
+                T sheetReader = createBuilder().build();
+                sheetReader.readExcelSheetData(TEST_FILE, "UnknownSheetName");
+            });
+            assertEquals("Excel sheet not found: 'UnknownSheetName'", thrown.getMessage());
+        }
     }
 
 }
