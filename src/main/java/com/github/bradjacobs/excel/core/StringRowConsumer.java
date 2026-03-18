@@ -3,7 +3,6 @@
  */
 package com.github.bradjacobs.excel.core;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -245,7 +244,7 @@ public class StringRowConsumer implements Consumer<List<String>> {
      * Check if row is considered to be 'blank/empty'
      */
     private static boolean isEmptyRow(List<String> rowData) {
-        if (CollectionUtils.isEmpty(rowData)) {
+        if (rowData == null || rowData.isEmpty()) {
             return true;
         }
         for (String value : rowData) {
