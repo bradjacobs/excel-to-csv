@@ -29,14 +29,12 @@ import static org.apache.poi.poifs.crypt.Decryptor.DEFAULT_POIFS_ENTRY;
 
 public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
 
-    private final SheetConfig sheetConfig;
-
     /**
      * Constructor
      */
     // TODO: Maybe change constructor to non-public
     public AdvancedExcelSheetReader(SheetConfig config) {
-        this.sheetConfig = config;
+        super(config);
     }
 
     @FunctionalInterface

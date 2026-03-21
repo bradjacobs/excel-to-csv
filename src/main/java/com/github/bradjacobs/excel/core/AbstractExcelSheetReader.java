@@ -30,7 +30,12 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
     private static final String DEFAULT_PASSWORD = null;
     private static final int FIRST_SHEET_INDEX = 0;
 
-    public AbstractExcelSheetReader() {
+    protected final SheetConfig sheetConfig;
+
+    public AbstractExcelSheetReader(SheetConfig sheetConfig) {
+        Validate.isTrue(sheetConfig != null, "SheetConfig cannot be null.");
+        this.sheetConfig = sheetConfig;
+
         // override the internal POI utils size limit to allow for 'bigger Excel files'
         //   (as of POI version 5.2.0 the default value is 100_000_000)
         org.apache.poi.util.IOUtils.setByteArrayMaxOverride(Integer.MAX_VALUE);

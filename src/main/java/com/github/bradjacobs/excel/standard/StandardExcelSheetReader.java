@@ -23,12 +23,11 @@ import java.util.stream.IntStream;
  * Reads an Excel Sheet and returns a 2-D array of data.
  */
 public class StandardExcelSheetReader extends AbstractExcelSheetReader {
-    protected final SheetConfig sheetConfig;
     protected final CellValueReader cellValueReader;
 
     // todo: still deciding if this constructor is ok or terrible.
     public StandardExcelSheetReader(SheetConfig sheetConfig) {
-        this.sheetConfig = sheetConfig;
+        super(sheetConfig);
         this.cellValueReader = new CellValueReader(sheetConfig.isAutoTrim(), sheetConfig.getCharSanitizeFlags());
     }
 
