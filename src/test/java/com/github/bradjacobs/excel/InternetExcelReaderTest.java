@@ -22,8 +22,17 @@ public class InternetExcelReaderTest {
 
     @Disabled("Test is disabled because it makes external internet call")
     @Test
-    public void testDownloadFromInternet() throws Exception {
-        ExcelReader excelReader = ExcelReader.builder().build();
+    public void testDownloadFromInternetLegacyReader() throws Exception {
+        ExcelReader excelReader = ExcelReader.builder().useAdvancedReader(false).build();
+        String csvText = excelReader.convertToCsvText(new URL(SAMPLE_INTERNET_EXCEL_FILE));
+        assertNotNull(csvText);
+        assertFalse(csvText.isEmpty());
+    }
+
+    @Disabled("Test is disabled because it makes external internet call")
+    @Test
+    public void testDownloadFromInternetAdvancedReader() throws Exception {
+        ExcelReader excelReader = ExcelReader.builder().useAdvancedReader(true).build();
         String csvText = excelReader.convertToCsvText(new URL(SAMPLE_INTERNET_EXCEL_FILE));
         assertNotNull(csvText);
         assertFalse(csvText.isEmpty());

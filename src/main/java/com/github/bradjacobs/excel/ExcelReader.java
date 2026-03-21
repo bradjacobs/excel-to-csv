@@ -94,6 +94,10 @@ public class ExcelReader {
     }
 
     private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
+        // the inputStream should already be BufferedInputStream,
+        //   but this is just an extra precaution.
+        inputStream = FileMagic.prepareToCheckMagic(inputStream);
+
         final boolean advancedMode = this.useAdvancedReader && isOOXMLStream(inputStream);
         final boolean hasSheetName = StringUtils.isNotEmpty(this.sheetName);
         final ExcelSheetReader reader = advancedMode
@@ -172,8 +176,7 @@ public class ExcelReader {
     }
 
     private boolean isOOXMLStream(InputStream inputStream) throws IOException {
-        InputStream markableInputStream = FileMagic.prepareToCheckMagic(inputStream);
-        FileMagic fileMagic = FileMagic.valueOf(markableInputStream);
+        FileMagic fileMagic = FileMagic.valueOf(inputStream);
         return FileMagic.OOXML == fileMagic;
 
         // TODO

@@ -21,7 +21,6 @@ public class InputStreamGenerator {
             Set.of("http", "https", "ftp", "file");
     private static final int CONNECTION_TIMEOUT = 20000;
     // some websites require a userAgent value set.
-    //    side:  seen a case where a userAgent with substring 'java' would fail  (empirical evidence)
     private static final String USER_AGENT_VALUE = "javaClient/" + System.getProperty("java.version");
 
     public InputStream getInputStream(File inputFile) throws IOException {
@@ -55,17 +54,21 @@ public class InputStreamGenerator {
         }
 
         // Could switch to an httpClient in the future.
-        URLConnection connection = url.openConnection();
+        URLConnection connection = openConnection(url);
         connection.setConnectTimeout(CONNECTION_TIMEOUT);
         connection.setReadTimeout(CONNECTION_TIMEOUT);
         connection.setRequestProperty("User-Agent", USER_AGENT_VALUE);
         connection.setRequestProperty("Accept-Encoding", "gzip");
         String encoding = connection.getContentEncoding();
-        if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
-            return new GZIPInputStream(connection.getInputStream());
+        InputStream urlInputStream = connection.getInputStream();
+        if ("gzip".equalsIgnoreCase(encoding)) {
+            urlInputStream = new GZIPInputStream(urlInputStream);
         }
-        else {
-            return connection.getInputStream();
-        }
+        return new BufferedInputStream(urlInputStream);
+    }
+
+    // scoped to allow for mock testing
+    protected URLConnection openConnection(URL url) throws IOException {
+        return url.openConnection();
     }
 }
