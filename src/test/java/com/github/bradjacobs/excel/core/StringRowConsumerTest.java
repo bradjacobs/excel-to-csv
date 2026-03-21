@@ -75,7 +75,7 @@ public class StringRowConsumerTest {
         }
 
         @Test
-        public void conumeWithNullInLastColumn() {
+        public void consumeWithNullInLastColumn() {
             String[][] input = {
                     {"aa", null},
                     {},
@@ -197,7 +197,7 @@ public class StringRowConsumerTest {
         // beginning blanks rows are to be kept,
         //   if not configured to remove blank rows.
         @Test
-        public void retainFirstlankRows() {
+        public void retainFirstBlankRows() {
             String[][] input = {
                     {"", ""},
                     {"", ""},
@@ -249,11 +249,10 @@ public class StringRowConsumerTest {
             runConsumerTest(createBasicConsumer(), input, expected);
         }
 
-
         @Test
         public void createWithNullFactoryParamIsNoneBehavior() {
             // if you create a consumer with a 'null'
-            // should behave to keep blank rows and columsn
+            // should behave to keep blank rows and columns
             String[][] input = {
                     {"aa", "", "bb"},
                     {"", "", ""},
@@ -267,9 +266,6 @@ public class StringRowConsumerTest {
             StringRowConsumer consumer = StringRowConsumer.of(null);
             runConsumerTest(consumer, input, expected);
         }
-
-
-
     }
 
     @Nested
@@ -297,6 +293,7 @@ public class StringRowConsumerTest {
                     {"aa", "bb"},
                     null,
                     {"", ""},
+                    {},
                     {"", ""},
                     {"cc", "dd"},
                     {"", ""},
@@ -417,7 +414,6 @@ public class StringRowConsumerTest {
             };
             runConsumerTest(createPruneBlankRowsAndColumnConsumer(), input, expected);
         }
-
     }
 
     /**
