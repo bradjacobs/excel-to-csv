@@ -104,6 +104,10 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<showWarnings>true</showWarnings>
+					<compilerArgs>
+						<arg>-Xlint:all,-serial</arg>
+					</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>
