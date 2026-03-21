@@ -64,7 +64,7 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 
 ## Usage
 ### Overview
-1. Create a new ExcelReader via builder() method.
+1. Create a new ExcelReader via the builder() method.
 2. Execute desired methods on ExcelReader
 
 ### ExcelReaderDetails
@@ -91,42 +91,53 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 | sanitizeDiacritics     | NO       | false   | replace diacritic characters with its basic counterpart (i.e. 'é' -> 'e', 'Ç' -> 'C')                                                                                                                                                                                          |
 
 ## OtherInfo
-* All rows in the output CSV will have the exact same number of columns. (which will be maximum non-blank column detected)
-* The CSV data values should retain same 'formatting' as the original Excel file. (i.e. Dates and Numeric values)
+* All rows in the output CSV will have the exact same number of columns. (which will be the maximum non-blank column detected)
+* The returned CSV data values are WYSIWYG and should retain the same 'formatting' as the original Excel file. (i.e., Dates and Numeric values)
   * No _formulas_ are copied.  Only the value as it 'physically appears' in a given cell
   * _**(see 'Known Cell Data Issues' for exceptions)_
 * Currently, no quotes will be added around 'blank' values 
 * Empty cells will be converted to empty string (not 'null')
 
 ## KnownCellDataIssues
-Known Cell Data Formatting Issues include (but not limited to) the following:
+Known Cell Data Formatting Issues include (but are not limited to) the following:
 <details>
   <summary>(Click To Expand...)</summary>
 
-* _Sometimes_ simple numeric values will be returned in a decimal format.
-  * i.e. expected "7", but got "7.0"
-  * usually due from how the file was saved.  'Resaving' in Excel can sometimes fix.
-* Advanced parser will throw an exception if encounters a cell without a CellReference
+Note that some issues below seem to be related to how the Excel file was saved.
+Opening the Excel file and then 'resaving' can sometimes resolve issues.
+
+Most cases below appear to be pretty rare (subjectively)
+
+* Sometimes simple numeric values will be returned in a decimal format (and vice versa).
+  * i.e. expected "7" but got "7.0" or expected "7.00" but got "7"
+* Sometimes 'zero' and 'blank' can get mixed up.
+  * i.e. expected "" but got "0.0"
+* Advanced parser can throw an exception if encounters a cell without a CellReference
   * a poi-examples class [XLSX2CSV.java](https://github.com/apache/poi/blob/trunk/poi-examples/src/main/java/org/apache/poi/examples/xssf/eventusermodel/XLSX2CSV.java) shows a proposed solution, but it only works in a handful of cases.
-  * rather than throw an exception the code could be change to provide a 'best guess' of which column the value belongs.
-* Any cells with 'error values' (#NAME?, #VALUE!, etc) will appear in the output CSV file (this _IS_ expected)
 * Certain Linked or Embedded Objects typically render as "#VALUE!" (Pictures, Stock, Geography, etc.)
 * Special or Custom Formats may sometimes render incorrectly.
   * most often noticed with date, time, or numeric values.
-  * the ;;; format will not produce a blank value
-* Number precision can sometimes be off for _very_ large (or _very_ small) values. 
-  * Usually reserved for abnormally big numbers (say 20+ digits, subjectively)
+  * the ;;; format currently will _NOT_ produce a blank value
+* Number precision can sometimes be off (appears to be rare).
+  * Examples:
+    * "33.8192973" vs a2="33.8192974"
+    * "0.1245" vs "0.124500000"
+    * "0.29999" vs "0.2999900001"
 * Cells of type DataBar or IconSet will show a value, even if marked as "icon only"
+
+Also note the following is 'Expected Behavior'
+* Cells with 'error values' (#NAME?, #VALUE!, etc.) will appear as such in the output CSV file
+
 </details>
 
 ## AlternateImplementations
-Searching on the web can yield alternate solutions that require less code.  However, they seem to usually not handle "large" Excel files or doesn't always handle Blank rows and columns very well
+Searching on the web can yield alternate solutions that require less code.  However, they seem to usually not handle "large" Excel files or don't always handle Blank rows and columns very well
 
 <details>
   <summary>Example Alternate Implementation 1... (Click To Expand)</summary>
 
 An example of a simpler way to read an Excel file without the extra code in this project is below:<br><br>
-Additional explanations about the code can be found in [SimplePoiExampleExcelReader.java](src/main/java/com/github/bradjacobs/excel/examples/SimplePoiExampleExcelReader.java)
+Additional explanations about the code can be found in [SimplePoiExampleExcelReader.java](src/main/java/com/github/bradjacobs/excel/demo/SimplePoiExampleExcelReader.java)
 
 ```java
 public List<List<String>> readBasicSheet(Path excelFile) throws IOException {
@@ -151,11 +162,10 @@ public List<List<String>> readBasicSheet(Path excelFile) throws IOException {
 }
 ```
 </details>
-<br>
 <details>
   <summary>Example Alternate Implementation 2... (Click To Expand)</summary>
 
-From a [StackOverflow Post](https://stackoverflow.com/questions/40283179/how-to-convert-xlsx-file-to-csv), [OrangeDog](https://stackoverflow.com/users/476716/orangedog) points out there is an easier way to get CSV text, which would look something ike this:
+From a [StackOverflow Post](https://stackoverflow.com/questions/40283179/how-to-convert-xlsx-file-to-csv), [OrangeDog](https://stackoverflow.com/users/476716/orangedog) points out there is an easier way to get CSV text, which would look something like this:
 ```java
 XSSFWorkbook input = new XSSFWorkbook(new File("input.xlsx"));
 try (CSVPrinter output = new CSVPrinter(new FileWriter("output.csv"), CSVFormat.DEFAULT);) {
@@ -170,8 +180,8 @@ This is a nice solution with _A LOT_ less code.  _**BUT**_... it seems to expose
 
 Namely:
 * empty cells could cause data to seemingly 'shift' to a different column
-  * i.e. if no value in Column A, but is a value in Column B, then the Column B value will show up as the first value in the row.
-* Bigger Excel files (> 1 MB ?) will throw an exception with message: _"The text would exceed the max allowed overall size of extracted text"_
+  * i.e. if no value in Column A, but there is a value in Column B, then the Column B value will show up as the first value in the row.
+* Bigger Excel files (> 1 MB ?) will throw an exception with the message: _"The text would exceed the max allowed overall size of extracted text"_
 * It will give data from all sheets (even if you only want one)
 * The output csv text might not have the cells quoted the way you want (subjective)
 </details>
@@ -183,9 +193,11 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
   <summary>Todo Item List... (Click To Expand)</summary>
 
 * General Unittest cleanup and add more tests (ongoing)
-* Integrate a real logger into the code.
+* Add an option to return unformatted numbers instead of WYSIWYG (i.e. "1000000" instead of "1,000,000")
+* Add an option to return dates in a common UTC format instead of WYSIWYG
+* Integrate a real logger into the code
 * Address any of the "Known Cell Data Issues" (above) if possible
-* Add more JavaDocs
+* Add more Javadocs
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
 * Reorganize Excel Test data for Junit tests.
