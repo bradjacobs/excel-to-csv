@@ -78,7 +78,7 @@ public class InputStreamGeneratorTest {
                     createUrlMockedInputStreamGenerator(testText, false);
 
             InputStream resultInputStream = streamGenerator
-                    .getInputStream(new URL("http://myexample.com/file.txt"));
+                    .getInputStream(new URL("https://myexample.com/file.txt"));
             assertEquals(testText, readStream(resultInputStream));
         }
 
@@ -90,14 +90,14 @@ public class InputStreamGeneratorTest {
                     createUrlMockedInputStreamGenerator(testText, true);
 
             InputStream resultInputStream = streamGenerator
-                    .getInputStream(new URL("http://myexample.com/file.txt"));
+                    .getInputStream(new URL("https://myexample.com/file.txt"));
             assertEquals(testText, readStream(resultInputStream));
         }
 
         @Test
         public void getUrlConnection() throws IOException {
-            // silly test to enforce codecoverage stats,
-            // as this method used by the Mocks doeesn't always register.
+            // silly test to enforce code coverage stats,
+            // as this method used by the Mocks doesn't always register.
             URLConnection connection = inputStreamGenerator.openConnection(new URL("http://fakefake"));
             assertNotNull(connection);
         }
@@ -133,7 +133,6 @@ public class InputStreamGeneratorTest {
                     .thenReturn(new ByteArrayInputStream(contentBytes));
             return streamGenerator;
         }
-
     }
 
     @Nested
@@ -142,18 +141,16 @@ public class InputStreamGeneratorTest {
 
         @Test
         public void nullPathInput() {
-            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                inputStreamGenerator.getInputStream((Path)null);
-            });
+            Exception exception = assertThrows(IllegalArgumentException.class,
+                    () -> inputStreamGenerator.getInputStream((Path)null));
             assertEquals("Must provide an input file.",
                     exception.getMessage());
         }
 
         @Test
         public void nullFileInput() {
-            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                inputStreamGenerator.getInputStream((File)null);
-            });
+            Exception exception = assertThrows(IllegalArgumentException.class,
+                    () -> inputStreamGenerator.getInputStream((File)null));
             assertEquals("Must provide an input file.",
                     exception.getMessage());
         }
@@ -161,9 +158,8 @@ public class InputStreamGeneratorTest {
         @Test
         public void fileNotExistPathInput() {
             Path fakeFile = Path.of("fake/file.xlsx").toAbsolutePath();
-            Exception exception = assertThrows(FileNotFoundException.class, () -> {
-                inputStreamGenerator.getInputStream(fakeFile);
-            });
+            Exception exception = assertThrows(FileNotFoundException.class,
+                    () -> inputStreamGenerator.getInputStream(fakeFile));
             assertEquals("Invalid Excel file path: " + fakeFile,
                     exception.getMessage());
         }
@@ -171,18 +167,16 @@ public class InputStreamGeneratorTest {
         @Test
         public void isDirectoryPathInput() {
             Path dir = Path.of(".").toAbsolutePath();
-            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                inputStreamGenerator.getInputStream(dir);
-            });
+            Exception exception = assertThrows(IllegalArgumentException.class,
+                    () -> inputStreamGenerator.getInputStream(dir));
             assertEquals("The input file is a directory.",
                     exception.getMessage());
         }
 
         @Test
         public void nullUrlInput() {
-            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                inputStreamGenerator.getInputStream((URL)null);
-            });
+            Exception exception = assertThrows(IllegalArgumentException.class,
+                    () -> inputStreamGenerator.getInputStream((URL)null));
             assertEquals("Must provide an input url.",
                     exception.getMessage());
         }
@@ -190,9 +184,8 @@ public class InputStreamGeneratorTest {
         @Test
         public void invalidSchemeUrlInput() throws MalformedURLException {
             URL url = new URL("jar:file:/path/abc.jar!/foo/file.xlsx");
-            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                inputStreamGenerator.getInputStream(url);
-            });
+            Exception exception = assertThrows(IllegalArgumentException.class,
+                    () -> inputStreamGenerator.getInputStream(url));
             assertEquals("URL has an unsupported protocol: jar",
                     exception.getMessage());
         }
