@@ -8,6 +8,7 @@ import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.io.InputStreamGenerator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,12 +90,8 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
     // Subclasses implement the core extraction logic:
     @Override
     public String[][] readExcelSheetData(InputStream inputStream, int sheetIndex, String password) throws IOException {
-        if (sheetIndex < 0) {
-            throw new IllegalArgumentException("Sheet Index cannot be negative");
-        }
-        if (inputStream == null) {
-            throw new IllegalArgumentException("InputStream cannot be null");
-        }
+        Validate.isTrue(sheetIndex >= 0, "Sheet Index cannot be negative");
+        Validate.isTrue(inputStream != null, "InputStream cannot be null");
         return readSheet(inputStream, sheetIndex, password);
     }
 
@@ -134,12 +131,8 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
     // Subclasses implement the core extraction logic:
     @Override
     public String[][] readExcelSheetData(InputStream inputStream, String sheetName, String password) throws IOException {
-        if (StringUtils.isEmpty(sheetName)) {
-            throw new IllegalArgumentException("Sheet Name cannot be empty");
-        }
-        if (inputStream == null) {
-            throw new IllegalArgumentException("InputStream cannot be null");
-        }
+        Validate.isTrue(StringUtils.isNotEmpty(sheetName), "Sheet Name cannot be empty");
+        Validate.isTrue(inputStream != null, "InputStream cannot be null");
         return readSheet(inputStream, sheetName, password);
     }
 
