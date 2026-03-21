@@ -122,9 +122,4 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     private void clearCurrentRow() {
         currentRowValues.clear();
     }
-
-    @Override
-    public void endSheet() {
-        // nothing to do
-    }
 }
