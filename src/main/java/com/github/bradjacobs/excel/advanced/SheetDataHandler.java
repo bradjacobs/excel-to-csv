@@ -20,6 +20,9 @@ import java.util.List;
 class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     protected static final String EMPTY_CELL = "";
     private static final String EXCEL_ERROR_PREFIX = "ERROR:";
+    private static final String MISSING_CELL_REF_MSG = "Unable to parse Excel Sheet. " +
+            "A cell value was encountered without a cellReference.  " +
+            "See 'Known Issues' for more details.";
 
     protected final SheetConfig sheetConfig;
     protected final CellValueReader cellValueReader;
@@ -120,10 +123,7 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
      */
     private void requireCellReference(String cellReference) {
         if (StringUtils.isEmpty(cellReference)) {
-            throw new IllegalStateException(
-                    "Unable to parse Excel Sheet. " +
-                            "A cell value was encountered without a cellReference.  " +
-                            "See 'Known Issues' for more details.");
+            throw new IllegalStateException(MISSING_CELL_REF_MSG);
         }
     }
 }
