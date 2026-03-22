@@ -11,6 +11,7 @@ import com.github.bradjacobs.excel.csv.QuoteMode;
 import com.github.bradjacobs.excel.io.InputStreamGenerator;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.poi.poifs.filesystem.FileMagic;
 
 import java.io.File;
@@ -140,24 +141,17 @@ public class ExcelReader {
      * @throws IllegalArgumentException if a problem was detected with the File object.
      */
     private void validateOutputFileParameter(Path outputFile) throws IllegalArgumentException {
-        if (outputFile == null) {
-            throw new IllegalArgumentException("Must supply outputFile location to save CSV data.");
-        }
-        else if (Files.isDirectory(outputFile)) {
-            throw new IllegalArgumentException("The outputFile cannot be an existing directory.");
-        }
+        Validate.isTrue(outputFile != null, "Must supply outputFile location to save CSV data.");
+        Validate.isTrue(!Files.isDirectory(outputFile), "The outputFile cannot be an existing directory.");
 
         // confirm output file has an allowed file extension
         String ext = FilenameUtils.getExtension(outputFile.toString());
-        if (! ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase())) {
-            throw new IllegalArgumentException(
-                    String.format("Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext));
-        }
+        Validate.isTrue(ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase()),
+                String.format("Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext));
 
         Path parentDirectory = outputFile.toAbsolutePath().normalize().getParent();
-        if (parentDirectory == null || !Files.isDirectory(parentDirectory)) {
-            throw new IllegalArgumentException("Attempted to save CSV output file in a non-existent directory: " + outputFile);
-        }
+        Validate.isTrue(parentDirectory != null && Files.isDirectory(parentDirectory),
+                "Attempted to save CSV output file in a non-existent directory: " + outputFile);
     }
 
     private Path fileToPath(File file) {
@@ -208,9 +202,7 @@ public class ExcelReader {
          * @param sheetIndex (0-based index of which sheet in Excel file to convert)
          */
         public Builder sheetIndex(int sheetIndex) {
-            if (sheetIndex < 0) {
-                throw new IllegalArgumentException("SheetIndex cannot be negative");
-            }
+            Validate.isTrue(sheetIndex >= 0, "SheetIndex cannot be negative");
             this.sheetIndex = sheetIndex;
             return this;
         }
@@ -234,9 +226,7 @@ public class ExcelReader {
          *  NEVER:   never add quotes to any values.
          */
         public Builder quoteMode(QuoteMode quoteMode) {
-            if (quoteMode == null) {
-                throw new IllegalArgumentException("Cannot set quoteMode to null");
-            }
+            Validate.isTrue(quoteMode != null, "Cannot set quoteMode to null");
             this.quoteMode = quoteMode;
             return this;
         }
