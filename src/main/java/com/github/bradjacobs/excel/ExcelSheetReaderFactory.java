@@ -9,7 +9,7 @@ import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
 import com.github.bradjacobs.excel.standard.StandardExcelSheetReader;
 
-// NOTE: maybe in future may change to enforce
+// NOTE: maybe in the future may change to enforce
 //   the usage of the builder, but right now it's optional
 public class ExcelSheetReaderFactory {
 
@@ -21,6 +21,9 @@ public class ExcelSheetReaderFactory {
     private ExcelSheetReaderFactory() {}
 
     public static ExcelSheetReader create(ReaderType type, SheetConfig sheetConfig) {
+        if (type == null) {
+            throw new IllegalArgumentException("ReaderType must not be null");
+        }
         switch (type) {
             case STANDARD:
                 return new StandardExcelSheetReader(sheetConfig);
@@ -31,6 +34,7 @@ public class ExcelSheetReaderFactory {
         }
     }
 
+    // TODO: might get rid of code below. (tbd)
     public static Builder standard() {
         return new Builder().type(ReaderType.STANDARD);
     }
