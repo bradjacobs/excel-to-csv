@@ -7,14 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-
-import static com.github.bradjacobs.excel.csv.QuoteMode.ALWAYS;
-import static com.github.bradjacobs.excel.csv.QuoteMode.LENIENT;
-import static com.github.bradjacobs.excel.csv.QuoteMode.NEVER;
-import static com.github.bradjacobs.excel.csv.QuoteMode.NORMAL;
 
 /**
  * Given a 2-D string array, escape each value to make csv-compatible and
@@ -33,10 +27,7 @@ public class MatrixToCsvTextConverter {
      * @param quoteMode quoteMode type to determine rules for 'quoting' string values
      */
     public MatrixToCsvTextConverter(QuoteMode quoteMode) {
-        if (quoteMode == null) {
-            throw new IllegalArgumentException("QuoteMode cannot be null.");
-        }
-        this.quoteRule = QUOTE_RULE_MAP.get(quoteMode);
+        this.quoteRule = getQuoteRule(quoteMode);
     }
 
     /**
@@ -125,10 +116,26 @@ public class MatrixToCsvTextConverter {
     private static final Predicate<String> LENIENT_QUOTE_RULE =
             value -> containsMatchingCharacter(value, IS_LENIENT_QUOTE_CHARACTER);
 
-    private static final Map<QuoteMode, Predicate<String>> QUOTE_RULE_MAP = Map.of(
-            NEVER, NEVER_QUOTE_RULE,
-            ALWAYS, ALWAYS_QUOTE_RULE,
-            NORMAL, NORMAL_QUOTE_RULE,
-            LENIENT, LENIENT_QUOTE_RULE
-    );
+    /**
+     * Lookup the the quote rule predicate for the given quoteMode.
+     * @param quoteMode quoteMode
+     * @return the quote rule predicate
+     */
+    private static Predicate<String> getQuoteRule(QuoteMode quoteMode) {
+        if (quoteMode == null) {
+            throw new IllegalArgumentException("QuoteMode cannot be null.");
+        }
+        switch (quoteMode) {
+            case NEVER:
+                return NEVER_QUOTE_RULE;
+            case ALWAYS:
+                return ALWAYS_QUOTE_RULE;
+            case NORMAL:
+                return NORMAL_QUOTE_RULE;
+            case LENIENT:
+                return LENIENT_QUOTE_RULE;
+            default:
+                throw new IllegalArgumentException("Unsupported quoteMode: " + quoteMode);
+        }
+    }
 }
