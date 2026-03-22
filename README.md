@@ -120,7 +120,7 @@ Most cases below appear to be pretty rare (subjectively)
   * the ;;; format currently will _NOT_ produce a blank value
 * Number precision can sometimes be off (appears to be rare).
   * Examples:
-    * "33.8192973" vs a2="33.8192974"
+    * "33.8192973" vs "33.8192974"
     * "0.1245" vs "0.124500000"
     * "0.29999" vs "0.2999900001"
 * Cells of type DataBar or IconSet will show a value, even if marked as "icon only"
