@@ -55,15 +55,7 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     @Override
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
-        if (StringUtils.isEmpty(cellReference)) {
-            // todo: just throw an exception if missing cellReference
-            //    other online 'solutions' show a way to manually track the column index,
-            //    but it seems to often be incorrect and would write cell data in incorrect column.
-            throw new IllegalStateException(
-                    "Unable to parse Excel Sheet. " +
-                            "A cell value was encountered without a cellReference.  " +
-                            "See 'Known Issues' for more details.");
-        }
+        requireCellReference(cellReference);
         CellAddress cellAddress = new CellAddress(cellReference);
         cell(cellAddress.getRow(), cellAddress.getColumn(), formattedValue, comment);
     }
@@ -118,5 +110,20 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     private void clearCurrentRow() {
         currentRowValues.clear();
+    }
+
+    /**
+     * Check existence of cellReference.
+     * Fail if it doesn't exist because the cell position
+     * cannot be recovered reliably.
+     * @param cellReference cell reference
+     */
+    private void requireCellReference(String cellReference) {
+        if (StringUtils.isEmpty(cellReference)) {
+            throw new IllegalStateException(
+                    "Unable to parse Excel Sheet. " +
+                            "A cell value was encountered without a cellReference.  " +
+                            "See 'Known Issues' for more details.");
+        }
     }
 }
