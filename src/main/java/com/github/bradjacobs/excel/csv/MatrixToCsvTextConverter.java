@@ -6,8 +6,7 @@ package com.github.bradjacobs.excel.csv;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 /**
@@ -16,8 +15,6 @@ import java.util.function.Predicate;
  */
 public class MatrixToCsvTextConverter {
     private static final int NORMAL_QUOTE_ASCII_THRESHOLD = 45;
-    private static final Set<Character> LENIENT_QUOTE_CHARACTERS =
-            new HashSet<>(Set.of('"', ',', '\t', '\r', '\n'));
     private static final String NEW_LINE = System.lineSeparator();
 
     private final Predicate<String> quoteRule;
@@ -86,35 +83,23 @@ public class MatrixToCsvTextConverter {
     }
 
     /**
-     * Check if any characters in the given string match the character predicate.
-     * @param value input string
-     * @param characterRule Predicate used to test each character in the string.
-     * @return true if there is at least one character match.
+     * Simple predicate to check if any character in a string matches.
+     * Will return false for null or empty strings.
+     * @param characterPredicate character predicate (as IntPredicate object)
+     * @return String Predicate
      */
-    private static boolean containsMatchingCharacter(String value, Predicate<Character> characterRule) {
-        if (StringUtils.isEmpty(value)) {
-            return false;
-        }
-
-        for (int i = 0; i < value.length(); i++) {
-            if (characterRule.test(value.charAt(i))) {
-                return true;
-            }
-        }
-        return false;
+    public static Predicate<String> anyCharMatch(IntPredicate characterPredicate) {
+        return s -> s != null && s.chars().anyMatch(characterPredicate);
     }
 
-    private static final Predicate<Character> IS_LOW_ASCII_CHAR =
-            character -> character < NORMAL_QUOTE_ASCII_THRESHOLD;
-    private static final Predicate<Character> IS_LENIENT_QUOTE_CHARACTER =
-            LENIENT_QUOTE_CHARACTERS::contains;
+    private static final IntPredicate IS_LOW_ASCII_CHAR = c -> c < NORMAL_QUOTE_ASCII_THRESHOLD;
+    private static final IntPredicate IS_LENIENT_QUOTE_CHARACTER = c ->
+            c == '"' || c == ',' || c == '\t' || c == '\r' || c == '\n';
 
     private static final Predicate<String> NEVER_QUOTE_RULE = value -> false;
     private static final Predicate<String> ALWAYS_QUOTE_RULE = value -> !StringUtils.isEmpty(value);
-    private static final Predicate<String> NORMAL_QUOTE_RULE =
-            value -> containsMatchingCharacter(value, IS_LOW_ASCII_CHAR);
-    private static final Predicate<String> LENIENT_QUOTE_RULE =
-            value -> containsMatchingCharacter(value, IS_LENIENT_QUOTE_CHARACTER);
+    private static final Predicate<String> NORMAL_QUOTE_RULE = anyCharMatch(IS_LOW_ASCII_CHAR);
+    private static final Predicate<String> LENIENT_QUOTE_RULE = anyCharMatch(IS_LENIENT_QUOTE_CHARACTER);
 
     /**
      * Lookup the the quote rule predicate for the given quoteMode.
