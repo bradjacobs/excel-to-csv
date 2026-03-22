@@ -4,7 +4,7 @@
 package com.github.bradjacobs.excel.advanced;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.core.CellValueReader;
+import com.github.bradjacobs.excel.core.CellValueSanitizer;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.util.CellAddress;
@@ -25,14 +25,14 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
             "See 'Known Issues' for more details.";
 
     protected final SheetConfig sheetConfig;
-    protected final CellValueReader cellValueReader;
+    protected final CellValueSanitizer cellValueSanitizer;
     protected final StringRowConsumer stringRowConsumer;
 
     protected final List<String> currentRowValues = new ArrayList<>();
 
     public SheetDataHandler(SheetConfig sheetConfig, StringRowConsumer stringRowConsumer) {
         this.sheetConfig = sheetConfig;
-        this.cellValueReader = new CellValueReader(
+        this.cellValueSanitizer = new CellValueSanitizer(
                 sheetConfig.isAutoTrim(),
                 sheetConfig.getCharSanitizeFlags()
         );
@@ -97,7 +97,7 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     }
 
     protected String sanitizeCellValue(String cellValue) {
-        return stripExcelErrorPrefix(cellValueReader.sanitizeCellValue(cellValue));
+        return stripExcelErrorPrefix(cellValueSanitizer.sanitizeCellValue(cellValue));
     }
 
     /**

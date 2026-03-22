@@ -9,7 +9,9 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 
 import java.util.Set;
 
-public class CellValueReader {
+// todo: the extends class is an experiment
+//   to see first hand how ok or bad the implementation turns out.
+public class CellValueReader extends CellValueSanitizer {
     private static final boolean EMULATE_CSV = true;
     private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
     static {
@@ -17,12 +19,8 @@ public class CellValueReader {
         EXCEL_DATA_FORMATTER.setUseCachedValuesForFormulaCells(true);
     }
 
-    private final boolean autoTrim;
-    private final SpecialCharacterSanitizer specialCharSanitizer;
-
     public CellValueReader(boolean autoTrim, Set<SanitizeType> sanitizeTypes) {
-        this.autoTrim = autoTrim;
-        this.specialCharSanitizer = new SpecialCharacterSanitizer(sanitizeTypes);
+        super(autoTrim, sanitizeTypes);
     }
 
     /**
@@ -49,20 +47,5 @@ public class CellValueReader {
         // plus convert any special Unicode characters (like nbsp or smart quotes),
         // as necessary.
         return sanitizeCellValue(cellValue);
-
-    }
-
-    public String sanitizeCellValue(String inputValue) {
-        if (inputValue == null) {
-            return "";
-        }
-        // if there are any certain special Unicode characters (like nbsp or smart quotes),
-        // replace w/ normal character equivalent
-        String resultValue = specialCharSanitizer.sanitize(inputValue);
-
-        if (this.autoTrim) {
-            resultValue = resultValue.trim();
-        }
-        return resultValue;
     }
 }
