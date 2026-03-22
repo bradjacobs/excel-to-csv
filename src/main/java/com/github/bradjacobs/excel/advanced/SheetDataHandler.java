@@ -19,9 +19,7 @@ import java.util.List;
 //   and unittests are in place before doing refactor.
 class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     protected static final String EMPTY_CELL = "";
-
-    private static final String EXCEL_ERROR_PREFIX = "ERROR:#";
-    private static final int EXCEL_ERROR_PREFIX_STRIP_LENGTH = 6;
+    private static final String EXCEL_ERROR_PREFIX = "ERROR:";
 
     protected final SheetConfig sheetConfig;
     protected final CellValueReader cellValueReader;
@@ -104,17 +102,16 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     }
 
     protected String sanitizeCellValue(String cellValue) {
-        return removeExcelErrorPrefix(cellValueReader.sanitizeCellValue(cellValue));
+        return stripExcelErrorPrefix(cellValueReader.sanitizeCellValue(cellValue));
     }
 
     /**
      * remove the first part of an error string to be consistent
      * with the behavior of reading cell values from Cell/Row/Sheet objects
      */
-    private String removeExcelErrorPrefix(String input) {
-        // note: checking the first 7 characters, but only removing the first 6.
+    private String stripExcelErrorPrefix(String input) {
         if (input.startsWith(EXCEL_ERROR_PREFIX)) {
-            return input.substring(EXCEL_ERROR_PREFIX_STRIP_LENGTH);
+            return input.substring(EXCEL_ERROR_PREFIX.length());
         }
         return input;
     }
