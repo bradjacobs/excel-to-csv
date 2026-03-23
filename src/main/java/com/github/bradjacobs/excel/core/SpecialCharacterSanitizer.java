@@ -5,6 +5,7 @@ package com.github.bradjacobs.excel.core;
 
 import com.github.bradjacobs.excel.config.SanitizeType;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.text.Normalizer;
 import java.util.Arrays;
@@ -43,9 +44,7 @@ public class SpecialCharacterSanitizer {
     }
 
     public SpecialCharacterSanitizer(Collection<SanitizeType> sanitizeTypes) {
-        if (sanitizeTypes == null) {
-            throw new IllegalArgumentException("Must provide non-null sanitizeTypes.");
-        }
+        Validate.isTrue(sanitizeTypes != null, "Must provide non-null sanitizeTypes.");
         this.replacementMap = buildReplacementMap(sanitizeTypes);
     }
 
