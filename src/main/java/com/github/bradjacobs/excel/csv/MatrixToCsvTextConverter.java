@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel.csv;
 
+import com.fasterxml.jackson.dataformat.csv.CsvGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
@@ -37,6 +38,8 @@ public class MatrixToCsvTextConverter {
         if (isEmptyDataMatrix(dataMatrix)) {
             return "";
         }
+
+        CsvGenerator generator = null;
 
         StringBuilder sb = new StringBuilder();
         int columnCount = dataMatrix[0].length;
@@ -93,13 +96,13 @@ public class MatrixToCsvTextConverter {
     }
 
     private static final IntPredicate IS_LOW_ASCII_CHAR = c -> c < NORMAL_QUOTE_ASCII_THRESHOLD;
-    private static final IntPredicate IS_LENIENT_QUOTE_CHARACTER = c ->
+    private static final IntPredicate IS_MINIMAL_QUOTE_CHARACTER = c ->
             c == '"' || c == ',' || c == '\t' || c == '\r' || c == '\n';
 
     private static final Predicate<String> NEVER_QUOTE_RULE = value -> false;
     private static final Predicate<String> ALWAYS_QUOTE_RULE = value -> !StringUtils.isEmpty(value);
     private static final Predicate<String> NORMAL_QUOTE_RULE = anyCharMatch(IS_LOW_ASCII_CHAR);
-    private static final Predicate<String> LENIENT_QUOTE_RULE = anyCharMatch(IS_LENIENT_QUOTE_CHARACTER);
+    private static final Predicate<String> MINIMAL_QUOTE_RULE = anyCharMatch(IS_MINIMAL_QUOTE_CHARACTER);
 
     /**
      * Lookup the the quote rule predicate for the given quoteMode.
@@ -117,8 +120,8 @@ public class MatrixToCsvTextConverter {
                 return ALWAYS_QUOTE_RULE;
             case NORMAL:
                 return NORMAL_QUOTE_RULE;
-            case LENIENT:
-                return LENIENT_QUOTE_RULE;
+            case MINIMAL:
+                return MINIMAL_QUOTE_RULE;
             default:
                 throw new IllegalArgumentException("Unsupported quoteMode: " + quoteMode);
         }

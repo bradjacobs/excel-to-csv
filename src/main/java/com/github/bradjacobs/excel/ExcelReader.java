@@ -222,7 +222,7 @@ public class ExcelReader {
          * @param quoteMode
          *  ALWAYS:  surround all values with quotes
          *  NORMAL:  add quotes around most values that contain non-alphanumeric (roughly similar to Jackson CsvMapper)
-         *  LENIENT: add quotes around values that only really 'need' it to adhere to valid CSV (roughly similar to Excel 'save-as' CSV)
+         *  MINIMAL: add quotes around values that only really 'need' it to adhere to valid CSV (roughly similar to Excel 'save-as' CSV)
          *  NEVER:   never add quotes to any values.
          */
         public Builder quoteMode(QuoteMode quoteMode) {

@@ -6,6 +6,6 @@ package com.github.bradjacobs.excel.csv;
 public enum QuoteMode {
     ALWAYS,
     NORMAL,
-    LENIENT,
+    MINIMAL,
     NEVER
 }

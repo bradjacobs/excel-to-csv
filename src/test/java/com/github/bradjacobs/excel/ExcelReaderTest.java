@@ -36,7 +36,7 @@ public class ExcelReaderTest {
 
     private static final String EXPECTED_NORMAL_CSV_FILE = "expected_normal.csv";
     private static final String EXPECTED_ALWAYS_CSV_FILE = "expected_always.csv";
-    private static final String EXPECTED_LENIENT_CSV_FILE = "expected_lenient.csv";
+    private static final String EXPECTED_MINIMAL_CSV_FILE = "expected_minimal.csv";
     private static final String EXPECTED_NEVER_CSV_FILE = "expected_never.csv";
 
     private static final int EXPECTED_ROW_COUNT = 12;
@@ -48,7 +48,7 @@ public class ExcelReaderTest {
         return Stream.of(
                 Arguments.of(QuoteMode.NORMAL, EXPECTED_NORMAL_CSV_FILE),
                 Arguments.of(QuoteMode.ALWAYS, EXPECTED_ALWAYS_CSV_FILE),
-                Arguments.of(QuoteMode.LENIENT, EXPECTED_LENIENT_CSV_FILE),
+                Arguments.of(QuoteMode.MINIMAL, EXPECTED_MINIMAL_CSV_FILE),
                 Arguments.of(QuoteMode.NEVER, EXPECTED_NEVER_CSV_FILE)
         );
     }

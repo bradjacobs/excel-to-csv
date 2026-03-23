@@ -50,7 +50,7 @@ String[][] dataMatrix = excelReader.convertToDataMatrix(new File("input.xlsx"));
 ```java
 // write csv file with specific settings
 ExcelReader excelReader = ExcelReader.builder()
-        .quoteMode(QuoteMode.LENIENT) // only quote values if necessary
+        .quoteMode(QuoteMode.MINIMAL) // only quote values if necessary
         .sheetIndex(1) // grab the 2nd worksheet
         .removeBlankRows(true) // ignore any empty rows from the Excel worksheet
         .build();
@@ -77,7 +77,7 @@ excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new 
 ### BuilderDetails
 | FIELD                  | REQUIRED | DEFAULT | DETAILS                                                                                                                                                                                                                                                                        |
 |------------------------|----------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| quoteMode              | NO       | NORMAL  | how aggressive to wrap quotes around values<br><br>*ALWAYS*: always put quotes around values<br>*NORMAL*: put quotes around most values that are non-alphanumeric<br>*LENIENT*: only add quotes around values that are needed to be CSV compliant<br>*NEVER*: never add quotes |
+| quoteMode              | NO       | NORMAL  | how aggressive to wrap quotes around values<br><br>*ALWAYS*: always put quotes around values<br>*NORMAL*: put quotes around most values that are non-alphanumeric<br>*MINIMAL*: only add quotes around values that are needed to be CSV compliant<br>*NEVER*: never add quotes |
 | sheetIndex             | NO       | 0       | 0-based index of which worksheet to convert to CSV                                                                                                                                                                                                                             |
 | sheetName              | NO       | (blank) | Name of the worksheet tab to be converted to CSV<br> (if set then 'sheetIndex' is ignored)                                                                                                                                                                                     |
 | autoTrim               | NO       | true    | Trim any leading/trailing whitespace on cell values.                                                                                                                                                                                                                           |
