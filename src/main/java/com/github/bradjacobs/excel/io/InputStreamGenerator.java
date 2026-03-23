@@ -3,6 +3,8 @@
  */
 package com.github.bradjacobs.excel.io;
 
+import org.apache.commons.lang3.Validate;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,26 +30,20 @@ public class InputStreamGenerator {
     }
 
     public InputStream getInputStream(Path inputFile) throws IOException {
-        if (inputFile == null) {
-            throw new IllegalArgumentException("Must provide an input file.");
-        }
-        else if (!Files.exists(inputFile)) {
+        Validate.isTrue(inputFile != null, "Must provide an input file.");
+        Validate.isTrue(!Files.isDirectory(inputFile), "The input file cannot be a directory.");
+        if (!Files.exists(inputFile)) {
+            // throw a different exception for FileNotFound
             throw new FileNotFoundException(String.format("Invalid Excel file path: %s", inputFile.toAbsolutePath()));
-        }
-        else if (Files.isDirectory(inputFile)) {
-            throw new IllegalArgumentException("The input file is a directory.");
         }
         return new BufferedInputStream( Files.newInputStream(inputFile) );
     }
 
     public InputStream getInputStream(URL url) throws IOException {
-        if (url == null) {
-            throw new IllegalArgumentException("Must provide an input url.");
-        }
+        Validate.isTrue(url != null, "Must provide an input url.");
+
         String urlProtocol = url.getProtocol();
-        if (! VALID_URL_SCHEMES.contains(urlProtocol)) {
-            throw new IllegalArgumentException(String.format("URL has an unsupported protocol: %s", urlProtocol));
-        }
+        Validate.isTrue(VALID_URL_SCHEMES.contains(urlProtocol), String.format("URL has an unsupported protocol: %s", urlProtocol));
 
         if (urlProtocol.equalsIgnoreCase("file")) {
             return getInputStream( Paths.get(url.getPath()) );

@@ -169,7 +169,7 @@ public class InputStreamGeneratorTest {
             Path dir = Path.of(".").toAbsolutePath();
             Exception exception = assertThrows(IllegalArgumentException.class,
                     () -> inputStreamGenerator.getInputStream(dir));
-            assertEquals("The input file is a directory.",
+            assertEquals("The input file cannot be a directory.",
                     exception.getMessage());
         }
 

@@ -64,7 +64,7 @@ public class ExcelReaderExceptionHandlingTest {
                     arguments(named("File Not Found", INPUT_FILE_NOT_FOUND_PATH), FileNotFoundException.class, "Invalid Excel file path: /bogus/path/here/file.xlsx"),
                     arguments(named("Null Input", null), IllegalArgumentException.class, "Must provide an input file."),
                     arguments(named("Invalid Excel File Input", TEXT_FILE_PATH), IOException.class, null),
-                    arguments(named("Directory Input", DIR_PATH), IllegalArgumentException.class, "The input file is a directory.")
+                    arguments(named("Directory Input", DIR_PATH), IllegalArgumentException.class, "The input file cannot be a directory.")
             );
         }
 
@@ -72,7 +72,7 @@ public class ExcelReaderExceptionHandlingTest {
             return Arrays.asList(
                     arguments(named("Url Not Found", INPUT_FILE_NOT_FOUND_URL), UnknownHostException.class, null),
                     arguments(named("Null Input", null), IllegalArgumentException.class, "Must provide an input url."),
-                    arguments(named("Directory Input", "file:///"), IllegalArgumentException.class, "The input file is a directory."),
+                    arguments(named("Directory Input", "file:///"), IllegalArgumentException.class, "The input file cannot be a directory."),
                     arguments(named("Invalid Url Protocol", "jar:file:/C:/foo/jar/parser.jar!/test.xlsx"), IllegalArgumentException.class, "URL has an unsupported protocol: jar")
             );
         }
