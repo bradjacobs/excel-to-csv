@@ -244,14 +244,6 @@ public class StringRowConsumer implements Consumer<List<String>> {
      * Check if row is considered to be 'blank/empty'
      */
     private static boolean isEmptyRow(List<String> rowData) {
-        if (rowData == null || rowData.isEmpty()) {
-            return true;
-        }
-        for (String value : rowData) {
-            if (StringUtils.isNotEmpty(value)) {
-                return false;
-            }
-        }
-        return true;
+        return rowData == null || rowData.stream().allMatch(StringUtils::isEmpty);
     }
 }
