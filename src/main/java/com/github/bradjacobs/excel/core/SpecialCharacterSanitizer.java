@@ -188,10 +188,10 @@ public class SpecialCharacterSanitizer {
     }
 
     private static Map<Character,Character> generateQuoteReplacementMap() {
-        return new LinkedHashMap<>(){{
-            putAll(generateReplacementMap(SINGLE_QUOTE_CHARS, '\''));
-            putAll(generateReplacementMap(DOUBLE_QUOTE_CHARS, '"'));
-        }};
+        Map<Character, Character> resultMap = new LinkedHashMap<>();
+        resultMap.putAll(generateReplacementMap(SINGLE_QUOTE_CHARS, '\''));
+        resultMap.putAll(generateReplacementMap(DOUBLE_QUOTE_CHARS, '"'));
+        return resultMap;
     }
 
     private static Map<Character,Character> generateDashReplacementMap() {
