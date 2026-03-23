@@ -4,8 +4,8 @@
 package com.github.bradjacobs.excel.csv;
 
 public enum QuoteMode {
-    ALWAYS,
-    NORMAL,
-    MINIMAL,
-    NEVER
+    ALWAYS,  // always quote values (expect for empty/blank)
+    NORMAL,  // Quotes if discovers potentially 'unsafe' characters (but can overquote)
+    MINIMAL, // only quote if a string contains a character that needs quotes for CSV compliance
+    NEVER    // never quote values
 }

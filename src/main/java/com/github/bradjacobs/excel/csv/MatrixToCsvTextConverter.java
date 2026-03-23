@@ -14,7 +14,10 @@ import java.util.function.Predicate;
  * combine to be final csv text string.
  */
 public class MatrixToCsvTextConverter {
+    // Threshold from jackson-dataformat-csv CsvEncoder (_cfgMinSafeChar).
+    // Characters below this ASCII value are considered potentially unsafe.
     private static final int NORMAL_QUOTE_ASCII_THRESHOLD = 45;
+
     private static final String NEW_LINE = System.lineSeparator();
 
     private final Predicate<String> quoteRule;
