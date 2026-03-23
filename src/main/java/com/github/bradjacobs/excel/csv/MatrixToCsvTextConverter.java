@@ -3,7 +3,6 @@
  */
 package com.github.bradjacobs.excel.csv;
 
-import com.fasterxml.jackson.dataformat.csv.CsvGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
@@ -38,8 +37,6 @@ public class MatrixToCsvTextConverter {
         if (isEmptyDataMatrix(dataMatrix)) {
             return "";
         }
-
-        CsvGenerator generator = null;
 
         StringBuilder sb = new StringBuilder();
         int columnCount = dataMatrix[0].length;
