@@ -43,7 +43,7 @@ public class InputStreamGenerator {
         Validate.isTrue(url != null, "Must provide an input url.");
 
         String urlProtocol = url.getProtocol();
-        Validate.isTrue(VALID_URL_SCHEMES.contains(urlProtocol), String.format("URL has an unsupported protocol: %s", urlProtocol));
+        Validate.isTrue(VALID_URL_SCHEMES.contains(urlProtocol), "URL has an unsupported protocol: %s", urlProtocol);
 
         if (urlProtocol.equalsIgnoreCase("file")) {
             return getInputStream( Paths.get(url.getPath()) );

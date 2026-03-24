@@ -147,7 +147,7 @@ public class ExcelReader {
         // confirm output file has an allowed file extension
         String ext = FilenameUtils.getExtension(outputFile.toString());
         Validate.isTrue(ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase()),
-                String.format("Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext));
+                "Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext);
 
         Path parentDirectory = outputFile.toAbsolutePath().normalize().getParent();
         Validate.isTrue(parentDirectory != null && Files.isDirectory(parentDirectory),
