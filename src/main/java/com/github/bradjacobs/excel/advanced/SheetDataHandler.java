@@ -7,6 +7,7 @@ import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.CellValueSanitizer;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
@@ -58,7 +59,10 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     @Override
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
-        requireCellReference(cellReference);
+        // cellReference must exist to determine cell position.
+        Validate.isTrue(StringUtils.isNotEmpty(cellReference),
+                MISSING_CELL_REF_MSG);
+
         CellAddress cellAddress = new CellAddress(cellReference);
         cell(cellAddress.getRow(), cellAddress.getColumn(), formattedValue, comment);
     }
@@ -113,17 +117,5 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     private void clearCurrentRow() {
         currentRowValues.clear();
-    }
-
-    /**
-     * Check existence of cellReference.
-     * Fail if it doesn't exist because the cell position
-     * cannot be recovered reliably.
-     * @param cellReference cell reference
-     */
-    private void requireCellReference(String cellReference) {
-        if (StringUtils.isEmpty(cellReference)) {
-            throw new IllegalStateException(MISSING_CELL_REF_MSG);
-        }
     }
 }
