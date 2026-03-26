@@ -183,7 +183,7 @@ public class ExcelReader {
     }
 
     // this builder extends abstract class to allow any of the
-    //   ExcelSheetReader.Builder values to be set on this Builder as well.
+    //   AbstractSheetConfigBuilder values to be set on this Builder as well.
     public static class Builder extends AbstractSheetConfigBuilder<ExcelReader, Builder> {
         private int sheetIndex = 0; // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name

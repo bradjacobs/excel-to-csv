@@ -191,10 +191,9 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 
 <details>
   <summary>Todo Item List... (Click To Expand)</summary>
-
+y 
 * General Unittest cleanup and add more tests (ongoing)
-* Add an option to return unformatted numbers instead of WYSIWYG (i.e. "1000000" instead of "1,000,000")
-* Add an option to return dates in a common UTC format instead of WYSIWYG
+* Refactoring in the advances package (visibliity policy logic and row filling, for example)
 * Integrate a real logger into the code
 * Address any of the "Known Cell Data Issues" (above) if possible
 * Add more Javadocs
@@ -202,6 +201,7 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 * Consider making a 'release version' or something that can be referenced via maven dependency
 * Reorganize Excel Test data for Junit tests.
 * The pom.xml could use some cleanup and organization.
+* (maybe) Add an option to return unformatted numbers instead of WYSIWYG (i.e. "1000000" instead of "1,000,000")
 </details>
 
 ## FinalThoughts

@@ -20,11 +20,11 @@ import java.util.stream.IntStream;
 /**
  * A more bare-bones example of using the POI library
  * for reading sheet data from an Excel file.
- *
+ * <p/>
  * NOTE_1:
  *   Generally it's best to avoid row/column iterators because it can produce an
  *   unexpected result with null cells or rows.
- *
+ * <p/>
  *   Example: If an Excel sheet was like this:
  *           A     B     C    D
  *       1  dog              cat
@@ -33,33 +33,33 @@ import java.util.stream.IntStream;
  *       [["dog", "", "", "cat"], ["", "cow", "", "pig"]]
  *   But using iterator can result in something like this:
  *       [["dog", "cat"], ["cow", "pig"]]
- *
+ * <p/>
  *   Do note that without the iterator it's possible to have trailing blank rows
  *     after all the data is read.
- *
+ * <p/>
  * NOTE_2:
  *   set 'formatter.setUseCachedValuesForFormulaCells(true)'
  *   to get the actual value one sees in a cell (and not the raw formula)
- *
+ * <p/>
  * NOTE_3:
  *   You may (or may not) want to allow rows with different lengths.
  *   There sre 2 examples below (one for each scenario)
- *
+ * <p/>
  * NOTE_4:
  *   Be aware that it's possible for 'row.getLastCellNum()'
  *     to return -1  (though it doesn't matter for this example)
- *
+ * <p/>
  * NOTE_5:
  *   To get the correct rowCount is actually
  *     sheet.getLastRowNum()  +  1
  *   but it's _not_ correct add +1 to 'row.getLastCellNum()' (oddly enough).
  *   In the code below used 'IntStream.rangeClosed' instead of 'IntStream.range'
  *   to avoid the extra + 1
- *
+ * <p/>
  * NOTE_6:
  *   The examples below till call 'trim()' on each of the cell values.
  *   Easily removable if not desired.
- *
+ * <p/>
  * NOTE_7:
  *   'formatter.formatCellValue(null)' - returns an empty string
  */

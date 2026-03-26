@@ -345,7 +345,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         }
 
         @Test
-        public void negativeSheetIndex() throws IOException {
+        public void negativeSheetIndex() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();
                 // fake inputStream, but expect the negative index to be detected first.
@@ -355,7 +355,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         }
 
         @Test
-        public void nullSheetName() throws IOException {
+        public void nullSheetName() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();
                 // fake inputStream, but expect the negative index to be detected first.
@@ -365,7 +365,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         }
 
         @Test
-        public void emptySheetName() throws IOException {
+        public void emptySheetName() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();
                 // fake inputStream, but expect the negative index to be detected first.
@@ -375,7 +375,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         }
 
         @Test
-        public void unknownSheetName() throws IOException {
+        public void unknownSheetName() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();
                 sheetReader.readExcelSheetData(TEST_FILE, "UnknownSheetName");

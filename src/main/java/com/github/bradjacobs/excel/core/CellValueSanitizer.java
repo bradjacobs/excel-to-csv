@@ -30,6 +30,4 @@ public class CellValueSanitizer {
         }
         return resultValue;
     }
-
-
 }

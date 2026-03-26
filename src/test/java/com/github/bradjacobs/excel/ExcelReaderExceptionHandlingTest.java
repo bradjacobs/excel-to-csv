@@ -132,7 +132,7 @@ public class ExcelReaderExceptionHandlingTest {
 
             // repeat the same test using URL input param.  \
             //   The invalid CSV out param should be detected _BEFORE_ the invalid url is detected
-            URL url = new URL("http://somesite.com/file.xlsx");
+            URL url = new URL("https://somesite.com/file.xlsx");
             Executable executable2 = () -> DEFAULT_EXCEL_READER.convertToCsvFile(url, path);
             assertExecutableException(executable2, expectedException, expectedMessage);
         }
@@ -146,7 +146,7 @@ public class ExcelReaderExceptionHandlingTest {
 
             // repeat the same test using URL input param.  \
             //   The invalid CSV out param should be detected _BEFORE_ the invalid url is detected
-            URL url = new URL("http://somesite.com/file.xlsx");
+            URL url = new URL("https://somesite.com/file.xlsx");
             Executable executable2 = () -> DEFAULT_EXCEL_READER.convertToCsvFile(url, file);
             assertExecutableException(executable2, expectedException, expectedMessage);
         }
