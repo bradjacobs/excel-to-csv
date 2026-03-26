@@ -12,8 +12,6 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
  */
 class VisibleOnlySheetDataHandler extends SheetDataHandler {
 
-    private final SheetContext sheetContext;
-
     /**
      * Tracks the last row index observed by {@link #startRow(int)}.
      */
@@ -23,16 +21,9 @@ class VisibleOnlySheetDataHandler extends SheetDataHandler {
             SheetConfig sheetConfig,
             StringRowConsumer stringRowConsumer,
             SheetContext sheetContext) {
-        super(sheetConfig, stringRowConsumer);
-        this.sheetContext = sheetContext;
-    }
-
-    private boolean isHiddenRow(int rowIndex) {
-        return sheetContext.isRowHidden(rowIndex);
-    }
-
-    private boolean isHiddenColumn(int columnIndex) {
-        return sheetContext.isColumnHidden(columnIndex);
+        super(sheetConfig,
+                stringRowConsumer,
+                new SheetContextVisibilityPolicy(sheetContext));
     }
 
     @Override
@@ -49,14 +40,14 @@ class VisibleOnlySheetDataHandler extends SheetDataHandler {
 
         final int firstMissingRowIndex = previousRowIndex + 1;
         for (int rowIndex = firstMissingRowIndex; rowIndex < currentRowIndex; rowIndex++) {
-            if (!isHiddenRow(rowIndex)) {
+            if (visibilityPolicy.isRowVisible(rowIndex)) {
                 stringRowConsumer.accept(null);
             }
         }
     }
 
     private boolean shouldSkipCell(int rowNum, int columnIndex) {
-        return isHiddenRow(rowNum) || isHiddenColumn(columnIndex);
+        return !visibilityPolicy.isCellVisible(rowNum, columnIndex);
     }
 
     @Override
@@ -67,13 +58,21 @@ class VisibleOnlySheetDataHandler extends SheetDataHandler {
         super.cell(rowNum, columnIndex, formattedValue, comment);
     }
 
-    @Override
-    protected boolean shouldAcceptRow(int rowNum) {
-        return !isHiddenRow(rowNum);
-    }
+    private static class SheetContextVisibilityPolicy implements SheetVisibilityPolicy {
 
-    @Override
-    protected boolean shouldAcceptColumn(int columnIndex) {
-        return !isHiddenColumn(columnIndex);
+        private final SheetContext sheetContext;
+        public SheetContextVisibilityPolicy(SheetContext sheetContext) {
+            this.sheetContext = sheetContext;
+        }
+
+        @Override
+        public boolean isRowVisible(int rowNum) {
+            return !sheetContext.isRowHidden(rowNum);
+        }
+
+        @Override
+        public boolean isColumnVisible(int columnIndex) {
+            return !sheetContext.isColumnHidden(columnIndex);
+        }
     }
 }

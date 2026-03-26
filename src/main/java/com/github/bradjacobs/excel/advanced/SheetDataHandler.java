@@ -24,20 +24,30 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     private static final String MISSING_CELL_REF_MSG = "Unable to parse Excel Sheet. " +
             "A cell value was encountered without a cellReference.  " +
             "See 'Known Issues' for more details.";
+    private static final SheetVisibilityPolicy ALWAYS_VISIBLE_POLICY = new SheetVisibilityPolicy() {};
 
     protected final SheetConfig sheetConfig;
     protected final CellValueSanitizer cellValueSanitizer;
     protected final StringRowConsumer stringRowConsumer;
+    protected final SheetVisibilityPolicy visibilityPolicy;
 
     protected final List<String> currentRowValues = new ArrayList<>();
 
     public SheetDataHandler(SheetConfig sheetConfig, StringRowConsumer stringRowConsumer) {
+        this(sheetConfig, stringRowConsumer, ALWAYS_VISIBLE_POLICY);
+    }
+
+    protected SheetDataHandler(
+            SheetConfig sheetConfig,
+            StringRowConsumer stringRowConsumer,
+            SheetVisibilityPolicy visibilityPolicy) {
         this.sheetConfig = sheetConfig;
         this.cellValueSanitizer = new CellValueSanitizer(
                 sheetConfig.isAutoTrim(),
                 sheetConfig.getCharSanitizeFlags()
         );
         this.stringRowConsumer = stringRowConsumer;
+        this.visibilityPolicy = visibilityPolicy;
     }
 
     public String[][] getMatrix() {
@@ -84,11 +94,11 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     }
 
     protected boolean shouldAcceptRow(int rowNum) {
-        return true;
+        return visibilityPolicy.isRowVisible(rowNum);
     }
 
     protected boolean shouldAcceptColumn(int columnIndex) {
-        return true;
+        return visibilityPolicy.isColumnVisible(columnIndex);
     }
 
     protected void fillMissingColumnsUpTo(int columnIndex) {
