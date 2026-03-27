@@ -19,7 +19,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
 class SheetXMLReader extends XMLFilterImpl {
-    private final SheetConfig sheetConfig;
     private final StringRowConsumer stringRowConsumer;
 
     public SheetXMLReader(
@@ -27,13 +26,16 @@ class SheetXMLReader extends XMLFilterImpl {
             SharedStrings sharedStrings,
             StylesTable styles,
             boolean uses1904DateWindowing) throws ParserConfigurationException, SAXException {
-        this.sheetConfig = sheetConfig;
         this.stringRowConsumer = StringRowConsumer.of(
                 sheetConfig.isRemoveBlankRows(),
                 sheetConfig.isRemoveBlankColumns()
         );
         DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
-        XMLReader reader = createXmlReader(sharedStrings, styles, dataFormatter);
+        XMLReader reader = createXmlReader(
+                sheetConfig,
+                sharedStrings,
+                styles,
+                dataFormatter);
         setParent(reader);
     }
 
@@ -48,6 +50,7 @@ class SheetXMLReader extends XMLFilterImpl {
     }
 
     private XMLReader createXmlReader(
+            SheetConfig sheetConfig,
             SharedStrings sharedStrings,
             StylesTable styles,
             DataFormatter dataFormatter
