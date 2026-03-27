@@ -113,7 +113,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
     ) throws IOException, InvalidFormatException {
         InputStream inputStream = fetchSheetInputStream(reader, (si, sn) -> sn.equalsIgnoreCase(sheetName));
         if (inputStream == null) {
-            throw new SheetNotFoundException(sheetName);
+            throw sheetNotFound(sheetName);
         }
         return inputStream;
     }

@@ -47,7 +47,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
     protected String[][] readSheet(InputStream inputStream, String sheetName, String password) throws IOException {
         Sheet sheet = getFileSheet(inputStream, password, (w) -> w.getSheet(sheetName));
         if (sheet == null) {
-            throw new SheetNotFoundException(sheetName);
+            throw sheetNotFound(sheetName);
         }
         return convertToDataMatrix(sheet);
     }

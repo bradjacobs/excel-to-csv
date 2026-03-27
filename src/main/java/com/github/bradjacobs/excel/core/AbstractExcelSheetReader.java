@@ -29,6 +29,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
     protected static final InputStreamGenerator inputStreamGenerator = new InputStreamGenerator();
     private static final String DEFAULT_PASSWORD = null;
     private static final int FIRST_SHEET_INDEX = 0;
+    private static final String SHEET_NOT_FOUND_MSG = "Excel sheet not found: '%s'";
 
     protected final SheetConfig sheetConfig;
 
@@ -143,13 +144,14 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
     protected abstract String[][] readSheet(InputStream inputStream, String sheetName, String password) throws IOException;
 
-    // common exception with message to use if sheet name was not found.
-    protected static class SheetNotFoundException extends IllegalArgumentException {
-        public SheetNotFoundException(String sheetName) {
-            super(String.format("Excel sheet not found: '%s'", sheetName));
-        }
+    /**
+     * Create exception to be thrown if sheet name is not found.
+     * @param sheetName the sheet name.
+     * @return IllegalArgumentException
+     */
+    protected static IllegalArgumentException sheetNotFound(String sheetName) {
+        return new IllegalArgumentException(String.format(SHEET_NOT_FOUND_MSG, sheetName));
     }
-
 
     // below is common code for sheet configuration builder
     abstract public static class AbstractSheetConfigBuilder<T, B extends AbstractSheetConfigBuilder<T, B>> {
