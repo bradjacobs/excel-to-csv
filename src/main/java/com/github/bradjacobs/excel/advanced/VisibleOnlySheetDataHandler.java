@@ -19,13 +19,14 @@ class VisibleOnlySheetDataHandler extends SheetDataHandler {
      */
     private int lastProcessedRowIndex = NO_PREVIOUS_ROW;
 
+    private final SheetVisibilityPolicy visibilityPolicy;
+
     public VisibleOnlySheetDataHandler(
             SheetConfig sheetConfig,
             StringRowConsumer stringRowConsumer,
             SheetContext sheetContext) {
-        super(sheetConfig,
-                stringRowConsumer,
-                createVisibilityPolicy(sheetContext));
+        super(sheetConfig, stringRowConsumer);
+        this.visibilityPolicy = createVisibilityPolicy(sheetContext);
     }
 
     @Override
@@ -56,6 +57,28 @@ class VisibleOnlySheetDataHandler extends SheetDataHandler {
             return;
         }
         super.cell(rowNum, columnIndex, formattedValue, comment);
+    }
+
+    @Override
+    protected void appendMissingColumnsBefore(int columnIndex) {
+        // fill in any blanks between values in a row (if necessary)
+        for (int col = currentRowValues.size(); col < columnIndex; col++) {
+            if (visibilityPolicy.isColumnVisible(col)) {
+                currentRowValues.add(EMPTY_CELL_VALUE);
+            }
+        }
+    }
+
+    @Override
+    public void endRow(int rowNum) {
+        if (isRowVisible(rowNum)) {
+            stringRowConsumer.accept(currentRowValues);
+        }
+        clearCurrentRow();
+    }
+
+    private boolean isRowVisible(int rowNum) {
+        return visibilityPolicy.isRowVisible(rowNum);
     }
 
     private static SheetVisibilityPolicy createVisibilityPolicy(SheetContext sheetContext) {

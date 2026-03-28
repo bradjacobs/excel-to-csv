@@ -19,35 +19,25 @@ import java.util.List;
 //   but want to first confirm all edge cases work correctly
 //   and unittests are in place before doing refactor.
 class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
-    protected static final String EMPTY_CELL = "";
+    protected static final String EMPTY_CELL_VALUE = "";
     private static final String EXCEL_ERROR_PREFIX = "ERROR:";
     private static final String MISSING_CELL_REF_MSG = "Unable to parse Excel Sheet. " +
             "A cell value was encountered without a cellReference.  " +
             "See 'Known Issues' for more details.";
-    private static final SheetVisibilityPolicy ALWAYS_VISIBLE_POLICY = new SheetVisibilityPolicy() {};
 
     protected final SheetConfig sheetConfig;
     protected final CellValueSanitizer cellValueSanitizer;
     protected final StringRowConsumer stringRowConsumer;
-    protected final SheetVisibilityPolicy visibilityPolicy;
 
     protected final List<String> currentRowValues = new ArrayList<>();
 
     public SheetDataHandler(SheetConfig sheetConfig, StringRowConsumer stringRowConsumer) {
-        this(sheetConfig, stringRowConsumer, ALWAYS_VISIBLE_POLICY);
-    }
-
-    protected SheetDataHandler(
-            SheetConfig sheetConfig,
-            StringRowConsumer stringRowConsumer,
-            SheetVisibilityPolicy visibilityPolicy) {
         this.sheetConfig = sheetConfig;
         this.cellValueSanitizer = new CellValueSanitizer(
                 sheetConfig.isAutoTrim(),
                 sheetConfig.getCharSanitizeFlags()
         );
         this.stringRowConsumer = stringRowConsumer;
-        this.visibilityPolicy = visibilityPolicy;
     }
 
     public String[][] getMatrix() {
@@ -61,14 +51,8 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     @Override
     public void endRow(int rowNum) {
-        flushCurrentRowIfVisible(rowNum);
+        stringRowConsumer.accept(currentRowValues);
         clearCurrentRow();
-    }
-
-    private void flushCurrentRowIfVisible(int rowNum) {
-        if (isRowVisible(rowNum)) {
-            stringRowConsumer.accept(currentRowValues);
-        }
     }
 
     @Override
@@ -100,20 +84,10 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         }
     }
 
-    protected boolean isRowVisible(int rowNum) {
-        return visibilityPolicy.isRowVisible(rowNum);
-    }
-
-    protected boolean isColumnVisible(int columnIndex) {
-        return visibilityPolicy.isColumnVisible(columnIndex);
-    }
-
     protected void appendMissingColumnsBefore(int columnIndex) {
         // fill in any blanks between values in a row (if necessary)
         for (int col = currentRowValues.size(); col < columnIndex; col++) {
-            if (isColumnVisible(col)) {
-                currentRowValues.add(EMPTY_CELL);
-            }
+            currentRowValues.add(EMPTY_CELL_VALUE);
         }
     }
 
@@ -132,7 +106,7 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         return input;
     }
 
-    private void clearCurrentRow() {
+    protected void clearCurrentRow() {
         currentRowValues.clear();
     }
 }
