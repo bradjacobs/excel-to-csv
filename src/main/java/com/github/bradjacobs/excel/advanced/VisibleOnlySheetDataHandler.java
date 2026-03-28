@@ -12,10 +12,12 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
  */
 class VisibleOnlySheetDataHandler extends SheetDataHandler {
 
+    private static final int NO_PREVIOUS_ROW = -1;
+
     /**
      * Tracks the last row index observed by {@link #startRow(int)}.
      */
-    private int lastProcessedRowIndex = -1;
+    private int lastProcessedRowIndex = NO_PREVIOUS_ROW;
 
     public VisibleOnlySheetDataHandler(
             SheetConfig sheetConfig,
