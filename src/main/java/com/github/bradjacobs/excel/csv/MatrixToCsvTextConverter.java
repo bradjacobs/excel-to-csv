@@ -105,7 +105,7 @@ public class MatrixToCsvTextConverter {
     private static final Predicate<String> MINIMAL_QUOTE_RULE = anyCharMatch(IS_MINIMAL_QUOTE_CHARACTER);
 
     /**
-     * Lookup the the quote rule predicate for the given quoteMode.
+     * Lookup the quote rule predicate for the given quoteMode.
      * @param quoteMode quoteMode
      * @return the quote rule predicate
      */

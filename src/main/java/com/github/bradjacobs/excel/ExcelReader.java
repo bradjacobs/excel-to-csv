@@ -127,7 +127,7 @@ public class ExcelReader {
     }
 
     private String prepareCsvContentForWriting(String csvContent) {
-        // prepend the 'bom' so that unicode characters will render correctly
+        // prepend the 'bom' so that Unicode characters will render correctly
         if (saveUnicodeFileWithBom && containsUnicode(csvContent)) {
             return BOM + csvContent;
         }
@@ -189,7 +189,7 @@ public class ExcelReader {
         private String sheetName = ""; // optionally provide a specific sheet name
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
-        private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains unicode.
+        private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains Unicode.
         private boolean useAdvancedReader = true; // use the advanced reader (if possible)
 
         @Override
@@ -242,7 +242,7 @@ public class ExcelReader {
         }
 
         /**
-         * Use a BOM when writing output file if data contains 'unicode characters'
+         * Use a BOM when writing output file if data contains 'Unicode characters'
          * @param saveUnicodeFileWithBom (defaults to true)
          */
         public Builder saveUnicodeFileWithBom(boolean saveUnicodeFileWithBom) {

@@ -54,7 +54,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
 
     /**
      * Read in a specific Sheet from the Excel File input stream.
-     * @param inputStream inputStream of the excel file.
+     * @param inputStream inputStream of the Excel file.
      * @param password password (optional)
      * @param workbookSheetGrabber function to grab the sheet from the workbook.
      * @return sheet
@@ -114,7 +114,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
 
     /**
      * Converts the given row into String[] of values.
-     * @param row excel sheet row
+     * @param row Excel sheet row
      * @param columnsToRead columns to read
      * @param maxRequestedColumnIndex max requested column index
      * @return List of values

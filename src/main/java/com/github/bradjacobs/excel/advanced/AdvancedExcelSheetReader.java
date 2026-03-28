@@ -63,7 +63,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
             SheetStreamProvider sheetStreamProvider
     ) throws IOException {
 
-        // preprocess the file stream to confirm it's the correct supported type,
+        // preprocess the file stream to confirm it's the supported type,
         // and password decrypt the stream (if necessary)
         try (InputStream inputStream = preprocessFileInputStream(excelInputStream, password)) {
             // note: don't need to close the pkg in this context.

@@ -200,7 +200,7 @@ public class ExcelReaderTest {
             assertEquals(expectedCsvText, outputFileContent, "mismatch of content of saved csv file");
         }
 
-        // if the output csv file saved does NOT have any unicode,
+        // if the output csv file saved does NOT have any Unicode,
         //  then the 'saveUnicodeFileWithBom' flag should have no effect.
         @Test
         public void testBomFlagWithoutUnicode(@TempDir Path tempDir) throws Exception {

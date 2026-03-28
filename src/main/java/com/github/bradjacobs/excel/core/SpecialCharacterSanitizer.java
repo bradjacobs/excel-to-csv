@@ -23,7 +23,7 @@ import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * Used to convert some special unicode characters into basic equivalent.
+ * Used to convert some special Unicode characters into basic equivalent.
  * examples: convert 'smart quotes' into normal quotes  (e.g. “” --> "")
  *   or convert special space characters (i.e. NBSP characters) to normal spaces.
  */
@@ -133,9 +133,9 @@ public class SpecialCharacterSanitizer {
     private static final Character[] DASH_CHARS = {
             //'\u00AD', // soft hyphen (Note: include or not?  usually invisible)
             '\u02D7', // modifier letter minus sign
-            '\u05A8', // armenian hyphen
-            '\u05BE', // hebrew punctuation maqaf
-            '\u1806', // mongolian soft hyphen
+            '\u05A8', // Armenian hyphen
+            '\u05BE', // Hebrew punctuation maqaf
+            '\u1806', // Mongolian soft hyphen
             '\u2010', // hyphen
             '\u2011', // non-breaking hyphen
             '\u2012', // figure dash

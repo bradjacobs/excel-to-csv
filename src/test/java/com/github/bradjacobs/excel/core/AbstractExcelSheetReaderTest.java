@@ -151,7 +151,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
         @Test
         public void defaultRetainBlankRows() throws IOException {
-            // by default we keep the blank rows.
+            // by default, we keep the blank rows.
             B builder = createBuilder();
             T sheetReader = builder.removeBlankRows(false).build();
 
@@ -194,7 +194,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
         @Test
         public void defaultRetainBlankColumns() throws IOException {
-            // by default we keep the blank columns.
+            // by default, we keep the blank columns.
             B builder = createBuilder();
             T sheetReader = builder.removeBlankColumns(false).build();
 
@@ -257,7 +257,7 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
     class SanitizeTests {
         private final List<Arguments> sanitizeCases = Arrays.asList(
                 // sanitizeType, originalValue, sanitizedValue, isDefaultEnabled
-                arguments(named("nbsp-spaces", SPACES), "aa\u00a0bb", "aa bb", true),
+                arguments(named("nbsp-spaces", SPACES), "aa_\u00a0_bb", "aa_ _bb", true),
                 arguments(named("doubleSmart-quotes", QUOTES), "with_“x”_val", "with_\"x\"_val", true),
                 arguments(named("singleSmart-quotes", QUOTES), "‘hi’", "'hi'", true),
                 arguments(named("emDash-dashes", DASHES), "aa—bb", "aa-bb", false),
@@ -312,9 +312,9 @@ abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
     }
 
     /**
-     *   By default the DataFormatter uses 'false' for 1904DateWindowing.
+     *   By default, the DataFormatter uses 'false' for 1904DateWindowing.
      * And this is often correct for most files.  However, if encounter
-     * a Excel workbook where 1904DateWindowing is true, then the
+     * an Excel workbook where 1904DateWindowing is true, then the
      * default behavior will cause dates to be formatted incorrectly.
      *   This test is to verify bug fix where the date values
      * would be incorrect for the 'AdvancedExcelSheetReader' class.
