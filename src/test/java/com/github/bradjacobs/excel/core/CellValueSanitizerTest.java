@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
+import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
 import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,5 +22,28 @@ public class CellValueSanitizerTest {
         assertEquals("", result, "mismatch expected cell value");
     }
 
-    // TODO add more tests
+    @Test
+    public void withTrim() {
+        CellValueSanitizer sanitizer = new CellValueSanitizer(true, Set.of(QUOTES));
+        String inputString = "  dog  ";
+        String expectedString = inputString.trim();
+        String result = sanitizer.sanitizeCellValue(inputString);
+        assertEquals(expectedString, result, "mismatch expected cell value string");
+    }
+
+    @Test
+    public void withoutTrim() {
+        CellValueSanitizer sanitizer = new CellValueSanitizer(false, Set.of(QUOTES));
+        String inputString = "  dog  ";
+        String result = sanitizer.sanitizeCellValue(inputString);
+        assertEquals(inputString, result, "mismatch expected cell value string");
+    }
+
+    @Test
+    public void withDiacriticsSet() {
+        CellValueSanitizer sanitizer = new CellValueSanitizer(true, Set.of(BASIC_DIACRITICS));
+        String inputString = "Façade";
+        String result = sanitizer.sanitizeCellValue(inputString);
+        assertEquals("Facade", result, "mismatch expected cell value string");
+    }
 }
