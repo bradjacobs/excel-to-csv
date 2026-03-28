@@ -19,14 +19,14 @@ class VisibleOnlySheetDataHandler extends SheetDataHandler {
      */
     private int lastProcessedRowIndex = NO_PREVIOUS_ROW;
 
-    private final SheetVisibilityPolicy visibilityPolicy;
+    private final SheetContext sheetContext;
 
     public VisibleOnlySheetDataHandler(
             SheetConfig sheetConfig,
             StringRowConsumer stringRowConsumer,
             SheetContext sheetContext) {
         super(sheetConfig, stringRowConsumer);
-        this.visibilityPolicy = createVisibilityPolicy(sheetContext);
+        this.sheetContext = sheetContext;
     }
 
     @Override
@@ -47,13 +47,9 @@ class VisibleOnlySheetDataHandler extends SheetDataHandler {
         }
     }
 
-    private boolean shouldSkipCell(int rowNum, int columnIndex) {
-        return !visibilityPolicy.isCellVisible(rowNum, columnIndex);
-    }
-
     @Override
     public void cell(int rowNum, int columnIndex, String formattedValue, XSSFComment comment) {
-        if (shouldSkipCell(rowNum, columnIndex)) {
+        if (!shouldEmitCell(rowNum, columnIndex)) {
             return;
         }
         super.cell(rowNum, columnIndex, formattedValue, comment);
@@ -63,7 +59,7 @@ class VisibleOnlySheetDataHandler extends SheetDataHandler {
     protected void appendMissingColumnsBefore(int columnIndex) {
         // fill in any blanks between values in a row (if necessary)
         for (int col = currentRowValues.size(); col < columnIndex; col++) {
-            if (visibilityPolicy.isColumnVisible(col)) {
+            if (isColumnVisible(col)) {
                 currentRowValues.add(EMPTY_CELL_VALUE);
             }
         }
@@ -78,20 +74,14 @@ class VisibleOnlySheetDataHandler extends SheetDataHandler {
     }
 
     private boolean isRowVisible(int rowNum) {
-        return visibilityPolicy.isRowVisible(rowNum);
+        return !sheetContext.isRowHidden(rowNum);
     }
 
-    private static SheetVisibilityPolicy createVisibilityPolicy(SheetContext sheetContext) {
-        return new SheetVisibilityPolicy() {
-            @Override
-            public boolean isRowVisible(int rowNum) {
-                return !sheetContext.isRowHidden(rowNum);
-            }
+    private boolean isColumnVisible(int columnIndex) {
+        return !sheetContext.isColumnHidden(columnIndex);
+    }
 
-            @Override
-            public boolean isColumnVisible(int columnIndex) {
-                return !sheetContext.isColumnHidden(columnIndex);
-            }
-        };
+    private boolean shouldEmitCell(int rowNum, int columnIndex) {
+        return isRowVisible(rowNum) && isColumnVisible(columnIndex);
     }
 }
