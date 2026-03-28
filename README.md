@@ -193,7 +193,7 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
   <summary>Todo Item List... (Click To Expand)</summary>
  
 * General Unittest cleanup and add more tests (ongoing)
-* Refactoring in the advances package (visibliity policy logic and row filling, for example)
+* Refactoring in the advanced package (visibility policy logic and row filling, for example)
 * Integrate a real logger into the code
 * Address any of the "Known Cell Data Issues" (above) if possible
 * Add more Javadocs
