@@ -56,15 +56,19 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     @Override
     public void startRow(int rowNum) {
-        fillMissingRows(rowNum);
+        appendMissingRowsBefore(rowNum);
     }
 
     @Override
     public void endRow(int rowNum) {
-        if (shouldAcceptRow(rowNum)) {
+        flushCurrentRowIfVisible(rowNum);
+        clearCurrentRow();
+    }
+
+    private void flushCurrentRowIfVisible(int rowNum) {
+        if (isRowVisible(rowNum)) {
             stringRowConsumer.accept(currentRowValues);
         }
-        clearCurrentRow();
     }
 
     @Override
@@ -78,33 +82,36 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     }
 
     protected void cell(int rowNum, int columnIndex, String formattedValue, XSSFComment comment) {
-        fillMissingColumnsUpTo(columnIndex);
+        appendMissingColumnsBefore(columnIndex);
         currentRowValues.add(sanitizeCellValue(formattedValue));
     }
 
-    protected void fillMissingRows(int rowNum) {
-        if (sheetConfig.isRemoveBlankRows()) {
-            return;
-        }
+    // todo: better naming required (inverted)
+    protected boolean shouldRetainBlankRows() {
+        return !sheetConfig.isRemoveBlankRows();
+    }
 
-        // add any filler blank row (if necessary)
-        while (stringRowConsumer.getRowCount() < rowNum) {
-            stringRowConsumer.accept(null);
+    protected void appendMissingRowsBefore(int rowNum) {
+        if (shouldRetainBlankRows()) {
+            // add any filler blank row (if necessary)
+            while (stringRowConsumer.getRowCount() < rowNum) {
+                stringRowConsumer.accept(null);
+            }
         }
     }
 
-    protected boolean shouldAcceptRow(int rowNum) {
+    protected boolean isRowVisible(int rowNum) {
         return visibilityPolicy.isRowVisible(rowNum);
     }
 
-    protected boolean shouldAcceptColumn(int columnIndex) {
+    protected boolean isColumnVisible(int columnIndex) {
         return visibilityPolicy.isColumnVisible(columnIndex);
     }
 
-    protected void fillMissingColumnsUpTo(int columnIndex) {
+    protected void appendMissingColumnsBefore(int columnIndex) {
         // fill in any blanks between values in a row (if necessary)
         for (int col = currentRowValues.size(); col < columnIndex; col++) {
-            if (shouldAcceptColumn(col)) {
+            if (isColumnVisible(col)) {
                 currentRowValues.add(EMPTY_CELL);
             }
         }
