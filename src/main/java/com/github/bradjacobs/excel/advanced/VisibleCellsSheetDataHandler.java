@@ -8,7 +8,7 @@ import com.github.bradjacobs.excel.core.StringRowConsumer;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
 /**
- * SpecialSheetHandler that only processes visible rows and columns.
+ * Special SheetDataHandler that only processes 'visible' rows and columns.
  */
 class VisibleCellsSheetDataHandler extends SheetDataHandler {
 
@@ -31,17 +31,24 @@ class VisibleCellsSheetDataHandler extends SheetDataHandler {
 
     @Override
     public void startRow(int rowNum) {
-        final int previousRowIndex = this.lastProcessedRowIndex;
-        this.lastProcessedRowIndex = rowNum;
+        int previousRowIndex = lastProcessedRowIndex;
+        lastProcessedRowIndex = rowNum;
         fillMissingVisibleRows(previousRowIndex, rowNum);
     }
 
+    /**
+     * if configured to retain blank rows, then add in any
+     * necessary missing blank rows between the previous
+     * row that was processed and the current row.
+     * @param previousRowIndex previous row index
+     * @param currentRowIndex current row index
+     */
     private void fillMissingVisibleRows(int previousRowIndex, int currentRowIndex) {
         if (shouldRetainBlankRows()) {
-            final int firstMissingRowIndex = previousRowIndex + 1;
+            int firstMissingRowIndex = previousRowIndex + 1;
             for (int rowIndex = firstMissingRowIndex; rowIndex < currentRowIndex; rowIndex++) {
                 if (isRowVisible(rowIndex)) {
-                    stringRowConsumer.accept(null);
+                    appendEmptyRow(); // add the blank row
                 }
             }
         }
@@ -58,19 +65,23 @@ class VisibleCellsSheetDataHandler extends SheetDataHandler {
     @Override
     protected void appendMissingColumnsBefore(int columnIndex) {
         // fill in any blanks between values in a row (if necessary)
-        for (int col = currentRowValues.size(); col < columnIndex; col++) {
+        for (int col = getCurrentRowSize(); col < columnIndex; col++) {
             if (isColumnVisible(col)) {
-                currentRowValues.add(EMPTY_CELL_VALUE);
+                appendEmptyCellValue();
             }
         }
     }
 
     @Override
-    public void endRow(int rowNum) {
+    protected void emitCurrentRow(int rowNum) {
+        // only emit a row if it's visible
         if (isRowVisible(rowNum)) {
-            stringRowConsumer.accept(currentRowValues);
+            super.emitCurrentRow(rowNum);
         }
-        clearCurrentRow();
+    }
+
+    private boolean shouldEmitCell(int rowNum, int columnIndex) {
+        return isRowVisible(rowNum) && isColumnVisible(columnIndex);
     }
 
     private boolean isRowVisible(int rowNum) {
@@ -79,9 +90,5 @@ class VisibleCellsSheetDataHandler extends SheetDataHandler {
 
     private boolean isColumnVisible(int columnIndex) {
         return !sheetContext.isColumnHidden(columnIndex);
-    }
-
-    private boolean shouldEmitCell(int rowNum, int columnIndex) {
-        return isRowVisible(rowNum) && isColumnVisible(columnIndex);
     }
 }

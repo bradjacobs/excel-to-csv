@@ -15,21 +15,18 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 import java.util.ArrayList;
 import java.util.List;
 
-// todo: some of the logic is a little squirrelly,
-//   but want to first confirm all edge cases work correctly
-//   and unittests are in place before doing refactor.
+// TODO: more javaDocs and unitTests
 class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
-    protected static final String EMPTY_CELL_VALUE = "";
+    private static final String EMPTY_CELL_VALUE = "";
     private static final String EXCEL_ERROR_PREFIX = "ERROR:";
     private static final String MISSING_CELL_REF_MSG = "Unable to parse Excel Sheet. " +
             "A cell value was encountered without a cellReference.  " +
             "See 'Known Issues' for more details.";
 
-    protected final SheetConfig sheetConfig;
-    protected final CellValueSanitizer cellValueSanitizer;
-    protected final StringRowConsumer stringRowConsumer;
-
-    protected final List<String> currentRowValues = new ArrayList<>();
+    private final SheetConfig sheetConfig;
+    private final CellValueSanitizer cellValueSanitizer;
+    private final StringRowConsumer stringRowConsumer;
+    private final List<String> currentRowValues = new ArrayList<>();
 
     public SheetDataHandler(SheetConfig sheetConfig, StringRowConsumer stringRowConsumer) {
         this.sheetConfig = sheetConfig;
@@ -51,7 +48,7 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     @Override
     public void endRow(int rowNum) {
-        stringRowConsumer.accept(currentRowValues);
+        emitCurrentRow(rowNum);
         clearCurrentRow();
     }
 
@@ -70,6 +67,14 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         currentRowValues.add(sanitizeCellValue(formattedValue));
     }
 
+    /**
+     * Emits the current row to the consumer
+     * @param rowNum current row number (for reference)
+     */
+    protected void emitCurrentRow(int rowNum) {
+        stringRowConsumer.accept(currentRowValues);
+    }
+
     // todo: better naming required (inverted)
     protected boolean shouldRetainBlankRows() {
         return !sheetConfig.isRemoveBlankRows();
@@ -77,23 +82,46 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     protected void appendMissingRowsBefore(int rowNum) {
         if (shouldRetainBlankRows()) {
-            // add any filler blank row (if necessary)
+            // add any filler blank rows (if necessary)
             while (stringRowConsumer.getRowCount() < rowNum) {
-                stringRowConsumer.accept(null);
+                appendEmptyRow();
             }
         }
+    }
+
+    /**
+     * Adds a blank row to the output via the consumer.
+     */
+    protected void appendEmptyRow() {
+        stringRowConsumer.accept(null);
+    }
+
+    /**
+     * Appends an empty cell value to the current row.
+     */
+    protected void appendEmptyCellValue() {
+        currentRowValues.add(EMPTY_CELL_VALUE);
+    }
+
+    /**
+     * Returns the current row size (number of cells)
+     * @return current row size
+     */
+    protected int getCurrentRowSize() {
+        return currentRowValues.size();
     }
 
     protected void appendMissingColumnsBefore(int columnIndex) {
         // fill in any blanks between values in a row (if necessary)
         for (int col = currentRowValues.size(); col < columnIndex; col++) {
-            currentRowValues.add(EMPTY_CELL_VALUE);
+            appendEmptyCellValue();
         }
     }
 
     protected String sanitizeCellValue(String cellValue) {
         return stripExcelErrorPrefix(cellValueSanitizer.sanitizeCellValue(cellValue));
     }
+
 
     /**
      * remove the first part of an error string to be consistent
