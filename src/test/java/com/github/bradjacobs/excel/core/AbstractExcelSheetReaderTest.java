@@ -37,7 +37,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 // TODO - this test needs more love
 //.  and should eventually replace the 'ExcelSheetReaderTest'
-abstract public class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B extends AbstractExcelSheetReader.AbstractSheetConfigBuilder<T, B>> {
+public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B extends AbstractExcelSheetReader.AbstractSheetConfigBuilder<T, B>> {
     private static final String TEST_DATA_FILE = "testSheetData.xlsx";
     private static final Path TEST_FILE = TestResourceUtil.getResourceFilePath(TEST_DATA_FILE);
 

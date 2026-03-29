@@ -37,7 +37,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
  * for the ExcelReader class.
  */
 @TestInstance(Lifecycle.PER_CLASS)
-public class ExcelReaderExceptionHandlingTest {
+class ExcelReaderExceptionHandlingTest {
     private static final Path VALID_TEST_INPUT_PATH = getResourceFilePath("test_data.xlsx");
     private static final File VALID_TEST_INPUT_FILE = VALID_TEST_INPUT_PATH.toFile();
     private static final Path VALID_TEST_INPUT_PSWD_PATH = getResourceFilePath("test_data_w_pswd_1234.xlsx");

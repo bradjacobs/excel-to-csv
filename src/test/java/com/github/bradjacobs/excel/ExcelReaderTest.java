@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // TODO - this class needs an overhaul.
-public class ExcelReaderTest {
+class ExcelReaderTest {
     private static final String TEST_DATA_FILE = "test_data.xlsx";
     private static final String TEST_SHEET_NAME = "TEST_SHEET";
     private static final String TEST_BLANK_SHEET_NAME = "TEST_BLANK_SHEET";

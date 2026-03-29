@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
  */
 // NOTE: limited tests here because don't want to learn
 //   about mocking all the different internal variations of cell types.
-public class CellValueReaderTest {
+class CellValueReaderTest {
 
     @Test
     public void withTrim() {

@@ -5,7 +5,7 @@ package com.github.bradjacobs.excel.standard;
 
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReaderTest;
 
-public class StandardExcelSheetReaderTest extends AbstractExcelSheetReaderTest<StandardExcelSheetReader, StandardExcelSheetReader.Builder> {
+class StandardExcelSheetReaderTest extends AbstractExcelSheetReaderTest<StandardExcelSheetReader, StandardExcelSheetReader.Builder> {
 
     @Override
     protected StandardExcelSheetReader.Builder createBuilder() {

@@ -35,7 +35,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 //   this class is now basically duplicated by the
 //   newer abstract class tests.
 //   Need to update (or remove) this test in a future update.
-public class OriginalExcelSheetReaderTest {
+class OriginalExcelSheetReaderTest {
 
     private static final String TEST_DATA_FILE = "testSheetData.xlsx";
 

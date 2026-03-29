@@ -12,7 +12,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class StringRowConsumerTest {
+class StringRowConsumerTest {
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)

@@ -17,7 +17,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class MatrixToCsvTextConverterTest {
+class MatrixToCsvTextConverterTest {
 
     // the following are special character that should always be quoted
     private static final List<Character> MINIMAL_QUOTE_CHARACTERS

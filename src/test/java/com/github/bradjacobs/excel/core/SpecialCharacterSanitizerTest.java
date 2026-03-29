@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-public class SpecialCharacterSanitizerTest {
+class SpecialCharacterSanitizerTest {
     private static final List<Arguments> spaceChars = Arrays.asList(
             arguments(named("NON_BREAKING SPACE", "\u00a0")),
             arguments(named("EN SPACE", "\u2002")),

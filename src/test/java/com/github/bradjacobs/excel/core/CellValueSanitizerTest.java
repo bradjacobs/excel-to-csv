@@ -11,7 +11,7 @@ import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
 import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CellValueSanitizerTest {
+class CellValueSanitizerTest {
 
     // the advanced implementation can pass in a null to
     //   this method, so ensure it's handled correctly.
