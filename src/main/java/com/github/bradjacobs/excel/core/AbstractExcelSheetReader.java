@@ -156,9 +156,9 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
     // below is common code for sheet configuration builder
     abstract public static class AbstractSheetConfigBuilder<T, B extends AbstractSheetConfigBuilder<T, B>> {
         protected boolean autoTrim = true;
-        protected boolean removeBlankRows = false;
-        protected boolean removeBlankColumns = false;
-        protected boolean removeInvisibleCells = false;
+        protected boolean skipBlankRows = false;
+        protected boolean skipBlankColumns = false;
+        protected boolean skipInvisibleCells = false;
         protected final Set<SanitizeType> sanitizeTypes
                 = new HashSet<>(SpecialCharacterSanitizer.DEFAULT_FLAGS);
 
@@ -174,30 +174,30 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
         }
 
         /**
-         * Whether to remove any blank rows.
-         * @param removeBlankRows (defaults to false)
+         * Whether to skip any blank rows.
+         * @param skipBlankRows (defaults to false)
          */
-        public B removeBlankRows(boolean removeBlankRows) {
-            this.removeBlankRows = removeBlankRows;
+        public B skipBlankRows(boolean skipBlankRows) {
+            this.skipBlankRows = skipBlankRows;
             return self();
         }
 
         /**
-         * Whether to remove any blank columns.
-         * @param removeBlankColumns (defaults to false)
+         * Whether to skip any blank columns.
+         * @param skipBlankColumns (defaults to false)
          */
-        public B removeBlankColumns(boolean removeBlankColumns) {
-            this.removeBlankColumns = removeBlankColumns;
+        public B skipBlankColumns(boolean skipBlankColumns) {
+            this.skipBlankColumns = skipBlankColumns;
             return self();
         }
 
         /**
          * Whether to prune out invisible cells.
          *   invisible = cellHeight = 0 or cellWidth = 0
-         * @param removeInvisibleCells (defaults to false)
+         * @param skipInvisibleCells (defaults to false)
          */
-        public B removeInvisibleCells(boolean removeInvisibleCells) {
-            this.removeInvisibleCells = removeInvisibleCells;
+        public B skipInvisibleCells(boolean skipInvisibleCells) {
+            this.skipInvisibleCells = skipInvisibleCells;
             return self();
         }
 
@@ -229,9 +229,9 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
         public SheetConfig buildConfig() {
             return new SheetConfig(
-                    removeBlankRows,
-                    removeBlankColumns,
-                    removeInvisibleCells,
+                    skipBlankRows,
+                    skipBlankColumns,
+                    skipInvisibleCells,
                     autoTrim,
                     sanitizeTypes);
         }

@@ -27,7 +27,7 @@ final class SheetContentHandlerFactory {
             StylesTable styles,
             DataFormatter dataFormatter
     ) {
-        if (sheetConfig.isRemoveInvisibleCells()) {
+        if (sheetConfig.skipInvisibleCells()) {
             SheetContext sheetContext = new SheetContext();
             return new VisibleAwareXSSFSheetXMLHandler(
                     styles,

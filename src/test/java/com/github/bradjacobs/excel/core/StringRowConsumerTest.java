@@ -195,7 +195,7 @@ public class StringRowConsumerTest {
 
 
         // beginning blanks rows are to be kept,
-        //   if not configured to remove blank rows.
+        //   if not configured to skip blank rows.
         @Test
         public void retainFirstBlankRows() {
             String[][] input = {
@@ -272,7 +272,7 @@ public class StringRowConsumerTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class PruneEmptyRowConsumerTests {
         @Test
-        public void removesBlankRowsWhenConfigured() {
+        public void ekipBlankRowsWhenConfigured() {
             String[][] input = {
                     {"aa", "bb"},
                     {"", ""},
@@ -286,7 +286,7 @@ public class StringRowConsumerTest {
         }
 
         @Test
-        public void removeMultiBlankRowsWhenConfigured() {
+        public void skipMultiBlankRowsWhenConfigured() {
             String[][] input = {
                     {"", "", ""},
                     {"", ""},
@@ -402,7 +402,7 @@ public class StringRowConsumerTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class PruneEmptyRowsAndColumnConsumerTests {
         @Test
-        public void removeBlankRowsAndColumnsWhenConfigured() {
+        public void skipBlankRowsAndColumnsWhenConfigured() {
             String[][] input = {
                     {"", "aa", "", "bb", ""},
                     {"", "", "", "", "", "", ""},

@@ -43,9 +43,9 @@ class SheetXMLReaderTest {
         });
 
         SheetConfig cfg = new SheetConfig(
-                false, // removeBlankRows
-                false, // removeBlankColumns
-                false, // removeInvisibleCells
+                false, // skipBlankRows
+                false, // skipBlankColumns
+                false, // skipInvisibleCells
                 true,  // autoTrim
                 Set.of()
         );
@@ -59,7 +59,7 @@ class SheetXMLReaderTest {
     }
 
     @Test
-    void removeInvisibleCells_true_skipsHiddenRowAndHiddenColumn() throws Exception {
+    void skipInvisibleCells_true_skipsHiddenRowAndHiddenColumn() throws Exception {
         byte[] workbookBytes = buildWorkbookBytes(wb -> {
             Sheet sheet = wb.createSheet("S1");
 
@@ -81,9 +81,9 @@ class SheetXMLReaderTest {
         });
 
         SheetConfig cfg = new SheetConfig(
-                false, // removeBlankRows
-                false, // removeBlankColumns
-                true,  // removeInvisibleCells
+                false, // skipBlankRows
+                false, // skipBlankColumns
+                true,  // skipInvisibleCells
                 true,  // autoTrim
                 Set.of()
         );
@@ -96,7 +96,7 @@ class SheetXMLReaderTest {
     }
 
     @Test
-    void removeInvisibleCells_false_includesHiddenRowAndHiddenColumn() throws Exception {
+    void skipInvisibleCells_false_includesHiddenRowAndHiddenColumn() throws Exception {
         byte[] workbookBytes = buildWorkbookBytes(wb -> {
             Sheet sheet = wb.createSheet("S1");
 
@@ -113,9 +113,9 @@ class SheetXMLReaderTest {
         });
 
         SheetConfig cfg = new SheetConfig(
-                false, // removeBlankRows
-                false, // removeBlankColumns
-                false, // removeInvisibleCells
+                false, // skipBlankRows
+                false, // skipBlankColumns
+                false, // skipInvisibleCells
                 true,  // autoTrim
                 Set.of()
         );
@@ -129,7 +129,7 @@ class SheetXMLReaderTest {
     }
 
     @Test
-    void removeBlankRows_false_preservesMissingRowsAsFillerRows() throws Exception {
+    void skipBlankRows_false_preservesMissingRowsAsFillerRows() throws Exception {
         byte[] workbookBytes = buildWorkbookBytes(wb -> {
             Sheet sheet = wb.createSheet("S1");
 
@@ -145,7 +145,7 @@ class SheetXMLReaderTest {
         });
 
         SheetConfig cfg = new SheetConfig(
-                false, // removeBlankRows => should preserve missing row via fillMissingRows
+                false, // skipBlankRows => should preserve missing row via fillMissingRows
                 false,
                 false,
                 true,
@@ -155,13 +155,13 @@ class SheetXMLReaderTest {
         String[][] matrix = parseFirstSheet(workbookBytes, cfg);
 
         assertNotNull(matrix, "matrix must not be null");
-        assertEquals(3, matrix.length, "missing row should be represented as a filler row when removeBlankRows=false");
+        assertEquals(3, matrix.length, "missing row should be represented as a filler row when skipBlankRows=false");
         assertEquals("R0C0", matrix[0][0], "row 0 value mismatch");
         assertEquals("R2C0", matrix[2][0], "row 2 value mismatch");
     }
 
     @Test
-    void removeBlankRows_true_doesNotAddFillerRowsForMissingRows() throws Exception {
+    void skipBlankRows_true_doesNotAddFillerRowsForMissingRows() throws Exception {
         byte[] workbookBytes = buildWorkbookBytes(wb -> {
             Sheet sheet = wb.createSheet("S1");
 
@@ -175,7 +175,7 @@ class SheetXMLReaderTest {
         });
 
         SheetConfig cfg = new SheetConfig(
-                true,  // removeBlankRows => fillMissingRows no-ops
+                true,  // skipBlankRows => fillMissingRows no-ops
                 false,
                 false,
                 true,
@@ -185,7 +185,7 @@ class SheetXMLReaderTest {
         String[][] matrix = parseFirstSheet(workbookBytes, cfg);
 
         assertNotNull(matrix, "matrix must not be null");
-        assertEquals(2, matrix.length, "missing row should not be synthesized when removeBlankRows=true");
+        assertEquals(2, matrix.length, "missing row should not be synthesized when skipBlankRows=true");
         assertEquals("R0C0", matrix[0][0], "row 0 value mismatch");
         assertEquals("R2C0", matrix[1][0], "row 1 (originally row 2) value mismatch");
     }

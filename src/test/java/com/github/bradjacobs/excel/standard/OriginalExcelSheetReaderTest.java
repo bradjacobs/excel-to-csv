@@ -149,20 +149,20 @@ public class OriginalExcelSheetReaderTest {
     class BlankRowTests {
         /**
          * Compare the diff of row counts with
-         *  removeBlankRows = true vs false
+         *  skipBlankRows = true vs false
          */
         @Test
-        public void removeBlankRows() {
+        public void skipBlankRows() {
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithThreeBlankRows");
             StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .removeBlankRows(false)
+                    .skipBlankRows(false)
                     .build();
             StandardExcelSheetReader standardExcelSheetReader2 = StandardExcelSheetReader.builder()
-                    .removeBlankRows(true)
+                    .skipBlankRows(true)
                     .build();
             String[][] dataMatrixRetainBlankRows = standardExcelSheetReader1.convertToDataMatrix(testSheet);
-            String[][] dataMatrixRemoveBlankRows = standardExcelSheetReader2.convertToDataMatrix(testSheet);
-            int rowDifference = dataMatrixRetainBlankRows.length - dataMatrixRemoveBlankRows.length;
+            String[][] dataMatrixSkipBlankRows = standardExcelSheetReader2.convertToDataMatrix(testSheet);
+            int rowDifference = dataMatrixRetainBlankRows.length - dataMatrixSkipBlankRows.length;
             assertEquals(3, rowDifference, "Mismatch expected row count");
         }
 
@@ -171,7 +171,7 @@ public class OriginalExcelSheetReaderTest {
             // by default we keep the blank rows.
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithThreeBlankRows");
             StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .removeBlankRows(false)
+                    .skipBlankRows(false)
                     .build();
             String[][] dataMatrixRetainBlankRows = standardExcelSheetReader1.convertToDataMatrix(testSheet);
             String[][] dataMatrixDefault = DEFAULT_SHEET_READER.convertToDataMatrix(testSheet);
@@ -186,7 +186,7 @@ public class OriginalExcelSheetReaderTest {
         public void pruneExtraBlankRows() {
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "ExtraBlankRowsAfterData");
             StandardExcelSheetReader standardExcelSheetReader = StandardExcelSheetReader.builder()
-                    .removeBlankRows(false)
+                    .skipBlankRows(false)
                     .build();
             String[][] dataMatrix = standardExcelSheetReader.convertToDataMatrix(testSheet);
             assertEquals(2, dataMatrix.length, "Mismatch expected row count");
@@ -198,20 +198,20 @@ public class OriginalExcelSheetReaderTest {
     class BlankColumnTests {
         /**
          * Compare the diff of column counts with
-         *  removeBlankColumns = true vs false
+         *  skipBlankColumns = true vs false
          */
         @Test
-        public void removeBlankColumns() {
+        public void skipBlankColumns() {
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithTwoBlankColumns");
             StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .removeBlankColumns(false)
+                    .skipBlankColumns(false)
                     .build();
             StandardExcelSheetReader standardExcelSheetReader2 = StandardExcelSheetReader.builder()
-                    .removeBlankColumns(true)
+                    .skipBlankColumns(true)
                     .build();
             String[][] dataMatrixRetainBlankColumns = standardExcelSheetReader1.convertToDataMatrix(testSheet);
-            String[][] dataMatrixRemoveBlankColumns = standardExcelSheetReader2.convertToDataMatrix(testSheet);
-            int columnDifference = dataMatrixRetainBlankColumns[0].length - dataMatrixRemoveBlankColumns[0].length;
+            String[][] dataMatrixSkipBlankColumns = standardExcelSheetReader2.convertToDataMatrix(testSheet);
+            int columnDifference = dataMatrixRetainBlankColumns[0].length - dataMatrixSkipBlankColumns[0].length;
             assertEquals(2, columnDifference, "Mismatch expected column count");
         }
 
@@ -220,7 +220,7 @@ public class OriginalExcelSheetReaderTest {
             // by default we keep the blank columns.
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithTwoBlankColumns");
             StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .removeBlankColumns(false)
+                    .skipBlankColumns(false)
                     .build();
             String[][] dataMatrixRetainBlankColumns = standardExcelSheetReader1.convertToDataMatrix(testSheet);
             String[][] dataMatrixDefault = DEFAULT_SHEET_READER.convertToDataMatrix(testSheet);
@@ -239,7 +239,7 @@ public class OriginalExcelSheetReaderTest {
          * The HiddenCellsDataFile contains multiple sheets in set of 2.
          *     (TestDataSheet, ExpectedResultsDataSheet)
          * where the ExpectedResultsDataSheet represents what the
-         * data should look like if were to remove/ignore the 'hidden data'
+         * data should look like if were to skip/ignore the 'hidden data'
          * from the TestDataSheet
          * @param sheetNamePrefix sheetPrefix
          */
@@ -260,11 +260,11 @@ public class OriginalExcelSheetReaderTest {
             Sheet testDataSheet = getFileSheet(HIDDEN_CELLS_DATA_FILE, testDataSheetName);
             Sheet expectedDataSheet = getFileSheet(HIDDEN_CELLS_DATA_FILE, expectedDataSheetName);
 
-            StandardExcelSheetReader removeHiddenSheetReader = StandardExcelSheetReader.builder()
-                    .removeInvisibleCells(true)
+            StandardExcelSheetReader skipHiddenCellsSheetReader = StandardExcelSheetReader.builder()
+                    .skipInvisibleCells(true)
                     .build();
 
-            String[][] actualMatrix = removeHiddenSheetReader.convertToDataMatrix(testDataSheet);
+            String[][] actualMatrix = skipHiddenCellsSheetReader.convertToDataMatrix(testDataSheet);
             if (actualMatrix.length > 0) {
                 String[] firstRow = actualMatrix[0];
                 // check to make sure we don't have rows that contain zero-length arrays (need only check the first)

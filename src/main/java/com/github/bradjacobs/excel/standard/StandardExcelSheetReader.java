@@ -101,8 +101,8 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
 
         StringRowConsumer stringRowConsumer =
                 StringRowConsumer.of(
-                        sheetConfig.isRemoveBlankRows(),
-                        sheetConfig.isRemoveBlankColumns());
+                        sheetConfig.skipBlankRows(),
+                        sheetConfig.skipBlankColumns());
 
         for (Row row : rowList) {
             List<String> rowValuesList = toRowValues(row, columnsToRead, maxRequestedColumnIndex);
@@ -176,7 +176,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
     }
 
     protected boolean isRowVisible(Row row) {
-        if (!sheetConfig.isRemoveInvisibleCells()) {
+        if (!sheetConfig.skipInvisibleCells()) {
             return true;
         }
         return row == null || !row.getZeroHeight();
@@ -189,7 +189,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      * @return int array of column indices to be read
      */
     protected int[] getAvailableColumns(Sheet sheet, int maxColumn) {
-        if (!sheetConfig.isRemoveInvisibleCells()) {
+        if (!sheetConfig.skipInvisibleCells()) {
             return IntStream.range(0, maxColumn).toArray();
         }
 

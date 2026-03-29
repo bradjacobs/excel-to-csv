@@ -73,7 +73,7 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     // todo: better naming required (inverted)
     protected boolean shouldRetainBlankRows() {
-        return !sheetConfig.isRemoveBlankRows();
+        return !sheetConfig.skipBlankRows();
     }
 
     protected void appendMissingRowsBefore(int rowNum) {

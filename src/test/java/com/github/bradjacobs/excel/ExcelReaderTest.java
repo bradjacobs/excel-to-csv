@@ -151,7 +151,7 @@ public class ExcelReaderTest {
         URL resourceUrl = getResourceFileUrl("repro.xlsx");
         ExcelReader excelReader = ExcelReader.builder()
                 .sheetName("WithBlankColumns1")
-                .removeBlankColumns(true)
+                .skipBlankColumns(true)
                 .build();
         String[][] dataMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals(3, dataMatrix[0].length, "mismatch expected column count");
@@ -162,7 +162,7 @@ public class ExcelReaderTest {
         URL resourceUrl = getResourceFileUrl("repro.xlsx");
         ExcelReader excelReader = ExcelReader.builder()
                 .sheetName("WithBlankColumns2")
-                .removeBlankColumns(true)
+                .skipBlankColumns(true)
                 .build();
         String[][] dataMatrix = excelReader.convertToDataMatrix(resourceUrl);
         assertEquals(1, dataMatrix[0].length, "mismatch expected column count");
@@ -240,7 +240,7 @@ public class ExcelReaderTest {
             // the file that had the bom flag turned on should have it as the first character
             assertEquals(expectedBom, csvFileString2.charAt(0), "Didn't find expected Bom on saved csv file");
 
-            // now if remove this first bom character, then the 2 strings should be equal
+            // now if we remove this first bom character, then the 2 strings should be equal
             String trimmedCsvFileString2 = csvFileString2.substring(1);
             assertEquals(csvFileString1, trimmedCsvFileString2);
         }

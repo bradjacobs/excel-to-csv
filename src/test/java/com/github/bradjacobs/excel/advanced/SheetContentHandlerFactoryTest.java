@@ -25,11 +25,11 @@ class SheetContentHandlerFactoryTest {
     private static final DataFormatter DATA_FORMATTER = new DataFormatter(true);
 
     @Test
-    void create_whenRemoveInvisibleCellsEnabled_returnsVisibleAwareHandler() {
+    void create_whenSkipInvisibleCellsEnabled_returnsVisibleAwareHandler() {
         SheetConfig config = new SheetConfig(
-                false,   // removeBlankRows
-                false,   // removeBlankColumns
-                true,    // removeInvisibleCells
+                false,   // skipBlankRows
+                false,   // skipBlankColumns
+                true,    // skipInvisibleCells
                 true,    // autoTrim
                 Collections.emptySet()
         );
@@ -51,11 +51,11 @@ class SheetContentHandlerFactoryTest {
     }
 
     @Test
-    void create_whenRemoveInvisibleCellsDisabled_returnsDefaultXssfHandler() {
+    void create_whenSkipInvisibleCellsDisabled_returnsDefaultXssfHandler() {
         SheetConfig config = new SheetConfig(
-                false,   // removeBlankRows
-                false,   // removeBlankColumns
-                false,   // removeInvisibleCells
+                false,   // skipBlankRows
+                false,   // skipBlankColumns
+                false,   // skipInvisibleCells
                 true,    // autoTrim
                 Collections.emptySet()
         );

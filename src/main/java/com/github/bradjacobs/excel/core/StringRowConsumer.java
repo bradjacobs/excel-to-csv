@@ -32,24 +32,24 @@ public class StringRowConsumer implements Consumer<List<String>> {
         COLUMNS(false, true),
         ROWS_AND_COLUMNS(true, true);
 
-        private final boolean removeBlankRows;
-        private final boolean removeBlankColumns;
+        private final boolean skipBlankRows;
+        private final boolean skipBlankColumns;
 
-        BlankRemoval(boolean removeBlankRows, boolean removeBlankColumns) {
-            this.removeBlankRows = removeBlankRows;
-            this.removeBlankColumns = removeBlankColumns;
+        BlankRemoval(boolean skipBlankRows, boolean skipBlankColumns) {
+            this.skipBlankRows = skipBlankRows;
+            this.skipBlankColumns = skipBlankColumns;
         }
     }
 
     private static final String BLANK = "";
 
     private final List<List<String>> rows = new ArrayList<>();
-    private final boolean removeBlankRows;
-    private final boolean removeBlankColumns;
+    private final boolean skipBlankRows;
+    private final boolean skipBlankColumns;
 
     /**
      * Tracks which columns contain at least one non-blank value.
-     * Only used when {@link #removeBlankColumns} is enabled.
+     * Only used when {@link #skipBlankColumns} is enabled.
      */
     private final List<Boolean> keepColumnsFlags = new ArrayList<>();
     private int keepColumnsCount = 0;
@@ -64,18 +64,18 @@ public class StringRowConsumer implements Consumer<List<String>> {
         if (removal == null) {
             removal = BlankRemoval.NONE;
         }
-        return of(removal.removeBlankRows, removal.removeBlankColumns);
+        return of(removal.skipBlankRows, removal.skipBlankColumns);
     }
 
     public static StringRowConsumer of(
-            boolean removeBlankRows,
-            boolean removeBlankColumns) {
-        return new StringRowConsumer(removeBlankRows, removeBlankColumns);
+            boolean skipBlankRows,
+            boolean skipBlankColumns) {
+        return new StringRowConsumer(skipBlankRows, skipBlankColumns);
     }
 
-    private StringRowConsumer(boolean removeBlankRows, boolean removeBlankColumns) {
-        this.removeBlankRows = removeBlankRows;
-        this.removeBlankColumns = removeBlankColumns;
+    private StringRowConsumer(boolean skipBlankRows, boolean skipBlankColumns) {
+        this.skipBlankRows = skipBlankRows;
+        this.skipBlankColumns = skipBlankColumns;
     }
 
     public int getRowCount() {
@@ -87,7 +87,7 @@ public class StringRowConsumer implements Consumer<List<String>> {
      */
     @Override
     public void accept(List<String> row) {
-        if (removeBlankRows && isEmptyRow(row)) {
+        if (skipBlankRows && isEmptyRow(row)) {
             return;
         }
         rows.add(normalizeRow(row));
@@ -157,7 +157,7 @@ public class StringRowConsumer implements Consumer<List<String>> {
     }
 
     private void ensureColumnTrackingCapacity(int width) {
-        if (!removeBlankColumns) {
+        if (!skipBlankColumns) {
             return;
         }
         while (keepColumnsFlags.size() < width) {
@@ -166,8 +166,8 @@ public class StringRowConsumer implements Consumer<List<String>> {
     }
 
     private void updateKeepColumnFlags(List<String> row) {
-        // bail early if not configured to remove blank columns.
-        if (!removeBlankColumns) {
+        // bail early if not configured to skip blank columns.
+        if (!skipBlankColumns) {
             return;
         }
         // if all tracked columns have already been detected
@@ -203,12 +203,12 @@ public class StringRowConsumer implements Consumer<List<String>> {
      * @return true if there are one or more blank columns to remove.
      */
     private boolean shouldFilterBlankColumns() {
-        return removeBlankColumns
+        return skipBlankColumns
                 && !rows.isEmpty()
                 && keepColumnsCount < keepColumnsFlags.size();
     }
 
-    // Helper class to remove blank column(s) from each row
+    // Helper class to filter out blank column(s) from each row
     private static class FilterColumnsOperator implements UnaryOperator<List<String>> {
         private final List<Boolean> keepColumnsFlags;
         private final int keepColumnsCount;

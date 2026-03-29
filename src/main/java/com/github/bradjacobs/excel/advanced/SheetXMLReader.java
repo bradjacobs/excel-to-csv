@@ -27,8 +27,8 @@ class SheetXMLReader extends XMLFilterImpl {
             StylesTable styles,
             boolean uses1904DateWindowing) throws ParserConfigurationException, SAXException {
         this.stringRowConsumer = StringRowConsumer.of(
-                sheetConfig.isRemoveBlankRows(),
-                sheetConfig.isRemoveBlankColumns()
+                sheetConfig.skipBlankRows(),
+                sheetConfig.skipBlankColumns()
         );
         DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
         XMLReader reader = createXmlReader(
