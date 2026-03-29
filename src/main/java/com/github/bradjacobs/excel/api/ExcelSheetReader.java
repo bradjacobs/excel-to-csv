@@ -10,6 +10,7 @@ import java.net.URL;
 import java.nio.file.Path;
 
 // todo javadocs
+// todo redo the interface to not be so repetitive.
 public interface ExcelSheetReader {
 
     // Read Excel first sheet.

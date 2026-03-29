@@ -192,13 +192,23 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 <details>
   <summary>Todo Item List... (Click To Expand)</summary>
  
+* Major Overhaul the primary interfaces (both in ExcelReader and ExcelSheetReader)
+  * Switch to returning some kind of generic data object
+  * Reduce methods - since many look almost identical (use strategy pattern perhaps)
+  * Perhaps a type of outputHandler instead of all the File,csvText,dataMatrix redundancy
+* Add option to read multiple sheets from single Excel file. 
+  * this would probably add some kind of 'sheet filtering', where user specifies sheets
+  * by indexes, or names, or all, or some other rule like 'sheet name contains', etc.
 * General Unittest cleanup and add more tests (ongoing)
 * Refactoring in the advanced package (visibility policy logic and row filling, for example)
 * Integrate a real logger into the code
+* Add in addtional 'row and column filtering' (low priority)
+  * this would expand on skiping blanks rows/columns.  (i.e. select only certain columns want returend)
 * Address any of the "Known Cell Data Issues" (above) if possible
 * Add more Javadocs
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
+  * need to update groupId and package names from 'com.github...' to 'io.github...' 
 * Reorganize Excel Test data for Junit tests.
 * The pom.xml could use some cleanup and organization.
 * (maybe) Add an option to return unformatted numbers instead of WYSIWYG (i.e. "1000000" instead of "1,000,000")
