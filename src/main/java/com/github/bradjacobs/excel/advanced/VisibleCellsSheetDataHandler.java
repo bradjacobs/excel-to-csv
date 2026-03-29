@@ -10,7 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 /**
  * SpecialSheetHandler that only processes visible rows and columns.
  */
-class VisibleOnlySheetDataHandler extends SheetDataHandler {
+class VisibleCellsSheetDataHandler extends SheetDataHandler {
 
     private static final int NO_PREVIOUS_ROW = -1;
 
@@ -21,7 +21,7 @@ class VisibleOnlySheetDataHandler extends SheetDataHandler {
 
     private final SheetContext sheetContext;
 
-    public VisibleOnlySheetDataHandler(
+    public VisibleCellsSheetDataHandler(
             SheetConfig sheetConfig,
             StringRowConsumer stringRowConsumer,
             SheetContext sheetContext) {

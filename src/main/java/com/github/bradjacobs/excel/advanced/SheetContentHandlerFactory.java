@@ -32,7 +32,7 @@ final class SheetContentHandlerFactory {
             return new VisibleAwareXSSFSheetXMLHandler(
                     styles,
                     sharedStrings,
-                    new VisibleOnlySheetDataHandler(
+                    new VisibleCellsSheetDataHandler(
                             sheetConfig,
                             stringRowConsumer,
                             sheetContext
