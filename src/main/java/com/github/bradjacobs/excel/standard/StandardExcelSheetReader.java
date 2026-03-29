@@ -90,7 +90,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         return convertToDataMatrix(rowList, availableColumns);
     }
 
-    protected String[][] convertToDataMatrix(List<Row> rowList, int[] columnsToRead) {
+    private String[][] convertToDataMatrix(List<Row> rowList, int[] columnsToRead) {
         // if there are no available columns then bail early.
         if (columnsToRead.length == 0) {
             return new String[0][0];
@@ -147,7 +147,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      * @param cell excel cell
      * @return string representation of the cell.
      */
-    protected String getCellValue(Cell cell) {
+    private String getCellValue(Cell cell) {
         return cellValueReader.getCellValue(cell);
     }
 
@@ -158,7 +158,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      * @param sheet input Excel Sheet
      * @return list of rows and the max column detected
      */
-    protected RowInfo getRows(Sheet sheet) {
+    private RowInfo getRows(Sheet sheet) {
         // NOTE: need to add 1 to the lastRowNum to make sure don't skip the last row
         //  (however doesn't seem to need for this when using row.getLastCellNum, which seems odd)
         int rowCount = sheet.getLastRowNum() + 1;
@@ -175,7 +175,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         return new RowInfo(rowList, maxColumnCount);
     }
 
-    protected boolean isRowVisible(Row row) {
+    private boolean isRowVisible(Row row) {
         if (!sheetConfig.skipInvisibleCells()) {
             return true;
         }
@@ -188,7 +188,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      * @param maxColumn max column count
      * @return int array of column indices to be read
      */
-    protected int[] getAvailableColumns(Sheet sheet, int maxColumn) {
+    private int[] getAvailableColumns(Sheet sheet, int maxColumn) {
         if (!sheetConfig.skipInvisibleCells()) {
             return IntStream.range(0, maxColumn).toArray();
         }
@@ -198,7 +198,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
                 .toArray();
     }
 
-    protected static class RowInfo {
+    private static class RowInfo {
         protected final List<Row> rowList;
         protected final int maxColumn;
 
