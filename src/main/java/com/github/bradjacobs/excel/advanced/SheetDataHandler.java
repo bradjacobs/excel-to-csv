@@ -37,10 +37,6 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         this.stringRowConsumer = stringRowConsumer;
     }
 
-    public String[][] getMatrix() {
-        return stringRowConsumer.generateMatrix();
-    }
-
     @Override
     public void startRow(int rowNum) {
         appendMissingRowsBefore(rowNum);
