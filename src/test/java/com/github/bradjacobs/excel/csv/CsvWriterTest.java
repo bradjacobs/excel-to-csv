@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel.csv;
 
+import com.github.bradjacobs.excel.SheetData;
 import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,20 +18,19 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class MatrixToCsvTextConverterTest {
-
+class CsvWriterTest {
     // the following are special character that should always be quoted
     private static final List<Character> MINIMAL_QUOTE_CHARACTERS
             = List.of('"', ',', '\t', '\r', '\n');
 
-    private static final MatrixToCsvTextConverter normalConverter
-            = new MatrixToCsvTextConverter(QuoteMode.NORMAL);
+    private static final CsvWriter normalCsvWriter
+            = CsvWriter.builder().build();
 
     @Test
     public void emptyMatrixToEmptyString() {
-        assertEquals("", normalConverter.createCsvText(null), "Expected empty string");
-        assertEquals("", normalConverter.createCsvText(new String[0][0]), "Expected empty string");
-        assertEquals("", normalConverter.createCsvText(new String[1][0]), "Expected empty string");
+        assertEquals("", normalCsvWriter.toCsv(null), "Expected empty string");
+        assertEquals("", normalCsvWriter.toCsv(new SheetData(new String[0][0])), "Expected empty string");
+        assertEquals("", normalCsvWriter.toCsv(new SheetData(new String[1][0])), "Expected empty string");
     }
 
     @Test
@@ -42,7 +42,8 @@ class MatrixToCsvTextConverterTest {
         String expected = "dog,cow" + System.lineSeparator()
                 + "frog,cat";
 
-        String csvResult = normalConverter.createCsvText(matrix);
+        SheetData sheetData = new SheetData(matrix);
+        String csvResult = normalCsvWriter.toCsv(sheetData);
         assertEquals(expected, csvResult, "Mismatch expected CSV output");
     }
 
@@ -55,7 +56,8 @@ class MatrixToCsvTextConverterTest {
         String expected = "dog,\"say \"\"hi\"\"\"" + System.lineSeparator()
                 + "frog,\"aa,bb\"";
 
-        String csvResult = normalConverter.createCsvText(matrix);
+        SheetData sheetData = new SheetData(matrix);
+        String csvResult = normalCsvWriter.toCsv(sheetData);
         assertEquals(expected, csvResult, "Mismatch expected CSV output");
     }
 
@@ -64,27 +66,32 @@ class MatrixToCsvTextConverterTest {
         String[][] matrix = {{"cow bell", "", "hot dog"}};
         String expected = "\"cow bell\",,\"hot dog\"";
 
-        String csvResult = normalConverter.createCsvText(matrix);
+        SheetData sheetData = new SheetData(matrix);
+        String csvResult = normalCsvWriter.toCsv(sheetData);
         assertEquals(expected, csvResult, "Mismatch expected CSV output");
     }
 
     @ParameterizedTest
     @MethodSource("quoteTestProvider")
     public void quoteModeChecking(String input, QuoteMode quoteMode, String expectedOutput) {
-        MatrixToCsvTextConverter converter = new MatrixToCsvTextConverter(quoteMode);
+
+        CsvWriter csvWriter = CsvWriter.builder().quoteMode(quoteMode).build();
         String[][] matrix = {{input}};
 
-        String output = converter.createCsvText(matrix);
+        SheetData sheetData = new SheetData(matrix);
+        String output = csvWriter.toCsv(sheetData);
         assertEquals(expectedOutput, output);
     }
 
     @Test
     public void invalidNullQuoteMode() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new MatrixToCsvTextConverter(null);
+           CsvWriter.builder().quoteMode(null);
         });
         assertEquals("QuoteMode cannot be null.", exception.getMessage());
     }
+
+    // TODO -- add tests for the 'writeToFile' method.
 
     //
     // Test Helper code below...

@@ -6,10 +6,8 @@ package com.github.bradjacobs.excel;
 import com.github.bradjacobs.excel.api.ExcelSheetReader;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReader.AbstractSheetConfigBuilder;
-import com.github.bradjacobs.excel.csv.CsvWriter;
 import com.github.bradjacobs.excel.csv.QuoteMode;
 import com.github.bradjacobs.excel.io.InputStreamGenerator;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.poi.poifs.filesystem.FileMagic;
@@ -18,86 +16,48 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Set;
 
 import static com.github.bradjacobs.excel.ExcelSheetReaderFactory.ReaderType.ADVANCED;
 import static com.github.bradjacobs.excel.ExcelSheetReaderFactory.ReaderType.STANDARD;
 
 /**
- * Simple class that reads an Excel Worksheet
- *   and will produce a CSV-equivalent
+ * ExcelProcessor
  */
-// todo: add more method javadocs
-public class ExcelReader {
+// TODO this is the 'next gen' of the ExcelReader
+// TODO - in flux code
+public class ExcelProcessor {
     private final int sheetIndex;
     private final String sheetName;
     private final String password; // 'null' == no password
-    private final boolean saveUnicodeFileWithBom;
     private final boolean useAdvancedReader;
-    private final CsvWriter csvWriter;
     private final ExcelSheetReader excelSheetReader;
     private final ExcelSheetReader advancedExcelSheetReader;
 
-    private static final Set<String> ALLOWED_OUTPUT_FILE_EXTENSIONS = Set.of("csv", "txt", "");
-    private static final String BOM = "\uFEFF"; // byte order marker for files with unicode.
-
     private final InputStreamGenerator inputStreamGenerator;
 
-    private ExcelReader(Builder builder) {
+    private ExcelProcessor(Builder builder) {
         this.sheetIndex = builder.sheetIndex;
         this.sheetName = builder.sheetName;
         this.password = builder.password;
-        this.saveUnicodeFileWithBom = builder.saveUnicodeFileWithBom;
         this.useAdvancedReader = builder.useAdvancedReader;
-        this.csvWriter = CsvWriter.builder()
-                .quoteMode(builder.quoteMode)
-                .saveUnicodeFileWithBom(builder.saveUnicodeFileWithBom)
-                .build();
         SheetConfig sheetConfig = builder.buildConfig();
         this.excelSheetReader = createSheetReader(STANDARD, sheetConfig);
         this.advancedExcelSheetReader = createSheetReader(ADVANCED, sheetConfig);
         this.inputStreamGenerator = new InputStreamGenerator();
     }
 
-    public void convertToCsvFile(Path excelFile, Path outputFile) throws IOException {
-        validateOutputFileParameter(outputFile);
-        writeCsvToFile( convertToCsvText(excelFile), outputFile);
+    public SheetData read(Path excelFile) throws IOException {
+        return read( inputStreamGenerator.getInputStream(excelFile) );
     }
-    public void convertToCsvFile(File excelFile, File outputFile) throws IOException {
-        convertToCsvFile(fileToPath(excelFile), fileToPath(outputFile));
+    public SheetData read(File excelFile) throws IOException {
+        return read(fileToPath(excelFile));
     }
-    public void convertToCsvFile(URL excelUrl, Path outputFile) throws IOException {
-        validateOutputFileParameter(outputFile);
-        writeCsvToFile( convertToCsvText(excelUrl), outputFile);
-    }
-    public void convertToCsvFile(URL excelUrl, File outputFile) throws IOException {
-        convertToCsvFile(excelUrl, fileToPath(outputFile));
+    public SheetData read(URL excelUrl) throws IOException {
+        return read( inputStreamGenerator.getInputStream(excelUrl) );
     }
 
-    public String convertToCsvText(Path excelFile) throws IOException {
-        return csvWriter.toCsv(new SheetData(convertToDataMatrix(excelFile)));
-    }
-    public String convertToCsvText(File excelFile) throws IOException {
-        return convertToCsvText(fileToPath(excelFile));
-    }
-    public String convertToCsvText(URL excelUrl) throws IOException {
-        return csvWriter.toCsv(new SheetData(convertToDataMatrix(excelUrl)));
-    }
-
-    public String[][] convertToDataMatrix(Path excelFile) throws IOException {
-        return convertToDataMatrix( inputStreamGenerator.getInputStream(excelFile) );
-    }
-    public String[][] convertToDataMatrix(File excelFile) throws IOException {
-        return convertToDataMatrix(fileToPath(excelFile));
-    }
-    public String[][] convertToDataMatrix(URL excelUrl) throws IOException {
-        return convertToDataMatrix( inputStreamGenerator.getInputStream(excelUrl) );
-    }
-
-    private String[][] convertToDataMatrix(InputStream inputStream) throws IOException {
+    private SheetData read(InputStream inputStream) throws IOException {
         // the inputStream should already be BufferedInputStream,
         //   but this is just an extra precaution.
         inputStream = FileMagic.prepareToCheckMagic(inputStream);
@@ -108,9 +68,11 @@ public class ExcelReader {
                 ? advancedExcelSheetReader
                 : excelSheetReader;
 
-        return hasSheetName
+        String[][] result = hasSheetName
                 ? reader.readExcelSheetData(inputStream, this.sheetName, this.password)
                 : reader.readExcelSheetData(inputStream, this.sheetIndex, this.password);
+
+        return new SheetData("-sheetName-", result);
     }
 
     private static ExcelSheetReader createSheetReader(
@@ -119,57 +81,8 @@ public class ExcelReader {
         return ExcelSheetReaderFactory.create(readerType, sheetConfig);
     }
 
-    /**
-     * Write the CSV data string out to a file.
-     * @param csvContent CSV data
-     * @param outputFile destination file.
-     */
-    private void writeCsvToFile(String csvContent, Path outputFile) throws IOException {
-        String contentToWrite = prepareCsvContentForWriting(csvContent);
-        Files.writeString(outputFile, contentToWrite, StandardCharsets.UTF_8);
-    }
-
-    private String prepareCsvContentForWriting(String csvContent) {
-        // prepend the 'bom' so that Unicode characters will render correctly
-        if (saveUnicodeFileWithBom && containsUnicode(csvContent)) {
-            return BOM + csvContent;
-        }
-        return csvContent;
-    }
-
-    /**
-     * Some sanity checks on the outputFile parameter prior to doing the actual conversion
-     *   (not exhaustive on all possible checks one could do)
-     * @param outputFile the destination CSV output file.
-     * @throws IllegalArgumentException if a problem was detected with the File object.
-     */
-    private void validateOutputFileParameter(Path outputFile) throws IllegalArgumentException {
-        Validate.isTrue(outputFile != null, "Must supply outputFile location to save CSV data.");
-        Validate.isTrue(!Files.isDirectory(outputFile), "The outputFile cannot be an existing directory.");
-
-        // confirm output file has an allowed file extension
-        String ext = FilenameUtils.getExtension(outputFile.toString());
-        Validate.isTrue(ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase()),
-                "Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext);
-
-        Path parentDirectory = outputFile.toAbsolutePath().normalize().getParent();
-        Validate.isTrue(parentDirectory != null && Files.isDirectory(parentDirectory),
-                "Attempted to save CSV output file in a non-existent directory: " + outputFile);
-    }
-
     private Path fileToPath(File file) {
         return (file != null ? file.toPath() : null);
-    }
-
-    private boolean containsUnicode(String input) {
-        int inputLength = input.length();
-        for (int i = 0; i < inputLength; i++) {
-            int codePoint = input.codePointAt(i);
-            if (codePoint > 127) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private boolean isOOXMLStream(InputStream inputStream) throws IOException {
@@ -187,12 +100,11 @@ public class ExcelReader {
 
     // this builder extends abstract class to allow any of the
     //   AbstractSheetConfigBuilder values to be set on this Builder as well.
-    public static class Builder extends AbstractSheetConfigBuilder<ExcelReader, Builder> {
+    public static class Builder extends AbstractSheetConfigBuilder<ExcelProcessor, Builder> {
         private int sheetIndex = 0; // default to the first tab
         private String sheetName = ""; // optionally provide a specific sheet name
         private QuoteMode quoteMode = QuoteMode.NORMAL;
         private String password = null;
-        private boolean saveUnicodeFileWithBom = true; // flag to write file with BOM if contains Unicode.
         private boolean useAdvancedReader = true; // use the advanced reader (if possible)
 
         @Override
@@ -245,15 +157,6 @@ public class ExcelReader {
         }
 
         /**
-         * Use a BOM when writing output file if data contains 'Unicode characters'
-         * @param saveUnicodeFileWithBom (defaults to true)
-         */
-        public Builder saveUnicodeFileWithBom(boolean saveUnicodeFileWithBom) {
-            this.saveUnicodeFileWithBom = saveUnicodeFileWithBom;
-            return this;
-        }
-
-        /**
          * Toggle using the advanced reader
          *   (typically only used for testing convenience)
          */
@@ -263,8 +166,8 @@ public class ExcelReader {
         }
 
         @Override
-        public ExcelReader build() {
-            return new ExcelReader(this);
+        public ExcelProcessor build() {
+            return new ExcelProcessor(this);
         }
     }
 }

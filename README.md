@@ -19,6 +19,9 @@ Simple tool to convert an Excel worksheet into CSV format.
 
 Implemented using the [Apache POI](https://poi.apache.org/) libraries
 
+ℹ️ **Info**
+> The primarily API and Builder methods are undergoing changes.
+
 ## Examples
 
 ### Basic
