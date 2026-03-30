@@ -39,7 +39,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
 
     @FunctionalInterface
     private interface SheetStreamProvider {
-        InputStream fetch(XSSFReader reader) throws IOException, InvalidFormatException;
+        SheetInfoRecord fetch(XSSFReader reader) throws IOException, InvalidFormatException;
     }
 
     @FunctionalInterface
@@ -49,12 +49,12 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
 
     @Override
     protected String[][] readSheet(InputStream inputStream, int sheetIndex, String password) throws IOException {
-        return readExcelSheetData(inputStream, password, reader -> fetchSheetInputStream(reader, sheetIndex));
+        return readExcelSheetData(inputStream, password, reader -> fetchSheetInfo(reader, sheetIndex));
     }
 
     @Override
     protected String[][] readSheet(InputStream inputStream, String sheetName, String password) throws IOException {
-        return readExcelSheetData(inputStream, password, reader -> fetchSheetInputStream(reader, sheetName));
+        return readExcelSheetData(inputStream, password, reader -> fetchSheetInfo(reader, sheetName));
     }
 
     private String[][] readExcelSheetData(
@@ -70,15 +70,16 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
             OPCPackage pkg = OPCPackage.open(inputStream);
             XSSFReader reader = new XSSFReader(pkg);
 
-            // NOTE - it's documented that the readOnlySharedStringsTable
-            // setting can be more 'memory friendly' for very large files.
+            // NOTE - it's documented that setting the readOnlySharedStringsTable
+            // can be more 'memory-friendly' for very large files.
             // But preliminary testing shows setting readOnly to be ~ 25% SLOWER!
             //reader.setUseReadOnlySharedStringsTable(true);
 
             SheetXMLReader sheetXmlReader = createSheetXMLReader(reader);
 
-            // get the inputStream for the specific sheet of interest
-            try (InputStream sheetInputStream = sheetStreamProvider.fetch(reader)) {
+            // get the sheetInfo with the inputStream for the specific sheet of interest
+            SheetInfoRecord sheetInfoRecord = sheetStreamProvider.fetch(reader);
+            try (InputStream sheetInputStream = sheetInfoRecord.inputStream) {
                 // actually parse the sheetInputStream for the data
                 InputSource sheetSource = new InputSource(sheetInputStream);
                 sheetXmlReader.parse(sheetSource);
@@ -93,35 +94,35 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
     /**
      * Grab specific sheet inputStream based on sheetIndex.
      */
-    private InputStream fetchSheetInputStream(
+    private SheetInfoRecord fetchSheetInfo(
             XSSFReader reader,
             int sheetIndex
     ) throws IOException, InvalidFormatException {
-        InputStream inputStream = fetchSheetInputStream(reader, (si, sn) -> sheetIndex == si);
-        if (inputStream == null) {
+        SheetInfoRecord sheetInfoRecord = fetchSheetInfo(reader, (si, sn) -> sheetIndex == si);
+        if (sheetInfoRecord == null) {
             throw new IllegalArgumentException(String.format("Sheet index '%d' is out of range.", sheetIndex));
         }
-        return inputStream;
+        return sheetInfoRecord;
     }
 
     /**
      * Grab specific sheet inputStream based on sheetName.
      */
-    private InputStream fetchSheetInputStream(
+    private SheetInfoRecord fetchSheetInfo(
             XSSFReader reader,
             String sheetName
     ) throws IOException, InvalidFormatException {
-        InputStream inputStream = fetchSheetInputStream(reader, (si, sn) -> sn.equalsIgnoreCase(sheetName));
-        if (inputStream == null) {
+        SheetInfoRecord sheetInfoRecord = fetchSheetInfo(reader, (si, sn) -> sn.equalsIgnoreCase(sheetName));
+        if (sheetInfoRecord == null) {
             throw sheetNotFound(sheetName);
         }
-        return inputStream;
+        return sheetInfoRecord;
     }
 
     /**
      * Gets the specific sheet inputStream based on the selector.
      */
-    private InputStream fetchSheetInputStream(
+    private SheetInfoRecord fetchSheetInfo(
             XSSFReader reader,
             SheetMatcher sheetMatcher
     ) throws IOException, InvalidFormatException {
@@ -132,10 +133,13 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         int sheetIndex = 0;
         InputStream resultSheetInputStream = null;
 
+        SheetInfoRecord sheetInfoRecord = null;
+
         while (sheetIterator.hasNext()) {
             InputStream currentSheetStream = sheetIterator.next();
             String currentSheetName = sheetIterator.getSheetName();
             if (sheetMatcher.isMatch(sheetIndex, currentSheetName)) {
+                sheetInfoRecord = new SheetInfoRecord(sheetIndex, currentSheetName, currentSheetStream);
                 resultSheetInputStream = currentSheetStream;
             }
             else {
@@ -145,7 +149,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
             sheetIndex++;
         }
 
-        return resultSheetInputStream;
+        return sheetInfoRecord;
     }
 
     private SheetXMLReader createSheetXMLReader(XSSFReader reader)
@@ -185,6 +189,19 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
             throw new NotOfficeXmlFileException("Cannot open excel file - unsupported file type: " + fm);
         }
         return resultStream;
+    }
+
+    // simple pojo to hold information for a specific sheet.
+    private static class SheetInfoRecord {
+        private final int sheetIndex;
+        private final String sheetName;
+        private final InputStream inputStream;
+
+        public SheetInfoRecord(int sheetIndex, String sheetName, InputStream inputStream) {
+            this.sheetIndex = sheetIndex;
+            this.sheetName = sheetName;
+            this.inputStream = inputStream;
+        }
     }
 
     public static Builder builder() {
