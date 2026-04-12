@@ -3,41 +3,22 @@
  */
 package com.github.bradjacobs.excel.api;
 
-import java.io.File;
+import com.github.bradjacobs.excel.SheetContent;
+import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
+import org.apache.commons.lang3.Validate;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Path;
+import java.util.List;
 
 // todo javadocs
 // todo redo the interface to not be so repetitive.
 public interface ExcelSheetReader {
 
-    // Read Excel first sheet.
-    String[][] readExcelSheetData(File excelFile) throws IOException;
-    String[][] readExcelSheetData(Path excelFile) throws IOException;
-    String[][] readExcelSheetData(URL excelFileUrl) throws IOException;
-    String[][] readExcelSheetData(InputStream inputStream) throws IOException;
+    List<SheetContent> readSheets(ExcelSheetReadRequest request) throws IOException;
 
-    // Read Excel sheet by index.
-    String[][] readExcelSheetData(File excelFile, int sheetIndex) throws IOException;
-    String[][] readExcelSheetData(Path excelFile, int sheetIndex) throws IOException;
-    String[][] readExcelSheetData(URL excelFileUrl, int sheetIndex) throws IOException;
-    String[][] readExcelSheetData(InputStream inputStream, int sheetIndex) throws IOException;
-
-    // Read Excel sheet by index with password
-    String[][] readExcelSheetData(File excelFile, int sheetIndex, String password) throws IOException;
-    String[][] readExcelSheetData(Path excelFile, int sheetIndex, String password) throws IOException;
-    String[][] readExcelSheetData(InputStream inputStream, int sheetIndex, String password) throws IOException;
-
-    // Read Excel sheet by sheet name
-    String[][] readExcelSheetData(File excelFile, String sheetName) throws IOException;
-    String[][] readExcelSheetData(Path excelFile, String sheetName) throws IOException;
-    String[][] readExcelSheetData(URL excelFileUrl, String sheetName) throws IOException;
-    String[][] readExcelSheetData(InputStream inputStream, String sheetName) throws IOException;
-
-    // Read Excel sheet by sheet name with password
-    String[][] readExcelSheetData(File excelFile, String sheetName, String password) throws IOException;
-    String[][] readExcelSheetData(Path excelFile, String sheetName, String password) throws IOException;
-    String[][] readExcelSheetData(InputStream inputStream, String sheetName, String password) throws IOException;
+    default SheetContent readSheet(ExcelSheetReadRequest request) throws IOException {
+        List<SheetContent> sheets = readSheets(request);
+        Validate.isTrue(sheets.size() == 1, "Expected exactly one sheet but found " + sheets.size());
+        return sheets.get(0);
+    }
 }

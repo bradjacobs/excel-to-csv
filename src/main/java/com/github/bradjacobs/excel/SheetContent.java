@@ -7,19 +7,24 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SheetData {
+
+public class SheetContent {
 
     private final String sheetName;
 
     private final String[][] dataMatrix;
 
-    public SheetData(String[][] dataMatrix) {
+    public SheetContent(String[][] dataMatrix) {
         this("", dataMatrix);
     }
 
-    public SheetData(String sheetName, String[][] dataMatrix) {
+    public SheetContent(String sheetName, String[][] dataMatrix) {
         this.sheetName = sheetName;
         this.dataMatrix = dataMatrix;
+    }
+
+    public String getSheetName() {
+        return sheetName;
     }
 
     public String[][] getMatrix() {

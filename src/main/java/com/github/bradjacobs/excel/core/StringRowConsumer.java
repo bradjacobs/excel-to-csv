@@ -43,9 +43,17 @@ public class StringRowConsumer implements Consumer<List<String>> {
 
     private static final String BLANK = "";
 
-    private final List<List<String>> rows = new ArrayList<>();
     private final boolean skipBlankRows;
     private final boolean skipBlankColumns;
+
+    /**
+     * Holds current row data consumed.
+     */
+    private final List<List<String>> rows = new ArrayList<>();
+    /**
+     * The current maximum column count observed after normalizing rows.
+     */
+    private int maxColumnCount = 0;
 
     /**
      * Tracks which columns contain at least one non-blank value.
@@ -53,11 +61,6 @@ public class StringRowConsumer implements Consumer<List<String>> {
      */
     private final List<Boolean> keepColumnsFlags = new ArrayList<>();
     private int keepColumnsCount = 0;
-
-    /**
-     * The current maximum column count observed after normalizing rows.
-     */
-    private int maxColumnCount = 0;
 
 
     public static StringRowConsumer of(BlankRemoval removal) {
@@ -78,6 +81,13 @@ public class StringRowConsumer implements Consumer<List<String>> {
         this.skipBlankColumns = skipBlankColumns;
     }
 
+    public void reset() {
+        this.rows.clear();
+        this.maxColumnCount = 0;
+        this.keepColumnsFlags.clear();
+        this.keepColumnsCount = 0;
+    }
+
     public int getRowCount() {
         return rows.size();
     }
@@ -92,7 +102,6 @@ public class StringRowConsumer implements Consumer<List<String>> {
         }
         rows.add(normalizeRow(row));
     }
-
 
     public List<List<String>> generateMatrixList() {
         removeTrailingBlankRows();

@@ -32,7 +32,7 @@ final class SheetContentHandlerFactory {
             return new VisibleAwareXSSFSheetXMLHandler(
                     styles,
                     sharedStrings,
-                    new VisibleCellsSheetDataHandler(
+                    new VisibleCellsSheetContentHandler(
                             sheetConfig,
                             stringRowConsumer,
                             sheetContext
@@ -46,7 +46,7 @@ final class SheetContentHandlerFactory {
         return new XSSFSheetXMLHandler(
                 styles,
                 sharedStrings,
-                new SheetDataHandler(
+                new SheetContentHandler(
                         sheetConfig,
                         stringRowConsumer
                 ),

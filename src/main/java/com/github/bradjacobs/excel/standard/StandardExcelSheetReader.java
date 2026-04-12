@@ -3,10 +3,14 @@
  */
 package com.github.bradjacobs.excel.standard;
 
+import com.github.bradjacobs.excel.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
 import com.github.bradjacobs.excel.core.CellValueReader;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
+import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
+import com.github.bradjacobs.excel.request.SheetInfo;
+import org.apache.commons.lang3.Validate;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -17,13 +21,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
  * Reads an Excel Sheet and returns a 2-D array of data.
  */
 public class StandardExcelSheetReader extends AbstractExcelSheetReader {
-    protected final CellValueReader cellValueReader;
+    private final CellValueReader cellValueReader;
 
     // todo: still deciding if this constructor is ok or terrible.
     public StandardExcelSheetReader(SheetConfig sheetConfig) {
@@ -31,42 +36,42 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         this.cellValueReader = new CellValueReader(sheetConfig.isAutoTrim(), sheetConfig.getCharSanitizeFlags());
     }
 
-    // interface for grabbing a specific sheet from the workbook.
-    @FunctionalInterface
-    private interface WorkbookSheetGrabber {
-        Sheet extractSheet(Workbook workbook);
-    }
-
     @Override
-    protected String[][] readSheet(InputStream inputStream, int sheetIndex, String password) throws IOException {
-        Sheet sheet = getFileSheet(inputStream, password, (w) -> w.getSheetAt(sheetIndex));
-        return convertToDataMatrix(sheet);
-    }
-
-    @Override
-    protected String[][] readSheet(InputStream inputStream, String sheetName, String password) throws IOException {
-        Sheet sheet = getFileSheet(inputStream, password, (w) -> w.getSheet(sheetName));
-        if (sheet == null) {
-            throw sheetNotFound(sheetName);
+    public List<SheetContent> readSheets(ExcelSheetReadRequest request) throws IOException {
+        Validate.isTrue(request != null, "Request cannot be null");
+        InputStream excelFileInputStream = request.getSourceInputStream();
+        if (excelFileInputStream == null) {
+            throw new IllegalArgumentException("Request must provide an InputStream");
         }
-        return convertToDataMatrix(sheet);
+
+        try (excelFileInputStream; Workbook workbook = WorkbookFactory.create(excelFileInputStream, request.getPassword())) {
+            List<WorkbookSheetInfo> selectedSheets = request.getSheetSelector().filterSheets(readWorkbookSheets(workbook));
+            return selectedSheets.stream()
+                    .map(this::toSheetContent)
+                    .collect(Collectors.toList());
+        }
     }
 
     /**
-     * Read in a specific Sheet from the Excel File input stream.
-     * @param inputStream inputStream of the Excel file.
-     * @param password password (optional)
-     * @param workbookSheetGrabber function to grab the sheet from the workbook.
-     * @return sheet
+     * Gets all sheets in the given workbook
+     * returns a list of 'WorkbookSheetInfo', which includes: Sheet, SheetName, SheetIndex.
+     * @param workbook workbook
+     * @return list of workbook sheets
      */
-    private Sheet getFileSheet(InputStream inputStream,
-                               String password,
-                               WorkbookSheetGrabber workbookSheetGrabber
-    ) throws IOException {
-        try (inputStream; Workbook wb = WorkbookFactory.create(inputStream, password)) {
-            return workbookSheetGrabber.extractSheet(wb);
+    private List<WorkbookSheetInfo> readWorkbookSheets(Workbook workbook) {
+        List<WorkbookSheetInfo> workbookSheets = new ArrayList<>();
+        for (int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) {
+            Sheet sheet = workbook.getSheetAt(sheetIndex);
+            workbookSheets.add(new WorkbookSheetInfo(sheet.getSheetName(), sheetIndex, sheet));
         }
+        return workbookSheets;
     }
+
+    private SheetContent toSheetContent(WorkbookSheetInfo sheetInfo) {
+        String[][] sheetDataMatrix = convertToSheetContentArray(sheetInfo.getSheet());
+        return new SheetContent(sheetInfo.getName(), sheetDataMatrix);
+    }
+
 
     /**
      * Create 2-D data matrix from the given Excel Sheet
@@ -74,7 +79,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      * @return 2-D array representing CSV format
      * each row will have the same number of columns
      */
-    public String[][] convertToDataMatrix(Sheet sheet) {
+    public String[][] convertToSheetContentArray(Sheet sheet) {
         if (sheet == null) {
             throw new IllegalArgumentException("Sheet parameter cannot be null.");
         }
@@ -87,10 +92,10 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         // get all the column (indexes) that are to be read
         int[] availableColumns = getAvailableColumns(sheet, maxColumn);
 
-        return convertToDataMatrix(rowList, availableColumns);
+        return convertToSheetContentArray(rowList, availableColumns);
     }
 
-    private String[][] convertToDataMatrix(List<Row> rowList, int[] columnsToRead) {
+    private String[][] convertToSheetContentArray(List<Row> rowList, int[] columnsToRead) {
         // if there are no available columns then bail early.
         if (columnsToRead.length == 0) {
             return new String[0][0];
@@ -221,6 +226,33 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         @Override
         public StandardExcelSheetReader build() {
             return new StandardExcelSheetReader(this.buildConfig());
+        }
+    }
+
+
+    private static class WorkbookSheetInfo implements SheetInfo {
+        private final String sheetName;
+        private final int sheetIndex;
+        private final Sheet sheet;
+
+        public WorkbookSheetInfo(String sheetName, int sheetIndex, Sheet sheet) {
+            this.sheetName = sheetName;
+            this.sheetIndex = sheetIndex;
+            this.sheet = sheet;
+        }
+
+        @Override
+        public String getName() {
+            return sheetName;
+        }
+
+        @Override
+        public int getIndex() {
+            return sheetIndex;
+        }
+
+        public Sheet getSheet() {
+            return sheet;
         }
     }
 }

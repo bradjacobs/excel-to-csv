@@ -6,15 +6,8 @@ package com.github.bradjacobs.excel.core;
 import com.github.bradjacobs.excel.api.ExcelSheetReader;
 import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.io.InputStreamGenerator;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,11 +17,10 @@ import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
 import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
 
 
+// TODO - this abstract class might be removed.
+//   it's usefulness has now become very limited.
 abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
-    protected static final InputStreamGenerator inputStreamGenerator = new InputStreamGenerator();
-    private static final String DEFAULT_PASSWORD = null;
-    private static final int FIRST_SHEET_INDEX = 0;
     private static final String SHEET_NOT_FOUND_MSG = "Excel sheet not found: '%s'";
 
     protected final SheetConfig sheetConfig;
@@ -41,108 +33,6 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
         //   (as of POI version 5.2.0 the default value is 100_000_000)
         org.apache.poi.util.IOUtils.setByteArrayMaxOverride(Integer.MAX_VALUE);
     }
-
-    @Override
-    public String[][] readExcelSheetData(File excelFile) throws IOException {
-        return readExcelSheetData(excelFile, FIRST_SHEET_INDEX);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(Path excelFile) throws IOException {
-        return readExcelSheetData(excelFile, FIRST_SHEET_INDEX);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(URL excelFileUrl) throws IOException {
-        return readExcelSheetData(excelFileUrl, FIRST_SHEET_INDEX);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(InputStream inputStream) throws IOException {
-        return readExcelSheetData(inputStream, FIRST_SHEET_INDEX);
-    }
-
-    // Variations of reading Excel Sheet via sheet Index.
-    @Override
-    public String[][] readExcelSheetData(File excelFile, int sheetIndex) throws IOException {
-        return readExcelSheetData(excelFile, sheetIndex, DEFAULT_PASSWORD);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(Path excelFile, int sheetIndex) throws IOException {
-        return readExcelSheetData(excelFile, sheetIndex, DEFAULT_PASSWORD);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(URL excelFileUrl, int sheetIndex) throws IOException {
-        return readExcelSheetData(inputStreamGenerator.getInputStream(excelFileUrl), sheetIndex, DEFAULT_PASSWORD);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(InputStream inputStream, int sheetIndex) throws IOException {
-        return readExcelSheetData(inputStream, sheetIndex, DEFAULT_PASSWORD);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(File excelFile, int sheetIndex, String password) throws IOException {
-        return readExcelSheetData(inputStreamGenerator.getInputStream(excelFile), sheetIndex, password);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(Path excelFile, int sheetIndex, String password) throws IOException {
-        return readExcelSheetData(inputStreamGenerator.getInputStream(excelFile), sheetIndex, password);
-    }
-
-    // Subclasses implement the core extraction logic:
-    @Override
-    public String[][] readExcelSheetData(InputStream inputStream, int sheetIndex, String password) throws IOException {
-        Validate.isTrue(sheetIndex >= 0, "Sheet Index cannot be negative");
-        Validate.isTrue(inputStream != null, "InputStream cannot be null");
-        return readSheet(inputStream, sheetIndex, password);
-    }
-
-    protected abstract String[][] readSheet(InputStream inputStream, int sheetIndex, String password) throws IOException;
-
-    // Variations of reading Excel Sheet via sheet name.
-    @Override
-    public String[][] readExcelSheetData(File excelFile, String sheetName) throws IOException {
-        return readExcelSheetData(excelFile, sheetName, DEFAULT_PASSWORD);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(Path excelFile, String sheetName) throws IOException {
-        return readExcelSheetData(excelFile, sheetName, DEFAULT_PASSWORD);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(URL excelFileUrl, String sheetName) throws IOException {
-        return readExcelSheetData(inputStreamGenerator.getInputStream(excelFileUrl), sheetName, null);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(InputStream inputStream, String sheetName) throws IOException {
-        return readExcelSheetData(inputStream, sheetName, DEFAULT_PASSWORD);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(File excelFile, String sheetName, String password) throws IOException {
-        return readExcelSheetData(inputStreamGenerator.getInputStream(excelFile), sheetName, password);
-    }
-
-    @Override
-    public String[][] readExcelSheetData(Path excelFile, String sheetName, String password) throws IOException {
-        return readExcelSheetData(inputStreamGenerator.getInputStream(excelFile), sheetName, password);
-    }
-
-    // Subclasses implement the core extraction logic:
-    @Override
-    public String[][] readExcelSheetData(InputStream inputStream, String sheetName, String password) throws IOException {
-        Validate.isTrue(StringUtils.isNotEmpty(sheetName), "Sheet Name cannot be empty");
-        Validate.isTrue(inputStream != null, "InputStream cannot be null");
-        return readSheet(inputStream, sheetName, password);
-    }
-
-    protected abstract String[][] readSheet(InputStream inputStream, String sheetName, String password) throws IOException;
 
     /**
      * Create exception to be thrown if sheet name is not found.

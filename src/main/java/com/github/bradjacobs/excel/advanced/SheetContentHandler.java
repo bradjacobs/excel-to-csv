@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // TODO: more javaDocs and unitTests
-class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
+class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     private static final String EMPTY_CELL_VALUE = "";
     private static final String EXCEL_ERROR_PREFIX = "ERROR:";
     private static final String MISSING_CELL_REF_MSG = "Unable to parse Excel Sheet. " +
@@ -28,7 +28,7 @@ class SheetDataHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     private final StringRowConsumer stringRowConsumer;
     private final List<String> currentRowValues = new ArrayList<>();
 
-    public SheetDataHandler(SheetConfig sheetConfig, StringRowConsumer stringRowConsumer) {
+    public SheetContentHandler(SheetConfig sheetConfig, StringRowConsumer stringRowConsumer) {
         this.sheetConfig = sheetConfig;
         this.cellValueSanitizer = new CellValueSanitizer(
                 sheetConfig.isAutoTrim(),

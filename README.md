@@ -1,18 +1,12 @@
 # Excel-To-Csv
-- [Description](#Description)
-- [Examples](#Examples)
-  * [Basic](#Basic)
-  * [Advanced](#Advanced)
-- [Usage](#Usage)
-  * [Overview](#Overview)
-  * [ExcelReaderDetails](#ExcelReaderDetails)
-  + [BuilderDetails](#BuilderDetails)
-- [OtherInfo](#OtherInfo)
-- [KnownCellDataIssues](#KnownCellDataIssues)
-- [AlternateImplementations](#AlternateImplementations)
-- [TODOs](#TODOs)
-- [FinalThoughts](#FinalThoughts)
-
+- [Description](#description)
+- [API Overview](#api-overview)
+- [Quick Start](#quick-start)
+- [Other Info](#other-info)
+- [Known Cell Data Issues](#known-cell-data-issues)
+- [Alternate Implementations](#alternate-implementations)
+- [TODOs](#todos)
+- [Final Thoughts](#final-thoughts)
 
 ## Description
 Simple tool to convert an Excel worksheet into CSV format.
@@ -20,88 +14,109 @@ Simple tool to convert an Excel worksheet into CSV format.
 Implemented using the [Apache POI](https://poi.apache.org/) libraries
 
 > ⚠️ **Warning**
-> > The primarily API and Builder methods are undergoing changes.
+> > Curreently giving the code an 'overhaul'.
 
-## Examples
+## API Overview
 
-### Basic
+The API follows a simple pipeline:
+1. Create an `ExcelSheetReadRequest` (defines what to read)
+2. Pass it to an `ExcelProcessor` (reads the Excel data)
+3. Receive a `SheetContent` result (holds the sheet data)
+4. Output it using `CsvWriter` (writes CSV files)
+
+## Quick Start
 ```java
-// read excel worksheet and write output to a file
-ExcelReader excelReader = ExcelReader.builder().build();
-excelReader.convertToCsvFile(Paths.get("input.xlsx"), Paths.get("output.csv"));
-// or
-excelReader.convertToCsvFile(new File("input.xlsx"), new File("output.csv"));
+ExcelSheetReadRequest request = ExcelSheetReadRequest
+    .from(Paths.get("input.xlsx"))
+    .byName("Sheet1")
+    .build();
+
+ExcelProcessor processor = ExcelProcessor.builder()
+    .skipBlankRows(true)
+    .build();
+
+SheetContent content = processor.readSheets(request).get(0);
+CsvWriter.write(Paths.get("output.csv"), content, QuoteMode.MINIMAL);
 ```
+<details>
+  <summary><strong>ExcelSheetReadRequest</strong></summary>
 
-```java
-// get a single string representing the entire worksheet in CSV format
-ExcelReader excelReader = ExcelReader.builder().build();
-String csvText = excelReader.convertToCsvText(Paths.get("input.xlsx"));
-// or
-String csvText = excelReader.convertToCsvText(new File("input.xlsx"));
-```
+Builds the request and selects which sheet(s) to read.
 
-```java
-// get 2-D string array representing the data in the worksheet
-ExcelReader excelReader = ExcelReader.builder().build();
-String[][] dataMatrix = excelReader.convertToDataMatrix(Paths.get("input.xlsx"));
-// or
-String[][] dataMatrix = excelReader.convertToDataMatrix(new File("input.xlsx"));
-```
+- `from(Path)`, `from(File)`, `from(URL)`
+- `byIndex(...)`, `byIndexes(...)`
+- `byName(...)`, `byNames(...)`
+- `sheetSelector(...)`
+- `password(...)`
 
-### Advanced
-```java
-// write csv file with specific settings
-ExcelReader excelReader = ExcelReader.builder()
-        .quoteMode(QuoteMode.MINIMAL) // only quote values if necessary
-        .sheetIndex(1) // grab the 2nd worksheet
-        .skipBlankRows(true) // ignore any empty rows from the Excel worksheet
-        .build();
-excelReader.convertToCsvFile(new File("input.xlsx"), new File("output.csv"));
-```
-```java
-// fetch Excel file from external URL location and save as a local csv file.
-ExcelReader excelReader = ExcelReader.builder().build();
-excelReader.convertToCsvFile(new URL("https://some.domain.com/input.xlsx"), new File("output.csv"));
-```
+</details>
 
-## Usage
-### Overview
-1. Create a new ExcelReader via the builder() method.
-2. Execute desired methods on ExcelReader
+<details>
+  <summary><strong>ExcelProcessor</strong></summary>
 
-### ExcelReaderDetails
-| METHOD              | INPUTS                       | OUTPUT&nbsp; | DESCRIPTION                                                                                                                                      |
-|---------------------|------------------------------|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| convertToCsvText    | Excel File                   | String       | Given Excel file input return a String representing the Worksheet as CSV                                                                         |
-| convertToDataMatrix | Excel File                   | String[][]   | Given Excel file input return a 2-D String array representing the Worksheet as CSV<br> (each array element represents a cell from the worksheet) |
-| convertToCsvFile    | Excel File & Output CSV File | (none)       | Given Excel file input write output directly to a specified destination file.                                                                    |
+Reads sheet data and returns `SheetContent`.
 
-### BuilderDetails
-| FIELD                  | REQUIRED | DEFAULT | DETAILS                                                                                                                                                                                                                                                                        |
-|------------------------|----------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| quoteMode              | NO       | NORMAL  | how aggressive to wrap quotes around values<br><br>*ALWAYS*: always put quotes around values<br>*NORMAL*: put quotes around most values that are non-alphanumeric<br>*MINIMAL*: only add quotes around values that are needed to be CSV compliant<br>*NEVER*: never add quotes |
-| sheetIndex             | NO       | 0       | 0-based index of which worksheet to convert to CSV                                                                                                                                                                                                                             |
-| sheetName              | NO       | (blank) | Name of the worksheet tab to be converted to CSV<br> (if set then 'sheetIndex' is ignored)                                                                                                                                                                                     |
-| autoTrim               | NO       | true    | Trim any leading/trailing whitespace on cell values.                                                                                                                                                                                                                           |
-| skipBlankRows          | NO       | false   | prune all blank rows from the CSV/dataMatrix output                                                                                                                                                                                                                            |
-| skipBlankColumns       | NO       | false   | prune all blank columns from the CSV/dataMatrix output                                                                                                                                                                                                                         |
-| skipInvisibleCells     | NO       | false   | when true, limit to only visible cells from Excel Sheet (i.e. row height > 0 and column width > 0)                                                                                                                                                                             |
-| saveUnicodeFileWithBom | NO       | true    | prepend 'BOM' to output CSV file if unicode characters were detected.                                                                                                                                                                                                          |
-| sanitizeSpaces         | NO       | true    | replace any unicode or abnormal space character (i.e. nbsp) with a normal space                                                                                                                                                                                                |
-| sanitizeQuotes         | NO       | true    | replace any special single/double quotes (i.e. smart quotes) with normal quotes                                                                                                                                                                                                |
-| sanitizeDashes         | NO       | false   | replace any special dash/hyphen character (i.e. em dash) with normal dash                                                                                                                                                                                                      |
-| sanitizeDiacritics     | NO       | false   | replace diacritic characters with its basic counterpart (i.e. 'é' -> 'e', 'Ç' -> 'C')                                                                                                                                                                                          |
+- `builder()`
+- `readSheets(ExcelSheetReadRequest)`
+- `useAdvancedReader(boolean)`
 
-## OtherInfo
+Common options:
+
+- `quoteMode`
+- `autoTrim`
+- `skipBlankRows`
+- `skipBlankColumns`
+- `skipInvisibleCells`
+- `saveUnicodeFileWithBom`
+- `sanitizeSpaces`
+- `sanitizeQuotes`
+- `sanitizeDashes`
+- `sanitizeDiacritics`
+
+</details>
+
+<details>
+  <summary><strong>SheetContent</strong></summary>
+
+Represents a single sheet result.
+
+- `getSheetName()`
+- `getMatrix()`
+- `getRows()`
+
+</details>
+
+<details>
+  <summary><strong>CsvWriter</strong></summary>
+
+Writes `SheetContent` to CSV.
+
+- `write(Path, SheetContent)`
+- `write(Path, SheetContent, QuoteMode)`
+- `write(Path, List<SheetContent>)`
+- `write(Path, List<SheetContent>, QuoteMode)`
+- `toCsv(SheetContent)`
+
+</details>
+
+<details>
+  <summary><strong>QuoteMode</strong></summary>
+
+- `ALWAYS`
+- `NORMAL`
+- `MINIMAL`
+- `NEVER`
+</details>
+
+## Other Info
 * All rows in the output CSV will have the exact same number of columns. (which will be the maximum non-blank column detected)
 * The returned CSV data values are WYSIWYG and should retain the same 'formatting' as the original Excel file. (i.e., Dates and Numeric values)
-  * No _formulas_ are copied.  Only the value as it 'physically appears' in a given cell
-  * _**(see 'Known Cell Data Issues' for exceptions)_
-* Currently, no quotes will be added around 'blank' values 
+    * No _formulas_ are copied.  Only the value as it 'physically appears' in a given cell
+    * _**(see 'Known Cell Data Issues' for exceptions)_
+* Currently, no quotes will be added around 'blank' values
 * Empty cells will be converted to empty string (not 'null')
 
-## KnownCellDataIssues
+## Known Cell Data Issues
 Known Cell Data Formatting Issues include (but are not limited to) the following:
 <details>
   <summary>(Click To Expand...)</summary>
@@ -112,28 +127,27 @@ Opening the Excel file and then 'resaving' can sometimes resolve issues.
 Most cases below appear to be pretty rare (subjectively)
 
 * Sometimes simple numeric values will be returned in a decimal format (and vice versa).
-  * i.e. expected "7" but got "7.0" or expected "7.00" but got "7"
+    * i.e. expected "7" but got "7.0" or expected "7.00" but got "7"
 * Sometimes 'zero' and 'blank' can get mixed up.
-  * i.e. expected "" but got "0.0"
+    * i.e. expected "" but got "0.0"
 * Advanced parser can throw an exception if encounters a cell without a CellReference
-  * a poi-examples class [XLSX2CSV.java](https://github.com/apache/poi/blob/trunk/poi-examples/src/main/java/org/apache/poi/examples/xssf/eventusermodel/XLSX2CSV.java) shows a proposed solution, but it only works in a handful of cases.
+    * a poi-examples class [XLSX2CSV.java](https://github.com/apache/poi/blob/trunk/poi-examples/src/main/java/org/apache/poi/examples/xssf/eventusermodel/XLSX2CSV.java) shows a proposed solution, but it only works in a handful of cases.
 * Certain Linked or Embedded Objects typically render as "#VALUE!" (Pictures, Stock, Geography, etc.)
 * Special or Custom Formats may sometimes render incorrectly.
-  * most often noticed with date, time, or numeric values.
-  * the ;;; format currently will _NOT_ produce a blank value
+    * most often noticed with date, time, or numeric values.
+    * the ;;; format currently will _NOT_ produce a blank value
 * Number precision can sometimes be off (appears to be rare).
-  * Examples:
-    * "33.8192973" vs "33.8192974"
-    * "0.1245" vs "0.124500000"
-    * "0.29999" vs "0.2999900001"
+    * Examples:
+        * "33.8192973" vs "33.8192974"
+        * "0.1245" vs "0.124500000"
+        * "0.29999" vs "0.2999900001"
 * Cells of type DataBar or IconSet will show a value, even if marked as "icon only"
 
 Also note the following is 'Expected Behavior'
 * Cells with 'error values' (#NAME?, #VALUE!, etc.) will appear as such in the output CSV file
-
 </details>
 
-## AlternateImplementations
+## Alternate Implementations
 Searching on the web can yield alternate solutions that require less code.  However, they seem to usually not handle "large" Excel files or don't always handle Blank rows and columns very well
 
 <details>
@@ -141,7 +155,6 @@ Searching on the web can yield alternate solutions that require less code.  Howe
 
 An example of a simpler way to read an Excel file without the extra code in this project is below:<br><br>
 Additional explanations about the code can be found in [SimplePoiExampleExcelReader.java](src/main/java/com/github/bradjacobs/excel/demo/SimplePoiExampleExcelReader.java)
-
 ```java
 public List<List<String>> readBasicSheet(Path excelFile) throws IOException {
   DataFormatter formatter = new DataFormatter(true);
@@ -183,7 +196,7 @@ This is a nice solution with _A LOT_ less code.  _**BUT**_... it seems to expose
 
 Namely:
 * empty cells could cause data to seemingly 'shift' to a different column
-  * i.e. if no value in Column A, but there is a value in Column B, then the Column B value will show up as the first value in the row.
+    * i.e. if no value in Column A, but there is a value in Column B, then the Column B value will show up as the first value in the row.
 * Bigger Excel files (> 1 MB ?) will throw an exception with the message: _"The text would exceed the max allowed overall size of extracted text"_
 * It will give data from all sheets (even if you only want one)
 * The output csv text might not have the cells quoted the way you want (subjective)
@@ -194,30 +207,27 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 
 <details>
   <summary>Todo Item List... (Click To Expand)</summary>
- 
-* Major Overhaul the primary interfaces (both in ExcelReader and ExcelSheetReader)
-  * Switch to returning some kind of generic data object
-  * Reduce methods - since many look almost identical (use strategy pattern perhaps)
-  * Perhaps a type of outputHandler instead of all the File,csvText,dataMatrix redundancy
-* Add option to read multiple sheets from single Excel file. 
-  * this would probably add some kind of 'sheet filtering', where user specifies sheets
-  * by indexes, or names, or all, or some other rule like 'sheet name contains', etc.
+
+* Miscellaneous cleanup and refactoring (ongoing)
 * General Unittest cleanup and add more tests (ongoing)
+* Check and fix any circular package dependencies
+* Redo the examples
 * Refactoring in the advanced package (visibility policy logic and row filling, for example)
+* Add more Javadocs
+* The pom.xml could use some cleanup and organization.
+* Further updates for API Documentation and README updates.
 * Integrate a real logger into the code
 * Add in addtional 'row and column filtering' (low priority)
-  * this would expand on skiping blanks rows/columns.  (i.e. select only certain columns want returend)
+    * this would expand on skiping blanks rows/columns.  (i.e. select only certain columns want returned)
 * Address any of the "Known Cell Data Issues" (above) if possible
-* Add more Javadocs
 * Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
-  * need to update groupId and package names from 'com.github...' to 'io.github...' 
+    * need to update groupId and package names from 'com.github...' to 'io.github...'
 * Reorganize Excel Test data for Junit tests.
-* The pom.xml could use some cleanup and organization.
 * (maybe) Add an option to return unformatted numbers instead of WYSIWYG (i.e. "1000000" instead of "1,000,000")
 </details>
 
-## FinalThoughts
+## Final Thoughts
 I don't actively work on this project much and only make occasional tweaks just for fun.
 
-This project was originally created in a day, so I'm sure there are specific cases I've missed.  :-) 
+This project was originally created in a day, so I'm sure there are specific cases I've missed.  :-)

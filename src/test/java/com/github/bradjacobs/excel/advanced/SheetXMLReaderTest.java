@@ -23,7 +23,11 @@ import java.io.InputStream;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // TODO - this class was AI-generated
 //   need to walk through and clean up as needed.
@@ -240,7 +244,7 @@ class SheetXMLReaderTest {
             try (InputStream sheetStream = firstSheetStream(reader)) {
                 SheetXMLReader parser = new SheetXMLReader(cfg, sharedStrings, styles, false);
                 parser.parse(new InputSource(sheetStream));
-                return parser.getSheetData();
+                return parser.getSheetContentArray();
             }
         }
     }

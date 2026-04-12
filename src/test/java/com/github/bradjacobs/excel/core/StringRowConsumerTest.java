@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel.core;
 
+import com.github.bradjacobs.excel.core.StringRowConsumer.BlankRemoval;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -266,6 +267,25 @@ class StringRowConsumerTest {
             StringRowConsumer consumer = StringRowConsumer.of(null);
             runConsumerTest(consumer, input, expected);
         }
+
+
+        @Test
+        public void resetConsumerAfterUse() {
+            String[][] input = {
+                    {"aa", "", "bb"},
+                    {"cc", "", "dd"}
+            };
+            String[][] expected = {
+                    {"aa", "", "bb"},
+                    {"cc", "", "dd"}
+            };
+            StringRowConsumer consumer = createBasicConsumer();
+            runConsumerTest(consumer, input, expected);
+
+            consumer.reset();
+            String[][] resetMatrix = consumer.generateMatrix();
+            assertEquals(0, resetMatrix.length);
+        }
     }
 
     @Nested
@@ -432,15 +452,15 @@ class StringRowConsumerTest {
     }
 
     private StringRowConsumer createBasicConsumer() {
-        return StringRowConsumer.of(StringRowConsumer.BlankRemoval.NONE);
+        return StringRowConsumer.of(BlankRemoval.NONE);
     }
     private StringRowConsumer createPruneBlankRowsConsumer() {
-        return StringRowConsumer.of(StringRowConsumer.BlankRemoval.ROWS);
+        return StringRowConsumer.of(BlankRemoval.ROWS);
     }
     private StringRowConsumer createPruneBlankColumnConsumer() {
-        return StringRowConsumer.of(StringRowConsumer.BlankRemoval.COLUMNS);
+        return StringRowConsumer.of(BlankRemoval.COLUMNS);
     }
     private StringRowConsumer createPruneBlankRowsAndColumnConsumer() {
-        return StringRowConsumer.of(StringRowConsumer.BlankRemoval.ROWS_AND_COLUMNS);
+        return StringRowConsumer.of(BlankRemoval.ROWS_AND_COLUMNS);
     }
 }
