@@ -88,7 +88,7 @@ public class ExcelSheetReadRequest {
         }
 
         public Builder password(String password) {
-            this.password = StringUtils.isNotEmpty(password) ? password : null;;
+            this.password = StringUtils.isNotEmpty(password) ? password : null;
             return this;
         }
 

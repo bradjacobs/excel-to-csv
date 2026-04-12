@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.standard;
 
-import com.github.bradjacobs.excel.SheetContent;
+import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
 import com.github.bradjacobs.excel.core.CellValueReader;

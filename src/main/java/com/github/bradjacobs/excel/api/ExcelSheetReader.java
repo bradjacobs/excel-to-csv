@@ -3,7 +3,6 @@
  */
 package com.github.bradjacobs.excel.api;
 
-import com.github.bradjacobs.excel.SheetContent;
 import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
 import org.apache.commons.lang3.Validate;
 

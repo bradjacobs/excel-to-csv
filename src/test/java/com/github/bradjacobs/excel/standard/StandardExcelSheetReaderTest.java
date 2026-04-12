@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.standard;
 
-import com.github.bradjacobs.excel.SheetContent;
+import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReaderTest;
 import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
 import org.junit.jupiter.api.DisplayName;

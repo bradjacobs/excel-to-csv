@@ -1,7 +1,7 @@
 package com.github.bradjacobs.excel.demo;
 
 import com.github.bradjacobs.excel.ExcelProcessor;
-import com.github.bradjacobs.excel.SheetContent;
+import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.csv.CsvWriter;
 import com.github.bradjacobs.excel.csv.QuoteMode;
 import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
