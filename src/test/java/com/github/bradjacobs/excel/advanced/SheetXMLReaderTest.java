@@ -50,7 +50,7 @@ class SheetXMLReaderTest {
                 false, // skipBlankRows
                 false, // skipBlankColumns
                 false, // skipInvisibleCells
-                true,  // autoTrim
+                true,  // trimStringValues
                 Set.of()
         );
 
@@ -88,7 +88,7 @@ class SheetXMLReaderTest {
                 false, // skipBlankRows
                 false, // skipBlankColumns
                 true,  // skipInvisibleCells
-                true,  // autoTrim
+                true,  // trimStringValues
                 Set.of()
         );
 
@@ -120,7 +120,7 @@ class SheetXMLReaderTest {
                 false, // skipBlankRows
                 false, // skipBlankColumns
                 false, // skipInvisibleCells
-                true,  // autoTrim
+                true,  // trimStringValues
                 Set.of()
         );
 

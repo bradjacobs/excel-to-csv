@@ -137,7 +137,7 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         /**
          * Sheet where the last column is filled with different
          * whitespace characters.  Since we have default values of:
-         *   sanitizeSpaces=true AND autoTrimSpaces=true
+         *   sanitizeSpaces=true AND trimStringValues=true
          * Then this last column should be removed from the result.
          */
         @Test
@@ -167,33 +167,33 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    class AutoTrimTests {
+    class TrimStringValuesTests {
         @Test
-        public void autoTrimEnabled(@TempDir Path tempDir) throws IOException {
+        public void trimStringValuesEnabled(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Path testFile = TestExcelFileSheetUtils.createSingleCellExcelFile(tempDir, testValue);
             ExcelSheetReadRequest req = createRequest(testFile);
 
-            T sheetReader = createBuilder().autoTrim(true).build();
+            T sheetReader = createBuilder().trimStringValues(true).build();
             SheetContent sheetContent = sheetReader.readSheet(req);
             String[][] dataMatrix = sheetContent.getMatrix();
             assertEquals(testValue.trim(), dataMatrix[0][0]);
         }
 
         @Test
-        public void autoTrimDisabled(@TempDir Path tempDir) throws IOException {
+        public void trimStringValuesDisabled(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Path testFile = TestExcelFileSheetUtils.createSingleCellExcelFile(tempDir, testValue);
             ExcelSheetReadRequest req = createRequest(testFile);
 
-            T sheetReader = createBuilder().autoTrim(false).build();
+            T sheetReader = createBuilder().trimStringValues(false).build();
             SheetContent sheetContent = sheetReader.readSheet(req);
             String[][] dataMatrix = sheetContent.getMatrix();
             assertEquals(testValue, dataMatrix[0][0]);
         }
 
         @Test
-        public void autoTrimDefault(@TempDir Path tempDir) throws IOException {
+        public void trimStringValuesDefault(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Path testFile = TestExcelFileSheetUtils.createSingleCellExcelFile(tempDir, testValue);
             ExcelSheetReadRequest req = createRequest(testFile);

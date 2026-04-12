@@ -33,7 +33,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
     // todo: still deciding if this constructor is ok or terrible.
     public StandardExcelSheetReader(SheetConfig sheetConfig) {
         super(sheetConfig);
-        this.cellValueReader = new CellValueReader(sheetConfig.isAutoTrim(), sheetConfig.getCharSanitizeFlags());
+        this.cellValueReader = new CellValueReader(sheetConfig.trimStringValues(), sheetConfig.getCharSanitizeFlags());
     }
 
     @Override

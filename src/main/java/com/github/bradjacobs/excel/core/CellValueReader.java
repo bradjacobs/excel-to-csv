@@ -19,8 +19,8 @@ public class CellValueReader {
 
     private final CellValueSanitizer sanitizer;
 
-    public CellValueReader(boolean autoTrim, Set<SanitizeType> sanitizeTypes) {
-        this.sanitizer = new CellValueSanitizer(autoTrim, sanitizeTypes);
+    public CellValueReader(boolean trimStringValues, Set<SanitizeType> sanitizeTypes) {
+        this.sanitizer = new CellValueSanitizer(trimStringValues, sanitizeTypes);
     }
 
     /**

@@ -63,7 +63,7 @@ Reads sheet data and returns `SheetContent`.
 Common options:
 
 - `quoteMode`
-- `autoTrim`
+- `trimStringValues`
 - `skipBlankRows`
 - `skipBlankColumns`
 - `skipInvisibleCells`

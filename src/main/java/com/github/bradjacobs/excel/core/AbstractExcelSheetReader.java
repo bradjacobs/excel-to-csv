@@ -21,8 +21,6 @@ import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
 //   it's usefulness has now become very limited.
 abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
-    private static final String SHEET_NOT_FOUND_MSG = "Excel sheet not found: '%s'";
-
     protected final SheetConfig sheetConfig;
 
     public AbstractExcelSheetReader(SheetConfig sheetConfig) {
@@ -36,7 +34,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
     // below is common code for sheet configuration builder
     abstract public static class AbstractSheetConfigBuilder<T, B extends AbstractSheetConfigBuilder<T, B>> {
-        protected boolean autoTrim = true;
+        protected boolean trimStringValues = true;
         protected boolean skipBlankRows = false;
         protected boolean skipBlankColumns = false;
         protected boolean skipInvisibleCells = false;
@@ -47,10 +45,10 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
         /**
          * Whether to trim whitespace on cell values
-         * @param autoTrim (defaults to true)
+         * @param trimStringValues (defaults to true)
          */
-        public B autoTrim(boolean autoTrim) {
-            this.autoTrim = autoTrim;
+        public B trimStringValues(boolean trimStringValues) {
+            this.trimStringValues = trimStringValues;
             return self();
         }
 
@@ -113,7 +111,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
                     skipBlankRows,
                     skipBlankColumns,
                     skipInvisibleCells,
-                    autoTrim,
+                    trimStringValues,
                     sanitizeTypes);
         }
 

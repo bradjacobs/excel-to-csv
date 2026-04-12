@@ -31,7 +31,7 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     public SheetContentHandler(SheetConfig sheetConfig, StringRowConsumer stringRowConsumer) {
         this.sheetConfig = sheetConfig;
         this.cellValueSanitizer = new CellValueSanitizer(
-                sheetConfig.isAutoTrim(),
+                sheetConfig.trimStringValues(),
                 sheetConfig.getCharSanitizeFlags()
         );
         this.stringRowConsumer = stringRowConsumer;

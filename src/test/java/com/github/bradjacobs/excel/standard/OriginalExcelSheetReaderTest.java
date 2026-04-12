@@ -89,7 +89,7 @@ class OriginalExcelSheetReaderTest {
         /**
          * Sheet where the last column is filled with different
          * whitespace characters.  Since we have default values of:
-         *   sanitizeSpaces=true AND autoTrimSpaces=true
+         *   sanitizeSpaces=true AND trimStringValues=true
          * Then this last column should be removed from the result.
          */
         @Test
@@ -112,31 +112,31 @@ class OriginalExcelSheetReaderTest {
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    class AutoTrimTests {
+    class TrimStringValuesTests {
         @Test
-        public void autoTrimEnabled(@TempDir Path tempDir) throws IOException {
+        public void trimStringValuesEnabled(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Sheet testSheet = createSingleCellExcelSheet(tempDir, testValue);
             StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .autoTrim(true)
+                    .trimStringValues(true)
                     .build();
             String[][] dataMatrix = standardExcelSheetReader1.convertToSheetContentArray(testSheet);
             assertEquals(testValue.trim(), dataMatrix[0][0]);
         }
 
         @Test
-        public void autoTrimDisabled(@TempDir Path tempDir) throws IOException {
+        public void trimStringValuesDisabled(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Sheet testSheet = createSingleCellExcelSheet(tempDir, testValue);
             StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
-                    .autoTrim(false)
+                    .trimStringValues(false)
                     .build();
             String[][] dataMatrix = standardExcelSheetReader1.convertToSheetContentArray(testSheet);
             assertEquals(testValue, dataMatrix[0][0]);
         }
 
         @Test
-        public void autoTrimDefault(@TempDir Path tempDir) throws IOException {
+        public void trimStringValuesDefault(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Sheet testSheet = createSingleCellExcelSheet(tempDir, testValue);
             String[][] dataMatrix = DEFAULT_SHEET_READER.convertToSheetContentArray(testSheet);

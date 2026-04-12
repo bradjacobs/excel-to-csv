@@ -11,19 +11,19 @@ public class SheetConfig {
     private final boolean skipBlankRows;
     private final boolean skipBlankColumns;
     private final boolean skipInvisibleCells;
-    private final boolean autoTrim;
+    private final boolean trimStringValues;
     private final Set<SanitizeType> sanitizeTypes;
 
     public SheetConfig(
             boolean skipBlankRows,
             boolean skipBlankColumns,
             boolean skipInvisibleCells,
-            boolean autoTrim,
+            boolean trimStringValues,
             Set<SanitizeType> sanitizeTypes) {
         this.skipBlankRows = skipBlankRows;
         this.skipBlankColumns = skipBlankColumns;
         this.skipInvisibleCells = skipInvisibleCells;
-        this.autoTrim = autoTrim;
+        this.trimStringValues = trimStringValues;
         this.sanitizeTypes = Collections.unmodifiableSet(sanitizeTypes);
     }
 
@@ -39,8 +39,8 @@ public class SheetConfig {
         return skipInvisibleCells;
     }
 
-    public boolean isAutoTrim() {
-        return autoTrim;
+    public boolean trimStringValues() {
+        return trimStringValues;
     }
 
     public Set<SanitizeType> getCharSanitizeFlags() {

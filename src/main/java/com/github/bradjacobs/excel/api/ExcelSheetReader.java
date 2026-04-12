@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.List;
 
 // todo javadocs
-// todo redo the interface to not be so repetitive.
 public interface ExcelSheetReader {
 
     List<SheetContent> readSheets(ExcelSheetReadRequest request) throws IOException;

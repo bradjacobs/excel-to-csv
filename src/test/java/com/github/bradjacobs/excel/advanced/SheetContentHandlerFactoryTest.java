@@ -30,7 +30,7 @@ class SheetContentHandlerFactoryTest {
                 false,   // skipBlankRows
                 false,   // skipBlankColumns
                 true,    // skipInvisibleCells
-                true,    // autoTrim
+                true,    // trimStringValues
                 Collections.emptySet()
         );
 
@@ -56,7 +56,7 @@ class SheetContentHandlerFactoryTest {
                 false,   // skipBlankRows
                 false,   // skipBlankColumns
                 false,   // skipInvisibleCells
-                true,    // autoTrim
+                true,    // trimStringValues
                 Collections.emptySet()
         );
 
