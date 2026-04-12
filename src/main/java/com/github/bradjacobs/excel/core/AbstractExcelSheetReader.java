@@ -34,15 +34,6 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
         org.apache.poi.util.IOUtils.setByteArrayMaxOverride(Integer.MAX_VALUE);
     }
 
-    /**
-     * Create exception to be thrown if sheet name is not found.
-     * @param sheetName the sheet name.
-     * @return IllegalArgumentException
-     */
-    protected static IllegalArgumentException sheetNotFound(String sheetName) {
-        return new IllegalArgumentException(String.format(SHEET_NOT_FOUND_MSG, sheetName));
-    }
-
     // below is common code for sheet configuration builder
     abstract public static class AbstractSheetConfigBuilder<T, B extends AbstractSheetConfigBuilder<T, B>> {
         protected boolean autoTrim = true;

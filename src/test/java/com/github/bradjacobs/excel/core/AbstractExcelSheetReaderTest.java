@@ -509,10 +509,6 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         }
     }
 
-// if (FileMagic.OLE2 != fm) {
-//     throw new IOException("Can't open workbook - unsupported file type: "+fm);
-// }
-
     @ParameterizedTest
     @MethodSource("invalidInputPaths")
     public void invalidInputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) throws IOException {
