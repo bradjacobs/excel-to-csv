@@ -83,7 +83,7 @@ public class ExcelSheetReadRequest {
         }
 
         public Builder sheetSelector(SheetSelector sheetSelector) {
-            this.sheetSelector = sheetSelector;
+            this.sheetSelector = sheetSelector != null ? sheetSelector : DEFAULT_SHEET_SELECTOR;
             return this;
         }
 

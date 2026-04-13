@@ -199,6 +199,21 @@ class ExcelSheetReadRequestTest {
         }
 
         @Test
+        void setsDefaultWithNullSheetSelector() {
+            Path path = tempDir.resolve("sample.xlsx");
+
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
+                    .sheetSelector(null)
+                    .build();
+
+            // confirm default sheet selector was applied.
+            List<SheetInfo> filteredSheetList = request.getSheetSelector().filterSheets(TEST_SHEETS);
+            assertEquals(1, filteredSheetList.size());
+            assertEquals(0, filteredSheetList.get(0).getIndex());
+        }
+
+
+        @Test
         void allowsSettingPassword() {
             Path path = tempDir.resolve("sample.xlsx");
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
