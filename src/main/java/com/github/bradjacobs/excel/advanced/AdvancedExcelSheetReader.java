@@ -78,14 +78,13 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         return sheetContentList;
     }
 
-    private List<SheetInfoRecord> getUnselectedSheets(List<SheetInfoRecord> allSheetInfos,
-                                                      List<SheetInfoRecord> selectedSheets) {
+    private List<SheetInfoRecord> getUnselectedSheets(List<SheetInfoRecord> allSheetInfos, List<SheetInfoRecord> selectedSheets) {
         List<SheetInfoRecord> unselectedSheets = new ArrayList<>(allSheetInfos);
         unselectedSheets.removeAll(selectedSheets);
         return unselectedSheets;
     }
 
-    private SheetContent extractSheetContent(SheetInfoRecord sheetInfoRecord, SheetXMLReader sheetXmlReader) throws IOException, SAXException, ParserConfigurationException {
+    private SheetContent extractSheetContent(SheetInfoRecord sheetInfoRecord, SheetXMLReader sheetXmlReader) throws IOException, SAXException {
         try (InputStream sheetInputStream = sheetInfoRecord.inputStream) {
             // actually parse the sheetInputStream for the data
             InputSource sheetSource = new InputSource(sheetInputStream);
@@ -146,7 +145,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
                 resultStream = DocumentFactoryHelper.getDecryptedStream(poifs, password);
             }
             else {
-                // if wrong type then close the poifs and throw an exception below.
+                // if wrong type, then close the poifs and throw an exception below.
                 poifs.close();
             }
         }
@@ -154,7 +153,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         if (FileMagic.OOXML != fm) {
             // todo - currently throw IOException to be consistent with the other impl.
             throw new IOException("Cannot open excel file - unsupported file type: " + fm);
-            //throw new NotOfficeXmlFileException("Cannot open excel file - unsupported file type: " + fm);
+            //throw new NotOfficeXmlFileException("Cannot open Excel file - unsupported file type: " + fm);
         }
         return resultStream;
     }

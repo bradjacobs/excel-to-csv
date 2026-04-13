@@ -76,7 +76,7 @@ public class SpecialCharacterSanitizer {
     private static Map<Character, Character> buildReplacementMap(Collection<SanitizeType> sanitizeTypes) {
         Map<Character, Character> map = new HashMap<>();
         for (SanitizeType sanitizeType : sanitizeTypes) {
-            map.putAll(FLAG_REPLACEMENT_LOOKUP_MAP.get(sanitizeType));
+            map.putAll(REPLACEMENT_MAP_BY_TYPE.get(sanitizeType));
         }
         return map;
     }
@@ -164,7 +164,7 @@ public class SpecialCharacterSanitizer {
     };
 
     private static final
-    Map<SanitizeType, Map<Character, Character>> FLAG_REPLACEMENT_LOOKUP_MAP
+    Map<SanitizeType, Map<Character, Character>> REPLACEMENT_MAP_BY_TYPE
             = Map.of(
                     SPACES, generateSpaceReplacementMap(),
                     QUOTES, generateQuoteReplacementMap(),

@@ -40,7 +40,7 @@ public class ExcelProcessor implements ExcelSheetReader {
         return sheetReader.readSheets(request);
     }
 
-    private ExcelSheetReader selectSheetReader(ExcelSheetReadRequest request) throws IOException {
+    private ExcelSheetReader selectSheetReader(ExcelSheetReadRequest request) {
         if (shouldUseAdvancedReader(request)) {
             return this.advancedExcelSheetReader;
         }
@@ -49,7 +49,7 @@ public class ExcelProcessor implements ExcelSheetReader {
 
     private boolean shouldUseAdvancedReader(ExcelSheetReadRequest request) {
         // todo - it's possible that password-protected can use
-        //   the advanceder reader, but those checks ore not presently in place.
+        //   the advanced reader, but those checks ore not presently in place.
         if (!this.useAdvancedReader || request.getPassword() != null) {
             return false;
         }
@@ -74,7 +74,7 @@ public class ExcelProcessor implements ExcelSheetReader {
         return new Builder();
     }
 
-    // this builder extends abstract class to allow any of the
+    // this builder extends the abstract class to allow any of the
     //   AbstractSheetConfigBuilder values to be set on this Builder as well.
     public static class Builder extends AbstractSheetConfigBuilder<ExcelProcessor, Builder> {
         private boolean useAdvancedReader = true; // use the advanced reader (if possible)

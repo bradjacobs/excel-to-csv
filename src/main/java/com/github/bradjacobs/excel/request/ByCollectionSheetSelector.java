@@ -67,7 +67,4 @@ abstract public class ByCollectionSheetSelector<T> implements SheetSelector {
     protected static <T> Collection<T> toCollection(T... values) {
         return values == null ? null : Arrays.asList(values);
     }
-
-    // causes the following warning:
-    //  java: Varargs method could cause heap pollution from non-reifiable varargs parameter values
 }
