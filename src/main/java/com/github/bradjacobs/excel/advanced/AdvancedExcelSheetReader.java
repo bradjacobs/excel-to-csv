@@ -49,10 +49,6 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         Validate.isTrue(request != null, "Request cannot be null");
 
         InputStream sourceInputStream = request.getSourceInputStream();
-        if (sourceInputStream == null) {
-            throw new IllegalArgumentException("Request must provide an InputStream");
-        }
-
         List<SheetContent> sheetContentList = new ArrayList<>();
 
         try (InputStream inputStream = preprocessFileInputStream(sourceInputStream, request.getPassword())) {

@@ -40,9 +40,6 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
     public List<SheetContent> readSheets(ExcelSheetReadRequest request) throws IOException {
         Validate.isTrue(request != null, "Request cannot be null");
         InputStream excelFileInputStream = request.getSourceInputStream();
-        if (excelFileInputStream == null) {
-            throw new IllegalArgumentException("Request must provide an InputStream");
-        }
 
         try (excelFileInputStream; Workbook workbook = WorkbookFactory.create(excelFileInputStream, request.getPassword())) {
             List<WorkbookSheetInfo> selectedSheets = request.getSheetSelector().filterSheets(readWorkbookSheets(workbook));
