@@ -4,6 +4,7 @@
 package com.github.bradjacobs.excel.advanced;
 
 import com.github.bradjacobs.excel.advanced.datewindowing.Date1904Util;
+import com.github.bradjacobs.excel.advanced.datewindowing.DateWindowingDataFormatter;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
@@ -18,6 +19,7 @@ import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.model.SharedStrings;
 import org.apache.poi.xssf.model.StylesTable;
@@ -129,8 +131,9 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         SharedStrings sharedStrings = reader.getSharedStringsTable();
         StylesTable styles = reader.getStylesTable();
         boolean uses1904DateWindowing = Date1904Util.is1904DateWindowing(reader);
+        DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
 
-        return new SheetXMLReader(this.sheetConfig, sharedStrings, styles, uses1904DateWindowing);
+        return new SheetXMLReader(this.sheetConfig, sharedStrings, styles, dataFormatter);
     }
 
     /**

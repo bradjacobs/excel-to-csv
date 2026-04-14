@@ -6,6 +6,7 @@ package com.github.bradjacobs.excel.advanced;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
@@ -32,6 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 // TODO - this class was AI-generated
 //   need to walk through and clean up as needed.
 class SheetXMLReaderTest {
+
+    // todo - placeholder dataFormatter (not configured correctly)
+    private static final DataFormatter TEST_DATA_FORMATTER = new DataFormatter(true);
+
 
     @Test
     void parse_delegatesToParentAndProducesMatrix_basicVisibleSheet() throws Exception {
@@ -214,7 +219,7 @@ class SheetXMLReaderTest {
             StylesTable styles = reader.getStylesTable();
 
             // todo this test needs to be redone
-            SheetXMLReader parser = new SheetXMLReader(cfg, sharedStrings, styles, false);
+            SheetXMLReader parser = new SheetXMLReader(cfg, sharedStrings, styles, TEST_DATA_FORMATTER);
 
             InputSource bad = new InputSource(new ByteArrayInputStream("<worksheet><row>".getBytes()));
             assertThrows(SAXException.class, () -> parser.parse(bad), "expected SAXException for malformed XML");
@@ -242,7 +247,7 @@ class SheetXMLReaderTest {
 
             // todo - refactor because of weird false param
             try (InputStream sheetStream = firstSheetStream(reader)) {
-                SheetXMLReader parser = new SheetXMLReader(cfg, sharedStrings, styles, false);
+                SheetXMLReader parser = new SheetXMLReader(cfg, sharedStrings, styles, TEST_DATA_FORMATTER);
                 parser.parse(new InputSource(sheetStream));
                 return parser.getSheetContentArray();
             }

@@ -25,12 +25,11 @@ class SheetXMLReader extends XMLFilterImpl {
             SheetConfig sheetConfig,
             SharedStrings sharedStrings,
             StylesTable styles,
-            boolean uses1904DateWindowing) throws ParserConfigurationException, SAXException {
+            DataFormatter dataFormatter) throws ParserConfigurationException, SAXException {
         this.stringRowConsumer = StringRowConsumer.of(
                 sheetConfig.skipBlankRows(),
                 sheetConfig.skipBlankColumns()
         );
-        DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
         XMLReader reader = createXmlReader(
                 sheetConfig,
                 sharedStrings,
