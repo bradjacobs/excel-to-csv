@@ -44,6 +44,18 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
         protected abstract B self();
 
         /**
+         * Disable all default sanitation settings.
+         * Intended for when you 'know' the input does not
+         * require any 'trimming' or handling of special Unicode characters.
+         * Can result in a 'mild' performance improvement. (est. ~ 10%)
+         */
+        public B disableAllSanitation() {
+            this.sanitizeTypes.clear();
+            this.trimStringValues = false;
+            return self();
+        }
+
+        /**
          * Whether to trim whitespace on cell values
          * @param trimStringValues (defaults to true)
          */

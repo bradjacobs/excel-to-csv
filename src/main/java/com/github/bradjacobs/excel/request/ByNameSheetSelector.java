@@ -7,8 +7,6 @@ import org.apache.commons.lang3.Validate;
 
 import java.util.Collection;
 
-// ByCollectionSheetSelector, ByIndexSheetSelector, ByNameSheetSelector
-
 public class ByNameSheetSelector extends ByCollectionSheetSelector<String> {
 
     public ByNameSheetSelector(String... values) {

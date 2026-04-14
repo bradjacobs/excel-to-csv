@@ -54,6 +54,11 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         try (InputStream inputStream = preprocessFileInputStream(sourceInputStream, request.getPassword())) {
             OPCPackage pkg = OPCPackage.open(inputStream);
             XSSFReader reader = new XSSFReader(pkg);
+
+            // NOTE: Docs say readOnlySharedStringsTable saves memory on large files,
+            // but tests show ~25% slower performance!
+            //reader.setUseReadOnlySharedStringsTable(true);
+
             SheetXMLReader sheetXmlReader = createSheetXMLReader(reader);
             List<SheetInfoRecord> allSheetInfos = fetchAllSheets(reader);
 
@@ -61,6 +66,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
                 List<SheetInfoRecord> selectedSheets =
                         request.getSheetSelector().filterSheets(allSheetInfos);
 
+                // close any 'extra' inputStreams that will not be processed.
                 closeInputStreams(getUnselectedSheets(allSheetInfos, selectedSheets));
 
                 for (SheetInfoRecord selectedSheet : selectedSheets) {

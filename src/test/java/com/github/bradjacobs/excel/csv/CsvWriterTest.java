@@ -98,6 +98,18 @@ class CsvWriterTest {
             assertEquals(expected, csvResult, "Mismatch expected CSV output");
         }
 
+        @Test
+        public void convertWithNullValue() {
+            // under 'normal circumstances' the matrix sould never
+            // contain a null, but this is a sanity to ensure we
+            // don't blow up on it.
+            String[][] matrix = {{"cow bell", null, "hot dog"}};
+            String expected = "\"cow bell\",null,\"hot dog\"";
+
+            SheetContent sheetContent = new SheetContent(matrix);
+            String csvResult = normalCsvWriter.toCsv(sheetContent);
+            assertEquals(expected, csvResult, "Mismatch expected CSV output");
+        }
     }
 
     @ParameterizedTest
@@ -258,13 +270,6 @@ class CsvWriterTest {
             assertEquals("QuoteMode cannot be null.", exception.getMessage());
         }
 
-        // todo
-        //   non-directory to directory save
-        //   directory to directory save
-        //   directory to file save
-        //   file to directory save
-        //   file to file save
-
         @Test
         public void missingSheetContentParameter() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -279,6 +284,61 @@ class CsvWriterTest {
                 normalCsvWriter.writeToDirectory(Path.of("."), List.of());
             });
             assertEquals("Must supply at least one sheetContent to write.", exception.getMessage());
+        }
+
+        @Test
+        public void nullOutputFilePathParameter() {
+            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+                String[][] matrix = {{"cow bell", "", "hot dog"}};
+                SheetContent sheetContent1 = new SheetContent("sheet", matrix);
+                normalCsvWriter.writeToFile((Path)null, sheetContent1);
+            });
+            assertEquals("Must supply outputFile location to save CSV data.", exception.getMessage());
+        }
+
+        @Test
+        public void nullOutputDirectoryParameter() {
+            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+                String[][] matrix = {{"cow bell", "", "hot dog"}};
+                SheetContent sheetContent1 = new SheetContent("sheet", matrix);
+                normalCsvWriter.writeToDirectory((Path)null, List.of(sheetContent1));
+            });
+            assertEquals("Must supply outputDirectory location to save CSV files.", exception.getMessage());
+        }
+
+        @Test
+        public void nullSheetNameOnMultiSave() {
+            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+                String[][] matrix = {{"cow bell", "", "hot dog"}};
+                SheetContent sheetContent1 = new SheetContent("sheet", matrix);
+                SheetContent sheetContent2 = new SheetContent(null, matrix);
+                List<SheetContent> sheetContentList = List.of(sheetContent1, sheetContent2);
+                normalCsvWriter.writeToDirectory(Path.of("."), sheetContentList);
+            });
+            assertEquals("Must supply a non-empty sheetName for each sheetContent to write.", exception.getMessage());
+        }
+        @Test
+        public void emptySheetNameOnMultiSave() {
+            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+                String[][] matrix = {{"cow bell", "", "hot dog"}};
+                SheetContent sheetContent1 = new SheetContent("sheet", matrix);
+                SheetContent sheetContent2 = new SheetContent("", matrix);
+                List<SheetContent> sheetContentList = List.of(sheetContent1, sheetContent2);
+                normalCsvWriter.writeToDirectory(Path.of("."), sheetContentList);
+            });
+            assertEquals("Must supply a non-empty sheetName for each sheetContent to write.", exception.getMessage());
+        }
+        @Test
+        public void emptyNullInListOnMultiSave() {
+            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+                String[][] matrix = {{"cow bell", "", "hot dog"}};
+                List<SheetContent> sheetContentList = new ArrayList<>();
+                sheetContentList.add(new SheetContent("sheet1", matrix));
+                sheetContentList.add(null);
+                sheetContentList.add(new SheetContent("sheet2", matrix));
+                normalCsvWriter.writeToDirectory(Path.of("."), sheetContentList);
+            });
+            assertEquals("Must supply a non-empty sheetName for each sheetContent to write.", exception.getMessage());
         }
 
         @ParameterizedTest

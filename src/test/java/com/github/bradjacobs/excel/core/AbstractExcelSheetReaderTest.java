@@ -42,8 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-// TODO - this test needs more love
-//.  and should eventually replace the 'ExcelSheetReaderTest'
+// TODO - this test needs much more cleanup
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B extends AbstractExcelSheetReader.AbstractSheetConfigBuilder<T, B>> {
     private static final String TEST_DATA_FILE = "testSheetData.xlsx";
@@ -72,7 +71,6 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class GeneralTests {
 
-
         @Test
         public void basicRead() throws IOException {
             Path testFile = TestResourceUtil.getResourceFilePath("test_data.xlsx");
@@ -82,6 +80,12 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
             SheetContent sheetContent = defaultSheetReader.readSheet(req);
             String[][] returnedSheetValues = sheetContent.getMatrix();
+            assertArrayEquals(EXPECTED_TEST_DATA, returnedSheetValues, "Mismatch expected sheet content");
+
+            List<List<String>> rowDataList = sheetContent.getRows();
+            String[][] convertedRowDataArray = rowDataList.stream()
+                    .map(innerList -> innerList.toArray(new String[0]))
+                    .toArray(String[][]::new);
             assertArrayEquals(EXPECTED_TEST_DATA, returnedSheetValues, "Mismatch expected sheet content");
         }
 
@@ -452,12 +456,11 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         );
     }
 
-
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class ErrorHandlingTests {
         @Test
-        public void nullInputStream() {
+        public void nullRequestParameter() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();
                 sheetReader.readSheet(null);
@@ -507,6 +510,18 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
             assertEquals("Requested Excel sheet not found: 'UnknownSheetName'", thrown.getMessage());
         }
+
+        @Test
+        public void requestManySheetsOnSingleSheetCall() throws IOException {
+            ExcelSheetReadRequest req = ExcelSheetReadRequest.from(TEST_FILE).byIndexes(0,1).build();
+            // readSheet is convenienct when expect exactly 1 sheet.
+            //  any other number of sheet data from the requests results in exception.
+            Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
+                // todo check message
+                T sheetReader = createBuilder().build();
+                sheetReader.readSheet(req);
+            });
+        }
     }
 
     @ParameterizedTest
@@ -534,8 +549,6 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         };
         assertExecutableException(executable, expectedException, expectedMessage);
     }
-
-
 
     /**
      * Junit run the executable and check that it throws the expected exception and msg.

@@ -118,7 +118,6 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         return stripExcelErrorPrefix(cellValueSanitizer.sanitizeCellValue(cellValue));
     }
 
-
     /**
      * remove the first part of an error string to be consistent
      * with the behavior of reading cell values from Cell/Row/Sheet objects

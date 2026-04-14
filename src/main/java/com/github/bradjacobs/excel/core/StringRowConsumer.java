@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -81,6 +82,9 @@ public class StringRowConsumer implements Consumer<List<String>> {
         this.skipBlankColumns = skipBlankColumns;
     }
 
+    /**
+     * Reset this <code>SheetRowConsumer</code> for the next sheet.
+     */
     public void reset() {
         this.rows.clear();
         this.maxColumnCount = 0;

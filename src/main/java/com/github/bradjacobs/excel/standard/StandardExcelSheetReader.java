@@ -47,6 +47,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
                     .map(this::toSheetContent)
                     .collect(Collectors.toList());
         }
+
     }
 
     /**
@@ -70,6 +71,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
     }
 
 
+    // todo: change to non-public unless reason to keep public.
     /**
      * Create 2-D data matrix from the given Excel Sheet
      * @param sheet Excel Sheet

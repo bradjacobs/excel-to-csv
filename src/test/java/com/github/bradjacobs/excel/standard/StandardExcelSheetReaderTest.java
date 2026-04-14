@@ -78,4 +78,12 @@ class StandardExcelSheetReaderTest extends AbstractExcelSheetReaderTest<Standard
                     String.format("Expected to find substring '%s' in string '%s'.", subString, mainString));
         }
     }
+
+    @Test
+    public void nullSheetParameter() throws Exception {
+        StandardExcelSheetReader sheetReader = StandardExcelSheetReader.builder().build();
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            sheetReader.convertToSheetContentArray(null);
+        });
+    }
 }

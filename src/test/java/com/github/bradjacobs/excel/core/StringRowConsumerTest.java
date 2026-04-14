@@ -268,7 +268,6 @@ class StringRowConsumerTest {
             runConsumerTest(consumer, input, expected);
         }
 
-
         @Test
         public void resetConsumerAfterUse() {
             String[][] input = {
