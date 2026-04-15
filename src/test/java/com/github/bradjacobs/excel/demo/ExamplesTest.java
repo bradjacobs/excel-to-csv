@@ -41,7 +41,7 @@ public class ExamplesTest {
         // create request to read 2 sheets from inputFile
         ExcelSheetReadRequest request = ExcelSheetReadRequest
                 .from(inputFile)
-                .byNames("MySheet1", "MySheet2")
+                .bySheetNames("MySheet1", "MySheet2")
                 .build();
         // create processor that will skip blank rows
         ExcelProcessor excelProcessor = ExcelProcessor.builder()

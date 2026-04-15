@@ -3,7 +3,6 @@
  */
 package com.github.bradjacobs.excel.advanced;
 
-import com.github.bradjacobs.excel.advanced.datewindowing.DateWindowingDataFormatter;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
 import org.apache.poi.ss.usermodel.DataFormatter;

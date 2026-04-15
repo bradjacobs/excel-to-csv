@@ -115,7 +115,7 @@ class ExcelSheetReadRequestTest {
             Path path = tempDir.resolve("sample.xlsx");
 
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
-                    .byIndex(2)
+                    .bySheetIndex(2)
                     .build();
 
             // confirm our custom sheet selector was applied.
@@ -129,7 +129,7 @@ class ExcelSheetReadRequestTest {
             Path path = tempDir.resolve("sample.xlsx");
 
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
-                    .byIndexes(2, 1)
+                    .bySheetIndexes(2, 1)
                     .build();
 
             // confirm our custom sheet selector was applied.
@@ -144,7 +144,7 @@ class ExcelSheetReadRequestTest {
             Path path = tempDir.resolve("sample.xlsx");
 
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
-                    .byIndexes(List.of(2, 1))
+                    .bySheetIndexes(List.of(2, 1))
                     .build();
 
             // confirm our custom sheet selector was applied.
@@ -159,7 +159,7 @@ class ExcelSheetReadRequestTest {
             Path path = tempDir.resolve("sample.xlsx");
 
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
-                    .byName("BBB")
+                    .bySheetName("BBB")
                     .build();
 
             // confirm our custom sheet selector was applied.
@@ -173,7 +173,7 @@ class ExcelSheetReadRequestTest {
             Path path = tempDir.resolve("sample.xlsx");
 
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
-                    .byNames("CCC", "aaa")
+                    .bySheetNames("CCC", "aaa")
                     .build();
 
             // confirm our custom sheet selector was applied.
@@ -188,7 +188,7 @@ class ExcelSheetReadRequestTest {
             Path path = tempDir.resolve("sample.xlsx");
 
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
-                    .byNames(List.of("CCC", "aaa"))
+                    .bySheetNames(List.of("CCC", "aaa"))
                     .build();
 
             // confirm our custom sheet selector was applied.

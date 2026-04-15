@@ -60,10 +60,10 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         return ExcelSheetReadRequest.from(filePath).build();
     }
     private ExcelSheetReadRequest createRequest(Path path, String sheetName) {
-        return ExcelSheetReadRequest.from(path).byNames(sheetName).build();
+        return ExcelSheetReadRequest.from(path).bySheetNames(sheetName).build();
     }
     private ExcelSheetReadRequest createRequest(Path path, int sheetIndex) {
-        return ExcelSheetReadRequest.from(path).byIndexes(sheetIndex).build();
+        return ExcelSheetReadRequest.from(path).bySheetIndexes(sheetIndex).build();
     }
 
 
@@ -104,7 +104,7 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
             ExcelSheetReadRequest req = ExcelSheetReadRequest
                     .from(TEST_FILE)
-                    .byNames("GrowingColumnLength")
+                    .bySheetNames("GrowingColumnLength")
                     .build();
 
             List<SheetContent> sheetContentList = defaultSheetReader.readSheets(req);
@@ -158,7 +158,7 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
             List<String> sheetNames = List.of("GrowingColumnLength", "withTwoBlankColumns", "WithThreeBlankRows");
             List<String> expectedFirstCell = List.of("aa", "aa11", "Name");
 
-            ExcelSheetReadRequest req = ExcelSheetReadRequest.from(TEST_FILE).byNames(sheetNames).build();
+            ExcelSheetReadRequest req = ExcelSheetReadRequest.from(TEST_FILE).bySheetNames(sheetNames).build();
 
             List<SheetContent> sheetContentList = defaultSheetReader.readSheets(req);
             assertEquals(sheetNames.size(), sheetContentList.size(), "Expected 3 sheets");
@@ -513,7 +513,7 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
         @Test
         public void requestManySheetsOnSingleSheetCall() throws IOException {
-            ExcelSheetReadRequest req = ExcelSheetReadRequest.from(TEST_FILE).byIndexes(0,1).build();
+            ExcelSheetReadRequest req = ExcelSheetReadRequest.from(TEST_FILE).bySheetIndexes(0,1).build();
             // readSheet is convenienct when expect exactly 1 sheet.
             //  any other number of sheet data from the requests results in exception.
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {

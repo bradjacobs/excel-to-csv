@@ -14,9 +14,9 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 public class ExcelSheetReadRequest {
-
     private static final String DEFAULT_PASSWORD = null;
     private static final int DEFAULT_SHEET_INDEX = 0;
+    // by default only process the first sheet in Excel file.
     private static final SheetSelector DEFAULT_SHEET_SELECTOR =
             new ByIndexSheetSelector(DEFAULT_SHEET_INDEX);
 
@@ -62,24 +62,28 @@ public class ExcelSheetReadRequest {
         }
 
         // Optional setters
-        public Builder byName(String name) {
-            return byNames(name);
+        public Builder bySheetName(String name) {
+            return bySheetNames(name);
         }
-        public Builder byNames(String ... names) {
+        public Builder bySheetNames(String ... names) {
             return sheetSelector(new ByNameSheetSelector(names));
         }
-        public Builder byNames(Collection<String> names) {
+        public Builder bySheetNames(Collection<String> names) {
             return sheetSelector(new ByNameSheetSelector(names));
         }
 
-        public Builder byIndex(int index) {
-            return byIndexes(index);
+        public Builder bySheetIndex(int index) {
+            return bySheetIndexes(index);
         }
-        public Builder byIndexes(int ... indexes) {
+        public Builder bySheetIndexes(int ... indexes) {
             return sheetSelector(new ByIndexSheetSelector(indexes));
         }
-        public Builder byIndexes(Collection<Integer> indexes) {
+        public Builder bySheetIndexes(Collection<Integer> indexes) {
             return sheetSelector(new ByIndexSheetSelector(indexes));
+        }
+
+        public Builder allSheets() {
+            return sheetSelector(new AllSheetsSelector());
         }
 
         public Builder sheetSelector(SheetSelector sheetSelector) {
