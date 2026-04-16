@@ -15,33 +15,39 @@ public enum QuoteMode {
     // always quote values (expect for empty/blank)
     ALWAYS {
         @Override
-        Predicate<String> createPredicate() {
+        Predicate<String> createPredicate(char delimiter) {
             return value -> !StringUtils.isEmpty(value);
         }
     },
     // Quotes if discovers potentially 'unsafe' characters (but can overquote)
     NORMAL {
         @Override
-        Predicate<String> createPredicate() {
-            return anyCharMatch(IS_LOW_ASCII_CHAR);
+        Predicate<String> createPredicate(char delimiter) {
+            return createNormalQuotePredicate(delimiter);
         }
     },
     // only quote if a string contains a character that needs quotes for CSV compliance
     MINIMAL {
         @Override
-        Predicate<String> createPredicate() {
-            return anyCharMatch(IS_MINIMAL_QUOTE_CHARACTER);
+        Predicate<String> createPredicate(char delimiter) {
+            return createMinimalPredicate(delimiter);
         }
     },
     // never quote values
     NEVER {
         @Override
-        Predicate<String> createPredicate() {
+        Predicate<String> createPredicate(char delimiter) {
             return value -> false;
         }
     };
 
-    abstract Predicate<String> createPredicate();
+    private static final char DEFAULT_DELIMITER = ',';
+
+    public Predicate<String> createPredicate() {
+        return createPredicate(DEFAULT_DELIMITER);
+    }
+
+    abstract Predicate<String> createPredicate(char delimiter);
 
     // Threshold from jackson-dataformat-csv CsvEncoder (_cfgMinSafeChar).
     // Characters below this ASCII value are considered potentially unsafe.
@@ -53,11 +59,27 @@ public enum QuoteMode {
      * @param characterPredicate character predicate (as IntPredicate object)
      * @return String Predicate
      */
-    public static Predicate<String> anyCharMatch(IntPredicate characterPredicate) {
+    private static Predicate<String> anyCharMatch(IntPredicate characterPredicate) {
         return s -> s != null && s.chars().anyMatch(characterPredicate);
     }
 
-    private static final IntPredicate IS_LOW_ASCII_CHAR = c -> c < NORMAL_QUOTE_ASCII_THRESHOLD;
-    private static final IntPredicate IS_MINIMAL_QUOTE_CHARACTER = c ->
-            c == '"' || c == ',' || c == '\t' || c == '\r' || c == '\n';
+    private static Predicate<String> createNormalQuotePredicate(char delimiter) {
+        IntPredicate charPredicate = delimiter < NORMAL_QUOTE_ASCII_THRESHOLD
+                ? c -> c < NORMAL_QUOTE_ASCII_THRESHOLD
+                : c -> c < NORMAL_QUOTE_ASCII_THRESHOLD || c == delimiter;
+        return anyCharMatch(charPredicate);
+    }
+
+    private static Predicate<String> createMinimalPredicate(char delimiter) {
+        IntPredicate minQuoteCharPredicate = isMinQuoteCharPredicate(delimiter);
+        return anyCharMatch(minQuoteCharPredicate);
+    }
+
+    private static IntPredicate isMinQuoteCharPredicate(char delimiter) {
+        return c -> c == '"'
+                || c == delimiter
+                || c == '\t'
+                || c == '\r'
+                || c == '\n';
+    }
 }
