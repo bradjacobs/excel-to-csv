@@ -7,8 +7,10 @@ import com.github.bradjacobs.excel.api.ExcelSheetReader;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
+import com.github.bradjacobs.excel.standard.StandardExcelSheetReader;
 import com.github.bradjacobs.excel.util.TestExcelFileSheetUtils;
 import com.github.bradjacobs.excel.util.TestResourceUtil;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.FieldSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -35,6 +38,7 @@ import static com.github.bradjacobs.excel.config.SanitizeType.DASHES;
 import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
 import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
 import static com.github.bradjacobs.excel.util.TestResourceUtil.getResourceFilePath;
+import static com.github.bradjacobs.excel.util.TestResourceUtil.getResourceFileUrl;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -150,7 +154,6 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
             String[][] dataMatrix = defaultSheetReader.readSheet(req).getMatrix();
             assertEquals(1, dataMatrix[0].length, "mismatch of expected number of columns in csv output.");
         }
-
 
         @Test
         public void readMultipleSheets() throws IOException {
@@ -567,6 +570,56 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         }
     }
 
+    // todo - consolidate password tests
+    private static final Path VALID_TEST_INPUT_PSWD_PATH = getResourceFilePath("test_data_w_pswd_1234.xlsx");
+
+    // NOTE - at the moment only the standard reader handles password files.
+    // Happy Path testcase reading an Excel file that is password-protected.
+    @Test
+    public void testReadPasswordProtectedFile() throws Exception {
+        URL resourceUrl = getResourceFileUrl("test_data_w_pswd_1234.xlsx");
+
+        StandardExcelSheetReader sheetReader = StandardExcelSheetReader.builder().build();
+        ExcelSheetReadRequest req = ExcelSheetReadRequest
+                .from(resourceUrl)
+                .password("1234")
+                .build();
+
+        SheetContent sheetContent = sheetReader.readSheet(req);
+        String[][] dataMatrix = sheetContent.getMatrix();
+        assertEquals("aaa", dataMatrix[0][0]);
+        assertEquals("bbb", dataMatrix[0][1]);
+    }
+
+    @Nested
+    @DisplayName("Invalid Password Tests")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class InvalidPasswordTests {
+        @ParameterizedTest
+        @CsvSource({
+                "bad_password, Password incorrect",
+                ",no password was supplied",  // first param is null password
+                "'',no password was supplied" // first param is empty string password
+        })
+        public void invalidPasswordCheck(String password, String expectedMessageSubstring) {
+            StandardExcelSheetReader sheetReader = StandardExcelSheetReader.builder().build();
+            ExcelSheetReadRequest req = ExcelSheetReadRequest
+                    .from(VALID_TEST_INPUT_PSWD_PATH)
+                    .password(password)
+                    .build();
+
+            Exception exception = assertThrows(Exception.class, () -> {
+                sheetReader.readSheet(req);
+            });
+            assertContains(expectedMessageSubstring, exception.getMessage());
+        }
+
+        private void assertContains(String subString, String mainString) {
+            assertTrue(mainString.contains(subString),
+                    String.format("Expected to find substring '%s' in string '%s'.", subString, mainString));
+        }
+
+    }
 
     private static final String[][] EXPECTED_TEST_DATA = new String[][] {
             {"col1","col_2","COL3","Col4","Col5"},

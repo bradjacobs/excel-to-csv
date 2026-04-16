@@ -48,12 +48,7 @@ public class ExcelProcessor implements ExcelSheetReader {
     }
 
     private boolean shouldUseAdvancedReader(ExcelSheetReadRequest request) {
-        // todo - it's possible that password-protected can use
-        //   the advanced reader, but those checks ore not presently in place.
-        if (!this.useAdvancedReader || request.getPassword() != null) {
-            return false;
-        }
-        return hasXlsxExtension(request);
+        return this.useAdvancedReader && hasXlsxExtension(request);
     }
 
     private boolean hasXlsxExtension(ExcelSheetReadRequest request) {
