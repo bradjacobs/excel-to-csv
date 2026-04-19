@@ -5,7 +5,7 @@
 - [Other Info](#other-info)
 - [Known Cell Data Issues](#known-cell-data-issues)
 - [Alternate Implementations](#alternate-implementations)
-- [TODOs](#todos)
+- [Future Work and Non-Goals](#future-work-and-non-goals)
 - [Final Thoughts](#final-thoughts)
 
 ## Description
@@ -143,7 +143,7 @@ Most cases below appear to be pretty rare (subjectively)
         * "0.29999" vs "0.2999900001"
 * Cells of type DataBar or IconSet will show a value, even if marked as "icon only"
 
-Also note the following is 'Expected Behavior'
+Also note the following _IS_ 'Expected Behavior'
 * Cells with 'error values' (#NAME?, #VALUE!, etc.) will appear as such in the output CSV file
 </details>
 
@@ -154,7 +154,7 @@ Searching on the web can yield alternate solutions that require less code.  Howe
   <summary>Example Alternate Implementation 1... (Click To Expand)</summary>
 
 An example of a simpler way to read an Excel file without the extra code in this project is below:<br><br>
-Additional explanations about the code can be found in [SimplePoiExampleExcelReader.java](src/main/java/com/github/bradjacobs/excel/demo/SimplePoiExampleExcelReader.java)
+Additional explanations about the code can be found in [SimplePoiExampleExcelReader.java](src/test/java/com/github/bradjacobs/excel/demo/SimplePoiExampleExcelReader.java)
 ```java
 public List<List<String>> readBasicSheet(Path excelFile) throws IOException {
   DataFormatter formatter = new DataFormatter(true);
@@ -202,29 +202,64 @@ Namely:
 * The output csv text might not have the cells quoted the way you want (subjective)
 </details>
 
-## TODOs
+## Future Work and Non-Goals
 Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
 
 <details>
   <summary>Todo Item List... (Click To Expand)</summary>
 
+Features:
+* Allow other delimiters besides ',' (comma).  Namely tab, semicolon, pipe.
+* Allow check of existing files to not automatically overwrite.
+* Add in addtional 'row and column filtering' (low priority)
+    * this would expand on skipping blanks rows/columns.  (i.e. select only certain columns want returned)
+    * for column, would select either column index or name
+
+Housekeeping:
 * Miscellaneous cleanup and refactoring (ongoing)
+* Integrate a real logger into the code
 * General Unittest cleanup and add more tests (ongoing)
 * Check and fix any circular package dependencies
 * Redo the examples
-* Refactoring in the advanced package (visibility policy logic and row filling, for example)
-* Add more Javadocs
-* The pom.xml could use some cleanup and organization.
+* More Javadocs
 * Further updates for API Documentation and README updates.
-* Integrate a real logger into the code
-* Add in addtional 'row and column filtering' (low priority)
-    * this would expand on skiping blanks rows/columns.  (i.e. select only certain columns want returned)
 * Address any of the "Known Cell Data Issues" (above) if possible
+* Reorganize Excel Test data for Junit tests.
+
+Other Project Stuff:
 * Put a more legitimate project version in the pom.xml
+* The pom.xml could use some cleanup and organization.
 * Consider making a 'release version' or something that can be referenced via maven dependency
     * need to update groupId and package names from 'com.github...' to 'io.github...'
-* Reorganize Excel Test data for Junit tests.
-* (maybe) Add an option to return unformatted numbers instead of WYSIWYG (i.e. "1000000" instead of "1,000,000")
+</details>
+
+Certain items that I _WILL NOT_ get around to.
+<details>
+  <summary>Won't Fix... (Click To Expand)</summary>
+
+* XLSB support (Excel 2016+)
+  * looks like a pain to implement, specially for a format i've rarely come across.
+* Date/Time formatting 
+  * too many considerations of format, timezone shifting, etc
+* Numeric formatting 
+  * Do not want to deal with things like: 
+    * 2 vs 2.0
+    * if 98% should be 0.98 or 98
+    * international formats
+    * super large, super small numbers
+    * etc
+  * Harder to deal with in the advaenced event implementation.
+* Multiple sheets to SINGLE CSV file.
+  * too many concerns if sheets have a different structure.
+  * Easy for someone to do programmatically (just merge the SheetContent List<List<String>> values).
+* Read all Excel files in a directory.
+  * Not hard to write for those who would want that functionality.
+* Formula handling Option.
+* Reading Cell Comment values.
+* Continue-on-error option.
+* Allowing for jagged row output.
+* CLI support
+  * there are probably existing Python versions that can do this better.
 </details>
 
 ## Final Thoughts
