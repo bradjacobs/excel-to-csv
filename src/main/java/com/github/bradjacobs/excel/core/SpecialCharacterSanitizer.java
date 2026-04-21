@@ -31,7 +31,7 @@ public class SpecialCharacterSanitizer {
 
     // by default, handle spaces and quotes
     public static final Set<SanitizeType> DEFAULT_FLAGS = Set.of(SPACES, QUOTES);
-    private static final Character SPACE_CHAR = ' ';
+    private static final char SPACE_CHAR = ' ';
 
     private final Map<Character, Character> replacementMap;
 
