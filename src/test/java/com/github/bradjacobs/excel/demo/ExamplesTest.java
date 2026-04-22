@@ -34,7 +34,7 @@ public class ExamplesTest {
     private static void convertExcelToCsvFile(Path inputFile, Path outputFile) throws IOException {
         ExcelSheetReadRequest request = ExcelSheetReadRequest.from(inputFile).build();
         SheetContent sheetContent = ExcelProcessor.builder().build().readSheet(request);
-        CsvWriter.write(outputFile, sheetContent);
+        CsvWriter.writeToFile(outputFile, sheetContent);
     }
 
     private static void convertExcelToCsvFile2(Path inputFile, Path outputFile) throws IOException {
@@ -50,8 +50,6 @@ public class ExamplesTest {
         // read the data from the 2 sheets
         List<SheetContent> sheetContentList = excelProcessor.readSheets(request);
         // write out 2 CSV files to given directory.  Only quote values required for CSV compliance.
-        CsvWriter.write(Paths.get("outDir"), sheetContentList, QuoteMode.MINIMAL);
+        CsvWriter.writeToDirectory(Paths.get("outDir"), sheetContentList, QuoteMode.MINIMAL);
     }
-
-
 }

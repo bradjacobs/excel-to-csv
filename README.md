@@ -209,13 +209,14 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
   <summary>Todo Item List... (Click To Expand)</summary>
 
 Features:
-* Allow other delimiters besides ',' (comma).  Namely tab, semicolon, pipe.
-* Allow check of existing files to not automatically overwrite.
 * Add in addtional 'row and column filtering' (low priority)
-    * this would expand on skipping blanks rows/columns.  (i.e. select only certain columns want returned)
-    * for column, would select either column index or name
+  * this would expand on skipping blanks rows/columns.  (i.e. select only certain columns want returned)
+  * for column, would select either column index or name
 
 Housekeeping:
+* Update/Fix this README with some API documentation
+  * CSVWriter usage and parameters
+  * Advanced vs Standard mode
 * Miscellaneous cleanup and refactoring (ongoing)
 * Integrate a real logger into the code
 * General Unittest cleanup and add more tests (ongoing)
@@ -227,8 +228,8 @@ Housekeeping:
 * Reorganize Excel Test data for Junit tests.
 
 Other Project Stuff:
-* Put a more legitimate project version in the pom.xml
 * The pom.xml could use some cleanup and organization.
+* Put a more legitimate project version in the pom.xml
 * Consider making a 'release version' or something that can be referenced via maven dependency
     * need to update groupId and package names from 'com.github...' to 'io.github...'
 </details>

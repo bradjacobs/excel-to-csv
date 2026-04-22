@@ -15,10 +15,10 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.github.bradjacobs.excel.csv.QuoteMode.NORMAL;
 import static com.github.bradjacobs.excel.util.TestResourceUtil.getResourceFileObject;
 import static com.github.bradjacobs.excel.util.TestResourceUtil.readResourceFileText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +43,7 @@ class CsvWriterTest {
     private static final List<Character> MINIMAL_QUOTE_CHARACTERS
             = List.of('"', ',', '\t', '\r', '\n');
 
-    private static final CsvWriter normalCsvWriter = new CsvWriter();
+    private static final CsvWriter normalCsvWriter = CsvWriter.builder().build();
 
     private static final String TEST_OUTPUT_FILE_NAME = "test_output.csv";
 
@@ -100,8 +99,8 @@ class CsvWriterTest {
 
         @Test
         public void convertWithNullValue() {
-            // under 'normal circumstances' the matrix sould never
-            // contain a null, but this is a sanity to ensure we
+            // under 'normal circumstances' the matrix should never
+            // contain a null, but this is a sanity check to ensure we
             // don't blow up on it.
             String[][] matrix = {{"cow bell", null, "hot dog"}};
             String expected = "\"cow bell\",null,\"hot dog\"";
@@ -110,13 +109,27 @@ class CsvWriterTest {
             String csvResult = normalCsvWriter.toCsv(sheetContent);
             assertEquals(expected, csvResult, "Mismatch expected CSV output");
         }
+
+        @ParameterizedTest(name = "Delimiter Quote test with input ''{0}''")
+        @ValueSource(strings = { ",", "\t", ";", ":", "|" })
+        void quoteSpecialDelimiter(String delimiter) {
+            String inputString = "aa" + delimiter + "bb";
+            String expected = "\"" + inputString + "\"";
+
+            String[][] matrix = { { inputString } };
+            SheetContent sheetContent = new SheetContent(matrix);
+
+            CsvWriter csvWriter = CsvWriter.builder().delimiter(delimiter.charAt(0)).build();
+            String output = csvWriter.toCsv(sheetContent);
+            assertEquals(expected, output);
+        }
     }
 
     @ParameterizedTest
     @MethodSource("quoteTestProvider")
     public void quoteModeChecking(String input, QuoteMode quoteMode, String expectedOutput) {
 
-        CsvWriter csvWriter = new CsvWriter(quoteMode);
+        CsvWriter csvWriter = CsvWriter.builder().quoteMode(quoteMode).build();
         String[][] matrix = {{input}};
 
         SheetContent sheetContent = new SheetContent(matrix);
@@ -134,7 +147,7 @@ class CsvWriterTest {
             String expected = "\"cow bell\",,\"hot dog\"";
             SheetContent sheetContent = new SheetContent(matrix);
 
-            CsvWriter.write(testOutputFile, sheetContent);
+            CsvWriter.writeToFile(testOutputFile, sheetContent);
             assertTrue(Files.exists(testOutputFile), "expected csv file was NOT created");
 
             String outputFileContent = readFileContents(testOutputFile);
@@ -149,7 +162,7 @@ class CsvWriterTest {
             String expected = "\"cow bell\",,\"hot dog\"";
             SheetContent sheetContent = new SheetContent(matrix);
 
-            normalCsvWriter.writeToFile(testOutputFile.toFile(), sheetContent);
+            normalCsvWriter.saveToFile(testOutputFile.toFile(), sheetContent);
             assertTrue(Files.exists(testOutputFile), "expected csv file was NOT created");
 
             String outputFileContent = readFileContents(testOutputFile);
@@ -167,11 +180,11 @@ class CsvWriterTest {
             String expected = "\"cow bell\",,\"hot dog\"";
             SheetContent sheetContent = new SheetContent(matrix);
 
-            CsvWriter bomFlagOffWriter = new CsvWriter(NORMAL, false);
-            CsvWriter bomFlagOnWriter = new CsvWriter(NORMAL, true);
+            CsvWriter bomFlagOffWriter = CsvWriter.builder().saveUnicodeFileWithBom(false).build();
+            CsvWriter bomFlagOnWriter = CsvWriter.builder().saveUnicodeFileWithBom(true).build();
 
-            bomFlagOffWriter.writeToFile(testOutputFileOff1, sheetContent);
-            bomFlagOnWriter.writeToFile(testOutputFileOn2, sheetContent);
+            bomFlagOffWriter.saveToFile(testOutputFileOff1, sheetContent);
+            bomFlagOnWriter.saveToFile(testOutputFileOn2, sheetContent);
 
             assertTrue(Files.exists(testOutputFileOff1), "expected csv file was NOT created");
             assertTrue(Files.exists(testOutputFileOn2), "expected csv file was NOT created");
@@ -194,11 +207,11 @@ class CsvWriterTest {
 
             SheetContent sheetContent = new SheetContent(matrix);
 
-            CsvWriter bomFlagOffWriter = new CsvWriter(NORMAL, false);
-            CsvWriter bomFlagOnWriter = new CsvWriter(NORMAL, true);
+            CsvWriter bomFlagOffWriter = CsvWriter.builder().saveUnicodeFileWithBom(false).build();
+            CsvWriter bomFlagOnWriter = CsvWriter.builder().saveUnicodeFileWithBom(true).build();
 
-            bomFlagOffWriter.writeToFile(testOutputFileOff1, sheetContent);
-            bomFlagOnWriter.writeToFile(testOutputFileOn2, sheetContent);
+            bomFlagOffWriter.saveToFile(testOutputFileOff1, sheetContent);
+            bomFlagOnWriter.saveToFile(testOutputFileOn2, sheetContent);
 
             assertTrue(Files.exists(testOutputFileOff1), "expected csv file was NOT created");
             assertTrue(Files.exists(testOutputFileOn2), "expected csv file was NOT created");
@@ -218,7 +231,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void saveMultipleFiles() throws Exception {
+        public void saveMultipleFilesToDirectoryPath() throws Exception {
             String[][] data1 = {
                 {"aa", "bb"},
                 {"cc", "dd"}
@@ -234,7 +247,7 @@ class CsvWriterTest {
             SheetContent sheetContent2 = new SheetContent("data2", data2);
             List<SheetContent> sheetContentList = List.of(sheetContent1, sheetContent2);
 
-            CsvWriter.write(tempDir, sheetContentList);
+            CsvWriter.writeToDirectory(tempDir, sheetContentList);
             Path file1 = tempDir.resolve("data1.csv");
             Path file2 = tempDir.resolve("data2.csv");
             assertTrue(Files.exists(file1), "expected csv file was NOT created");
@@ -244,6 +257,29 @@ class CsvWriterTest {
             String fileContent2 = readFileContents(file2);
             assertEquals(expected1, fileContent1, "mismatch of content of saved csv file");
             assertEquals(expected2, fileContent2, "mismatch of content of saved csv file");
+        }
+
+        @Test
+        public void saveAllowFileOverwrite() throws Exception {
+            Path testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME);
+
+            String[][] matrix = {{"cow bell", "", "hot dog"}};
+            SheetContent sheetContent = new SheetContent(matrix);
+
+            normalCsvWriter.saveToFile(testOutputFile.toFile(), sheetContent);
+            assertTrue(Files.exists(testOutputFile), "the expected csv file was NOT created");
+
+            String[][] matrix2 = {{"abc bell", "", "def dog"}};
+            String expected2 = "\"abc bell\",,\"def dog\"";
+            SheetContent sheetContent2 = new SheetContent(matrix2);
+
+            CsvWriter customWriter = CsvWriter.builder().allowOverwriteFile(true).build();
+
+            customWriter.saveToFile(testOutputFile.toFile(), sheetContent2);
+            assertTrue(Files.exists(testOutputFile), "the expected csv file was NOT created");
+
+            String outputFileContent = readFileContents(testOutputFile);
+            assertEquals(expected2, outputFileContent, "mismatch of content of saved csv file");
         }
     }
 
@@ -263,9 +299,26 @@ class CsvWriterTest {
     class ExceptionBehaviorTests {
 
         @Test
+        public void dontAllowFileOverwrite() throws Exception {
+            Path testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME);
+
+            String[][] matrix = {{"cow bell", "", "hot dog"}};
+            SheetContent sheetContent = new SheetContent(matrix);
+
+            normalCsvWriter.saveToFile(testOutputFile.toFile(), sheetContent);
+            assertTrue(Files.exists(testOutputFile), "the expected csv file was NOT created");
+
+            // by default the allow Overwrite file = false
+            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+                normalCsvWriter.saveToFile(testOutputFile.toFile(), sheetContent);
+            });
+            assertEquals("Attempted to overwrite an existing file: " + TEST_OUTPUT_FILE_NAME, exception.getMessage());
+        }
+
+        @Test
         public void invalidNullQuoteMode() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                new CsvWriter(null);
+                CsvWriter.builder().quoteMode(null).build();
             });
             assertEquals("QuoteMode cannot be null.", exception.getMessage());
         }
@@ -273,7 +326,7 @@ class CsvWriterTest {
         @Test
         public void missingSheetContentParameter() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                normalCsvWriter.writeToDirectory(Path.of("."), null);
+                normalCsvWriter.saveToDirectory(Path.of("."), null);
             });
             assertEquals("Must supply at least one sheetContent to write.", exception.getMessage());
         }
@@ -281,9 +334,17 @@ class CsvWriterTest {
         @Test
         public void emptySheetContentListParameter() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                normalCsvWriter.writeToDirectory(Path.of("."), List.of());
+                normalCsvWriter.saveToDirectory(Path.of("."), List.of());
             });
             assertEquals("Must supply at least one sheetContent to write.", exception.getMessage());
+        }
+
+        @Test
+        public void invalidDelimiterParameter() {
+            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+                CsvWriter.builder().delimiter('a').build();
+            });
+            assertEquals("Invalid delimiter: a", exception.getMessage());
         }
 
         @Test
@@ -291,7 +352,7 @@ class CsvWriterTest {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
                 SheetContent sheetContent1 = new SheetContent("sheet", matrix);
-                normalCsvWriter.writeToFile((Path)null, sheetContent1);
+                normalCsvWriter.saveToFile((Path)null, sheetContent1);
             });
             assertEquals("Must supply outputFile location to save CSV data.", exception.getMessage());
         }
@@ -301,7 +362,7 @@ class CsvWriterTest {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
                 SheetContent sheetContent1 = new SheetContent("sheet", matrix);
-                normalCsvWriter.writeToDirectory((Path)null, List.of(sheetContent1));
+                normalCsvWriter.saveToDirectory((Path)null, List.of(sheetContent1));
             });
             assertEquals("Must supply outputDirectory location to save CSV files.", exception.getMessage());
         }
@@ -313,7 +374,7 @@ class CsvWriterTest {
                 SheetContent sheetContent1 = new SheetContent("sheet", matrix);
                 SheetContent sheetContent2 = new SheetContent(null, matrix);
                 List<SheetContent> sheetContentList = List.of(sheetContent1, sheetContent2);
-                normalCsvWriter.writeToDirectory(Path.of("."), sheetContentList);
+                normalCsvWriter.saveToDirectory(Path.of("."), sheetContentList);
             });
             assertEquals("Must supply a non-empty sheetName for each sheetContent to write.", exception.getMessage());
         }
@@ -324,7 +385,7 @@ class CsvWriterTest {
                 SheetContent sheetContent1 = new SheetContent("sheet", matrix);
                 SheetContent sheetContent2 = new SheetContent("", matrix);
                 List<SheetContent> sheetContentList = List.of(sheetContent1, sheetContent2);
-                normalCsvWriter.writeToDirectory(Path.of("."), sheetContentList);
+                normalCsvWriter.saveToDirectory(Path.of("."), sheetContentList);
             });
             assertEquals("Must supply a non-empty sheetName for each sheetContent to write.", exception.getMessage());
         }
@@ -336,32 +397,32 @@ class CsvWriterTest {
                 sheetContentList.add(new SheetContent("sheet1", matrix));
                 sheetContentList.add(null);
                 sheetContentList.add(new SheetContent("sheet2", matrix));
-                normalCsvWriter.writeToDirectory(Path.of("."), sheetContentList);
+                normalCsvWriter.saveToDirectory(Path.of("."), sheetContentList);
             });
             assertEquals("Must supply a non-empty sheetName for each sheetContent to write.", exception.getMessage());
         }
 
         @ParameterizedTest
         @MethodSource("com.github.bradjacobs.excel.csv.CsvWriterTest#invalidOutputPaths")
-        public void invalidOutputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) throws MalformedURLException {
+        public void invalidOutputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             Path path = location != null ? Paths.get(location) : null;
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
             SheetContent sheetContent = new SheetContent(matrix);
 
-            Executable executable1 = () -> normalCsvWriter.writeToFile(path, sheetContent);
+            Executable executable1 = () -> normalCsvWriter.saveToFile(path, sheetContent);
             assertExecutableException(executable1, expectedException, expectedMessage);
         }
 
         @ParameterizedTest
         @MethodSource("com.github.bradjacobs.excel.csv.CsvWriterTest#invalidOutputPaths")
-        public void invalidOutputFileParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) throws MalformedURLException {
+        public void invalidOutputFileParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             File file = location != null ? new File(location) : null;
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
             SheetContent sheetContent = new SheetContent(matrix);
 
-            Executable executable1 = () -> normalCsvWriter.writeToFile(file, sheetContent);
+            Executable executable1 = () -> normalCsvWriter.saveToFile(file, sheetContent);
             assertExecutableException(executable1, expectedException, expectedMessage);
         }
     }
@@ -404,7 +465,7 @@ class CsvWriterTest {
         StandardExcelSheetReader sheetReader = StandardExcelSheetReader.builder().build();
         SheetContent sheetContent = sheetReader.readSheet(request);
 
-        CsvWriter csvWriter = new CsvWriter(quoteMode);
+        CsvWriter csvWriter = CsvWriter.builder().quoteMode(quoteMode).build();
         String csvText = csvWriter.toCsv(sheetContent);
 
         assertEquals(expectedCsvText, csvText, "mismatch of expected csv output");
@@ -429,7 +490,7 @@ class CsvWriterTest {
             quoteTestInputList.add(testQuoteInput);
         }
 
-        // test a string _solely_ with character that must always be quoted
+        // test a string _solely_ with a character that must always be quoted
         for (Character minimalQuoteCharacter : MINIMAL_QUOTE_CHARACTERS) {
             String input = Character.toString(minimalQuoteCharacter);
             QuoteTestInput testQuoteInput = createExpectedQuotedTestInput(input);
@@ -455,7 +516,7 @@ class CsvWriterTest {
     }
 
     /**
-     * Create a QuoteTestInput where the expected should be same regardless of QuoteMode
+     * Create a QuoteTestInput where the expected should be the same regardless of QuoteMode
      * @param input the input string
      * @return QuoteTestInput object
      */
@@ -474,7 +535,7 @@ class CsvWriterTest {
     }
 
     /**
-     * Create an expected CSV quoted version of the value
+     * Create an expected CSV-quoted version of the value
      * @param input input value
      * @return quoted string
      */

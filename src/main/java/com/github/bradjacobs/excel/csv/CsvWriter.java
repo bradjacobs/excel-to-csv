@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -26,42 +28,43 @@ import java.util.function.Predicate;
  */
 public class CsvWriter {
     private static final Set<String> ALLOWED_OUTPUT_FILE_EXTENSIONS = Set.of("csv", "txt", "");
+    private static final Set<Character> VALID_DELIMITERS = Set.of(',', '\t', ';', ':', '|');
     private static final String NEW_LINE = System.lineSeparator();
     private static final String BOM = "\uFEFF"; // byte order marker for files with unicode.
+
     private static final QuoteMode DEFAULT_MODE = QuoteMode.NORMAL;
+    private static final char DEFAULT_DELIMITER = ',';
     private static final boolean DEFAULT_SAVE_W_BOM = true;
+    private static final boolean DEFAULT_ALLOW_OVERWRITE_FILE = false;
 
-    private final boolean saveUnicodeFileWithBom;
     private final Predicate<String> quoteRule;
+    private final char delimiter;
+    private final boolean saveUnicodeFileWithBom;
+    private final boolean allowOverwriteFile;
 
-    public static void write(Path outputPath, SheetContent sheetContent) throws IOException {
-        write(outputPath, sheetContent, DEFAULT_MODE);
-    }
-
-    public static void write(Path outputPath, SheetContent sheetContent, QuoteMode quoteMode) throws IOException {
-        CsvWriter csvWriter = new CsvWriter(quoteMode);
-        csvWriter.writeToFile(outputPath, sheetContent);
+    public static void writeToFile(Path outputPath, SheetContent sheetContent) throws IOException {
+        writeToFile(outputPath, sheetContent, DEFAULT_MODE);
     }
 
-    public static void write(Path outputDirectory, List<SheetContent> sheetContents) throws IOException {
-        write(outputDirectory, sheetContents, DEFAULT_MODE);
+    public static void writeToFile(Path outputPath, SheetContent sheetContent, QuoteMode quoteMode) throws IOException {
+        CsvWriter csvWriter = CsvWriter.builder().quoteMode(quoteMode).build();
+        csvWriter.saveToFile(outputPath, sheetContent);
     }
 
-    public static void write(Path outputDirectory, List<SheetContent> sheetContents, QuoteMode quoteMode) throws IOException {
-        CsvWriter csvWriter = new CsvWriter(quoteMode);
-        csvWriter.writeToDirectory(outputDirectory, sheetContents);
+    public static void writeToDirectory(Path outputDirectory, List<SheetContent> sheetContents) throws IOException {
+        writeToDirectory(outputDirectory, sheetContents, DEFAULT_MODE);
     }
 
-    public CsvWriter() {
-        this(DEFAULT_MODE, DEFAULT_SAVE_W_BOM);
+    public static void writeToDirectory(Path outputDirectory, List<SheetContent> sheetContents, QuoteMode quoteMode) throws IOException {
+        CsvWriter csvWriter = CsvWriter.builder().quoteMode(quoteMode).build();
+        csvWriter.saveToDirectory(outputDirectory, sheetContents);
     }
-    public CsvWriter(QuoteMode quoteMode) {
-        this(quoteMode, DEFAULT_SAVE_W_BOM);
-    }
-    public CsvWriter(QuoteMode quoteMode, boolean saveUnicodeFileWithBom) {
-        Validate.isTrue(quoteMode != null, "QuoteMode cannot be null.");
-        this.quoteRule = quoteMode.createPredicate();
-        this.saveUnicodeFileWithBom = saveUnicodeFileWithBom;
+
+    private CsvWriter(Builder builder) {
+        this.quoteRule = builder.quoteMode.createPredicate(builder.delimiter);
+        this.delimiter = builder.delimiter;
+        this.allowOverwriteFile = builder.allowOverwriteFile;
+        this.saveUnicodeFileWithBom = builder.saveUnicodeFileWithBom;
     }
 
     /**
@@ -69,34 +72,47 @@ public class CsvWriter {
      * @param sheetContent the data to write out.
      * @param outputPath destination file.
      */
-    public void writeToFile(Path outputPath, SheetContent sheetContent) throws IOException {
+    public void saveToFile(Path outputPath, SheetContent sheetContent) throws IOException {
         validateOutputFileParameter(outputPath);
         String csvContent = toCsv(sheetContent);
-        writeToFile(outputPath, csvContent);
+        saveToFile(outputPath, csvContent);
     }
 
-    public void writeToFile(File outputFile, SheetContent sheetContent) throws IOException {
-        writeToFile(outputFile != null ? outputFile.toPath() : null, sheetContent);
+    public void saveToFile(File outputFile, SheetContent sheetContent) throws IOException {
+        saveToFile(fileToPath(outputFile), sheetContent);
     }
 
-    public void writeToDirectory(Path outputDirectory, List<SheetContent> sheetContentList) throws IOException {
+    public void saveToDirectory(Path outputDirectory, List<SheetContent> sheetContentList) throws IOException {
         Validate.isTrue(outputDirectory != null, "Must supply outputDirectory location to save CSV files.");
         Validate.isTrue(Files.isDirectory(outputDirectory), "Must supply a valid directory to write CSV data.");
         Validate.isTrue(sheetContentList != null && !sheetContentList.isEmpty(), "Must supply at least one sheetContent to write.");
         Validate.isTrue(!containsMissingSheetName(sheetContentList), "Must supply a non-empty sheetName for each sheetContent to write.");
 
+        Map<Path, SheetContent> fileToSheetContentMap = new LinkedHashMap<>();
+        // first create all the output file paths and validate.
         for (SheetContent sheetContent : sheetContentList) {
             String fileName = sheetContent.getSheetName().trim() + ".csv";
             Path outputPath = outputDirectory.resolve(fileName);
+            validateOutputFileParameter(outputPath);
+            fileToSheetContentMap.put(outputPath, sheetContent);
+        }
+
+        // do the file writes.
+        for (Path filePath : fileToSheetContentMap.keySet()) {
+            SheetContent sheetContent = fileToSheetContentMap.get(filePath);
             String csvContent = toCsv(sheetContent);
-            writeToFile(outputPath, csvContent);
+            saveToFile(filePath, csvContent);
         }
     }
 
+    private static Path fileToPath(File file) {
+        return file != null ? file.toPath() : null;
+    }
+
     /**
-     * Convert the 2-D value matrix into a single CSV string.
+     * Convert the sheetContent into a single CSV string.
      *   (quotes will be applied on values as needed)
-     * @param sheetContent string data matrix
+     * @param sheetContent sheetContent
      * @return csv file string
      */
     public String toCsv(SheetContent sheetContent) {
@@ -125,7 +141,7 @@ public class CsvWriter {
                 }
 
                 if (i != lastColumnIndex) {
-                    sb.append(',');
+                    sb.append(this.delimiter);
                 }
             }
         }
@@ -140,7 +156,7 @@ public class CsvWriter {
     }
 
     /**
-     * checks if data matrix array is empty
+     * checks if the data matrix array is empty
      * @param dataMatrix dataMatrix
      * @return true if dataMatrix is considered 'empty'
      */
@@ -148,7 +164,7 @@ public class CsvWriter {
         return dataMatrix == null || dataMatrix.length == 0 || dataMatrix[0].length == 0;
     }
 
-    private void writeToFile(Path outputPath, String csvContent) throws IOException {
+    private void saveToFile(Path outputPath, String csvContent) throws IOException {
         Files.writeString(outputPath,
                 prepareCsvContentForWriting(csvContent),
                 StandardCharsets.UTF_8);
@@ -175,7 +191,7 @@ public class CsvWriter {
         Validate.isTrue(outputFile != null, "Must supply outputFile location to save CSV data.");
         Validate.isTrue(!Files.isDirectory(outputFile), "The outputFile cannot be an existing directory.");
 
-        // confirm output file has an allowed file extension
+        // confirm the output file has an allowed file extension
         String ext = FilenameUtils.getExtension(outputFile.toString());
         Validate.isTrue(ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase()),
                 "Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext);
@@ -183,6 +199,9 @@ public class CsvWriter {
         Path parentDirectory = outputFile.toAbsolutePath().normalize().getParent();
         Validate.isTrue(parentDirectory != null && Files.isDirectory(parentDirectory),
                 "Attempted to save CSV output file in a non-existent directory: " + outputFile);
+
+        Validate.isTrue(allowOverwriteFile || !Files.exists(outputFile),
+                "Attempted to overwrite an existing file: " + outputFile.getFileName().toString());
     }
 
     private boolean containsMissingSheetName(List<SheetContent> sheetContentList) {
@@ -190,5 +209,48 @@ public class CsvWriter {
                 .anyMatch(obj -> obj == null ||
                         obj.getSheetName() == null ||
                         obj.getSheetName().trim().isEmpty());
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private QuoteMode quoteMode = DEFAULT_MODE;
+        private char delimiter = DEFAULT_DELIMITER;
+        private boolean saveUnicodeFileWithBom = DEFAULT_SAVE_W_BOM;
+        private boolean allowOverwriteFile = DEFAULT_ALLOW_OVERWRITE_FILE;
+
+        private Builder() {}
+
+        public Builder quoteMode(QuoteMode quoteMode) {
+            Validate.isTrue(quoteMode != null, "QuoteMode cannot be null.");
+            this.quoteMode = quoteMode;
+            return this;
+        }
+
+        public Builder delimiter(char delimiter) {
+            Validate.isTrue(VALID_DELIMITERS.contains(delimiter), "Invalid delimiter: " + delimiter);
+            this.delimiter = delimiter;
+            return this;
+        }
+
+        /**
+         * Use a BOM when writing output file if data contains 'Unicode characters'
+         * @param saveUnicodeFileWithBom (defaults to true)
+         */
+        public Builder saveUnicodeFileWithBom(boolean saveUnicodeFileWithBom) {
+            this.saveUnicodeFileWithBom = saveUnicodeFileWithBom;
+            return this;
+        }
+
+        public Builder allowOverwriteFile(boolean allowOverwriteFile) {
+            this.allowOverwriteFile = allowOverwriteFile;
+            return this;
+        }
+
+        public CsvWriter build() {
+            return new CsvWriter(this);
+        }
     }
 }
