@@ -61,7 +61,6 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
             // but tests show ~25% slower performance!
             //reader.setUseReadOnlySharedStringsTable(true);
 
-            SheetXMLReader sheetXmlReader = createSheetXMLReader(reader);
             List<SheetInfoRecord> allSheetInfos = fetchAllSheets(reader);
 
             try {
@@ -71,7 +70,13 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
                 // close any 'extra' inputStreams that will not be processed.
                 closeInputStreams(getUnselectedSheets(allSheetInfos, selectedSheets));
 
+                SharedStrings sharedStrings = reader.getSharedStringsTable();
+                StylesTable styles = reader.getStylesTable();
+                boolean uses1904DateWindowing = Date1904Util.is1904DateWindowing(reader);
+                DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
+
                 for (SheetInfoRecord selectedSheet : selectedSheets) {
+                    SheetXMLReader sheetXmlReader = new SheetXMLReader(this.sheetConfig, sharedStrings, styles, dataFormatter);
                     sheetContentList.add(extractSheetContent(selectedSheet, sheetXmlReader));
                 }
             }
@@ -98,9 +103,6 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
             InputSource sheetSource = new InputSource(sheetInputStream);
             sheetXmlReader.parse(sheetSource);
             String[][] sheetValuesMatrix = sheetXmlReader.getSheetContentArray();
-
-            // TODO - a bit kludgy.  Reset the read to can be used for the next sheet.
-            sheetXmlReader.reset();
             return new SheetContent(sheetInfoRecord.sheetName, sheetValuesMatrix);
         }
     }
@@ -123,17 +125,6 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
             sheetIndex++;
         }
         return records;
-    }
-
-    private SheetXMLReader createSheetXMLReader(XSSFReader reader)
-            throws IOException, InvalidFormatException, ParserConfigurationException, SAXException {
-
-        SharedStrings sharedStrings = reader.getSharedStringsTable();
-        StylesTable styles = reader.getStylesTable();
-        boolean uses1904DateWindowing = Date1904Util.is1904DateWindowing(reader);
-        DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
-
-        return new SheetXMLReader(this.sheetConfig, sharedStrings, styles, dataFormatter);
     }
 
     /**

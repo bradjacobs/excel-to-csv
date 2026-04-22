@@ -267,24 +267,6 @@ class StringRowConsumerTest {
             StringRowConsumer consumer = StringRowConsumer.of(null);
             runConsumerTest(consumer, input, expected);
         }
-
-        @Test
-        public void resetConsumerAfterUse() {
-            String[][] input = {
-                    {"aa", "", "bb"},
-                    {"cc", "", "dd"}
-            };
-            String[][] expected = {
-                    {"aa", "", "bb"},
-                    {"cc", "", "dd"}
-            };
-            StringRowConsumer consumer = createBasicConsumer();
-            runConsumerTest(consumer, input, expected);
-
-            consumer.reset();
-            String[][] resetMatrix = consumer.generateMatrix();
-            assertEquals(0, resetMatrix.length);
-        }
     }
 
     @Nested

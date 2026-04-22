@@ -37,10 +37,6 @@ class SheetXMLReader extends XMLFilterImpl {
         setParent(reader);
     }
 
-    public void reset() {
-        this.stringRowConsumer.reset();
-    }
-
     // necessary override to correctly execute parse method.
     @Override
     public void parse(InputSource input) throws SAXException, IOException {

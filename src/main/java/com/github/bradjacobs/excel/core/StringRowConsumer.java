@@ -81,16 +81,6 @@ public class StringRowConsumer implements Consumer<List<String>> {
         this.skipBlankColumns = skipBlankColumns;
     }
 
-    /**
-     * Reset this <code>SheetRowConsumer</code> for the next sheet.
-     */
-    public void reset() {
-        this.rows.clear();
-        this.maxColumnCount = 0;
-        this.keepColumnsFlags.clear();
-        this.keepColumnsCount = 0;
-    }
-
     public int getRowCount() {
         return rows.size();
     }

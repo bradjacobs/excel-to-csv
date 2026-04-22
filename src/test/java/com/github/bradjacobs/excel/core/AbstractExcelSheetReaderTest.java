@@ -312,12 +312,12 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
          */
         @ParameterizedTest(name = "HiddenTest {index}: Sheet = {0}")
         @ValueSource(strings = {
+                "BaseCase",
                 "LastInvisible",
                 "MiddleBlankColumns",
                 "MiddleBlankRows",
                 "SingleHIddenRow",
                 "SingleHIddenColumn",
-                "BaseCase",
                 "LastColumn",
                 "FirstLastRow",
                 "AllColumnHidden",
@@ -345,6 +345,26 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
             String[][] expectedMatrix = defaultSheetReader.readSheet(expectedReq).getMatrix();
             assertArrayEquals(expectedMatrix, actualMatrix);
+        }
+
+        @Test
+        public void withInvisibleConfigsReadAllSheets() throws IOException {
+
+            B builder = createBuilder();
+            T sheetReader = builder.skipInvisibleCells(true).build();
+
+            ExcelSheetReadRequest req = ExcelSheetReadRequest.from(HIDDEN_CELLS_FILE).allSheets().build();
+
+            List<SheetContent> allSheetContentList = sheetReader.readSheets(req);
+
+            // todo: update to be more resilient of sheets are in unexpected order.
+            for (int i = 0; i < allSheetContentList.size(); i+=2) {
+                SheetContent actual = allSheetContentList.get(i);
+                SheetContent expected = allSheetContentList.get(i+1);
+                String[][] actualMatrix = actual.getMatrix();
+                String[][] expectedMatrix = expected.getMatrix();
+                assertArrayEquals(expectedMatrix, actualMatrix);
+            }
         }
     }
 
