@@ -8,7 +8,7 @@ import com.github.bradjacobs.excel.core.StringRowConsumer;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
 /**
- * Special SheetDataHandler that only processes 'visible' rows and columns.
+ * Special SheetContentHandler that only processes 'visible' rows and columns.
  */
 class VisibleCellsSheetContentHandler extends SheetContentHandler {
 
