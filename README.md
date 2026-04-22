@@ -36,7 +36,7 @@ ExcelProcessor processor = ExcelProcessor.builder()
     .build();
 
 SheetContent content = processor.readSheets(request).get(0);
-CsvWriter.write(Paths.get("output.csv"), content, QuoteMode.MINIMAL);
+CsvWriter.writeToFile(Paths.get("output.csv"), content, QuoteMode.MINIMAL);
 ```
 <details>
   <summary><strong>ExcelSheetReadRequest</strong></summary>
@@ -46,6 +46,7 @@ Builds the request and selects which sheet(s) to read.
 - `from(Path)`, `from(File)`, `from(URL)`
 - `byIndex(...)`, `byIndexes(...)`
 - `byName(...)`, `byNames(...)`
+- `allSheets()`
 - `sheetSelector(...)`
 - `password(...)`
 
@@ -91,10 +92,10 @@ Represents a single sheet result.
 
 Writes `SheetContent` to CSV.
 
-- `write(Path, SheetContent)`
-- `write(Path, SheetContent, QuoteMode)`
-- `write(Path, List<SheetContent>)`
-- `write(Path, List<SheetContent>, QuoteMode)`
+- `writeToFile(Path, SheetContent)`
+- `writeToFile(Path, SheetContent, QuoteMode)`
+- `writeToDirectory(Path, List<SheetContent>)`
+- `writeToDirectory(Path, List<SheetContent>, QuoteMode)`
 - `toCsv(SheetContent)`
 
 </details>
