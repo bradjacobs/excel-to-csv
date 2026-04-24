@@ -128,6 +128,47 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Dependency Plugin for checking used/unused dependencies -->
+			<!--   set phase=validate because prefer this to be run first -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.6.0</version>
+				<executions>
+					<execution>
+						<id>analyze-dependencies</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>analyze</goal>
+						</goals>
+						<configuration>
+							<failOnWarning>true</failOnWarning>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Enforcer plugin to ensure a single version of dependencies -->
+			<!-- prefer for this to come after checking for unused dependencies -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<dependencyConvergence />
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>
