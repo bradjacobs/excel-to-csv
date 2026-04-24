@@ -5,6 +5,7 @@ package com.github.bradjacobs.excel.advanced;
 
 import com.github.bradjacobs.excel.advanced.datewindowing.Date1904Util;
 import com.github.bradjacobs.excel.advanced.datewindowing.DateWindowingDataFormatter;
+import com.github.bradjacobs.excel.api.BasicSheetContent;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
@@ -103,7 +104,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
             InputSource sheetSource = new InputSource(sheetInputStream);
             sheetXmlReader.parse(sheetSource);
             String[][] sheetValuesMatrix = sheetXmlReader.getSheetContentArray();
-            return new SheetContent(sheetInfoRecord.sheetName, sheetValuesMatrix);
+            return new BasicSheetContent(sheetInfoRecord.sheetName, sheetValuesMatrix);
         }
     }
 

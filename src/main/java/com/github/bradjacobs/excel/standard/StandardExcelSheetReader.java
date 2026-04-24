@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel.standard;
 
+import com.github.bradjacobs.excel.api.BasicSheetContent;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
@@ -67,7 +68,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
 
     private SheetContent toSheetContent(WorkbookSheetInfo sheetInfo) {
         String[][] sheetDataMatrix = convertToSheetContentArray(sheetInfo.getSheet());
-        return new SheetContent(sheetInfo.getName(), sheetDataMatrix);
+        return new BasicSheetContent(sheetInfo.getName(), sheetDataMatrix);
     }
 
 

@@ -1,39 +1,22 @@
-/*
- * This file is subject to the terms and conditions defined in the 'LICENSE' file.
- */
 package com.github.bradjacobs.excel.api;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
+public interface SheetContent {
 
-public class SheetContent {
+    String getSheetName();
 
-    private final String sheetName;
+    int getRowCount();
 
-    private final String[][] dataMatrix;
+    int getColumnCount();
 
-    public SheetContent(String[][] dataMatrix) {
-        this("", dataMatrix);
-    }
+    boolean isEmpty();
 
-    public SheetContent(String sheetName, String[][] dataMatrix) {
-        this.sheetName = sheetName;
-        this.dataMatrix = dataMatrix;
-    }
+    String getCellValue(int rowIndex, int columnIndex);
 
-    public String getSheetName() {
-        return sheetName;
-    }
+    List<String> getRow(int rowIndex);
 
-    public String[][] getMatrix() {
-        return dataMatrix;
-    }
+    List<List<String>> getRows();
 
-    public List<List<String>> getRows() {
-        return Arrays.stream(dataMatrix)
-                .map(Arrays::asList)
-                .collect(Collectors.toList());
-    }
+    String[][] getMatrix();
 }

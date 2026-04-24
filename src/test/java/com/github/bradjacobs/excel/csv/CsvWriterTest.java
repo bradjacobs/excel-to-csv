@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel.csv;
 
+import com.github.bradjacobs.excel.api.BasicSheetContent;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
 import com.github.bradjacobs.excel.standard.StandardExcelSheetReader;
@@ -55,8 +56,8 @@ class CsvWriterTest {
         @Test
         public void emptyMatrixToEmptyString() {
             assertEquals("", normalCsvWriter.toCsv(null), "Expected empty string");
-            assertEquals("", normalCsvWriter.toCsv(new SheetContent(new String[0][0])), "Expected empty string");
-            assertEquals("", normalCsvWriter.toCsv(new SheetContent(new String[1][0])), "Expected empty string");
+            assertEquals("", normalCsvWriter.toCsv(new BasicSheetContent(new String[0][0])), "Expected empty string");
+            assertEquals("", normalCsvWriter.toCsv(new BasicSheetContent(new String[1][0])), "Expected empty string");
         }
 
         @Test
@@ -68,7 +69,7 @@ class CsvWriterTest {
             String expected = "dog,cow" + System.lineSeparator()
                     + "frog,cat";
 
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
             String csvResult = normalCsvWriter.toCsv(sheetContent);
             assertEquals(expected, csvResult, "Mismatch expected CSV output");
         }
@@ -82,7 +83,7 @@ class CsvWriterTest {
             String expected = "dog,\"say \"\"hi\"\"\"" + System.lineSeparator()
                     + "frog,\"aa,bb\"";
 
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
             String csvResult = normalCsvWriter.toCsv(sheetContent);
             assertEquals(expected, csvResult, "Mismatch expected CSV output");
         }
@@ -92,7 +93,7 @@ class CsvWriterTest {
             String[][] matrix = {{"cow bell", "", "hot dog"}};
             String expected = "\"cow bell\",,\"hot dog\"";
 
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
             String csvResult = normalCsvWriter.toCsv(sheetContent);
             assertEquals(expected, csvResult, "Mismatch expected CSV output");
         }
@@ -105,7 +106,7 @@ class CsvWriterTest {
             String[][] matrix = {{"cow bell", null, "hot dog"}};
             String expected = "\"cow bell\",null,\"hot dog\"";
 
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
             String csvResult = normalCsvWriter.toCsv(sheetContent);
             assertEquals(expected, csvResult, "Mismatch expected CSV output");
         }
@@ -117,7 +118,7 @@ class CsvWriterTest {
             String expected = "\"" + inputString + "\"";
 
             String[][] matrix = { { inputString } };
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
 
             CsvWriter csvWriter = CsvWriter.builder().delimiter(delimiter.charAt(0)).build();
             String output = csvWriter.toCsv(sheetContent);
@@ -132,7 +133,7 @@ class CsvWriterTest {
         CsvWriter csvWriter = CsvWriter.builder().quoteMode(quoteMode).build();
         String[][] matrix = {{input}};
 
-        SheetContent sheetContent = new SheetContent(matrix);
+        SheetContent sheetContent = new BasicSheetContent(matrix);
         String output = csvWriter.toCsv(sheetContent);
         assertEquals(expectedOutput, output);
     }
@@ -145,7 +146,7 @@ class CsvWriterTest {
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
             String expected = "\"cow bell\",,\"hot dog\"";
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
 
             CsvWriter.writeToFile(testOutputFile, sheetContent);
             assertTrue(Files.exists(testOutputFile), "expected csv file was NOT created");
@@ -160,7 +161,7 @@ class CsvWriterTest {
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
             String expected = "\"cow bell\",,\"hot dog\"";
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
 
             normalCsvWriter.saveToFile(testOutputFile.toFile(), sheetContent);
             assertTrue(Files.exists(testOutputFile), "expected csv file was NOT created");
@@ -178,7 +179,7 @@ class CsvWriterTest {
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
             String expected = "\"cow bell\",,\"hot dog\"";
-            SheetContent sheetContent = new SheetContent(matrix);
+            BasicSheetContent sheetContent = new BasicSheetContent(matrix);
 
             CsvWriter bomFlagOffWriter = CsvWriter.builder().saveUnicodeFileWithBom(false).build();
             CsvWriter bomFlagOnWriter = CsvWriter.builder().saveUnicodeFileWithBom(true).build();
@@ -205,7 +206,7 @@ class CsvWriterTest {
             String[][] matrix = {{"total Façade", "", "in the CAFÉ"}};
             String expected = "\"total Façade\",,\"in the CAFÉ\"";
 
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
 
             CsvWriter bomFlagOffWriter = CsvWriter.builder().saveUnicodeFileWithBom(false).build();
             CsvWriter bomFlagOnWriter = CsvWriter.builder().saveUnicodeFileWithBom(true).build();
@@ -243,8 +244,8 @@ class CsvWriterTest {
             };
             String expected2 = "ee,ff" + System.lineSeparator() + "gg,hh";
 
-            SheetContent sheetContent1 = new SheetContent("data1", data1);
-            SheetContent sheetContent2 = new SheetContent("data2", data2);
+            SheetContent sheetContent1 = new BasicSheetContent("data1", data1);
+            SheetContent sheetContent2 = new BasicSheetContent("data2", data2);
             List<SheetContent> sheetContentList = List.of(sheetContent1, sheetContent2);
 
             CsvWriter.writeToDirectory(tempDir, sheetContentList);
@@ -264,14 +265,14 @@ class CsvWriterTest {
             Path testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME);
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
 
             normalCsvWriter.saveToFile(testOutputFile.toFile(), sheetContent);
             assertTrue(Files.exists(testOutputFile), "the expected csv file was NOT created");
 
             String[][] matrix2 = {{"abc bell", "", "def dog"}};
             String expected2 = "\"abc bell\",,\"def dog\"";
-            SheetContent sheetContent2 = new SheetContent(matrix2);
+            SheetContent sheetContent2 = new BasicSheetContent(matrix2);
 
             CsvWriter customWriter = CsvWriter.builder().allowOverwriteFile(true).build();
 
@@ -303,7 +304,7 @@ class CsvWriterTest {
             Path testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME);
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
 
             normalCsvWriter.saveToFile(testOutputFile.toFile(), sheetContent);
             assertTrue(Files.exists(testOutputFile), "the expected csv file was NOT created");
@@ -351,7 +352,7 @@ class CsvWriterTest {
         public void nullOutputFilePathParameter() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
-                SheetContent sheetContent1 = new SheetContent("sheet", matrix);
+                SheetContent sheetContent1 = new BasicSheetContent("sheet", matrix);
                 normalCsvWriter.saveToFile((Path)null, sheetContent1);
             });
             assertEquals("Must supply outputFile location to save CSV data.", exception.getMessage());
@@ -361,7 +362,7 @@ class CsvWriterTest {
         public void nullOutputDirectoryParameter() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
-                SheetContent sheetContent1 = new SheetContent("sheet", matrix);
+                SheetContent sheetContent1 = new BasicSheetContent("sheet", matrix);
                 normalCsvWriter.saveToDirectory((Path)null, List.of(sheetContent1));
             });
             assertEquals("Must supply outputDirectory location to save CSV files.", exception.getMessage());
@@ -371,8 +372,8 @@ class CsvWriterTest {
         public void nullSheetNameOnMultiSave() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
-                SheetContent sheetContent1 = new SheetContent("sheet", matrix);
-                SheetContent sheetContent2 = new SheetContent(null, matrix);
+                SheetContent sheetContent1 = new BasicSheetContent("sheet", matrix);
+                SheetContent sheetContent2 = new BasicSheetContent(null, matrix);
                 List<SheetContent> sheetContentList = List.of(sheetContent1, sheetContent2);
                 normalCsvWriter.saveToDirectory(Path.of("."), sheetContentList);
             });
@@ -382,8 +383,8 @@ class CsvWriterTest {
         public void emptySheetNameOnMultiSave() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
-                SheetContent sheetContent1 = new SheetContent("sheet", matrix);
-                SheetContent sheetContent2 = new SheetContent("", matrix);
+                SheetContent sheetContent1 = new BasicSheetContent("sheet", matrix);
+                SheetContent sheetContent2 = new BasicSheetContent("", matrix);
                 List<SheetContent> sheetContentList = List.of(sheetContent1, sheetContent2);
                 normalCsvWriter.saveToDirectory(Path.of("."), sheetContentList);
             });
@@ -394,9 +395,9 @@ class CsvWriterTest {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
                 List<SheetContent> sheetContentList = new ArrayList<>();
-                sheetContentList.add(new SheetContent("sheet1", matrix));
+                sheetContentList.add(new BasicSheetContent("sheet1", matrix));
                 sheetContentList.add(null);
-                sheetContentList.add(new SheetContent("sheet2", matrix));
+                sheetContentList.add(new BasicSheetContent("sheet2", matrix));
                 normalCsvWriter.saveToDirectory(Path.of("."), sheetContentList);
             });
             assertEquals("Must supply a non-empty sheetName for each sheetContent to write.", exception.getMessage());
@@ -408,7 +409,7 @@ class CsvWriterTest {
             Path path = location != null ? Paths.get(location) : null;
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
 
             Executable executable1 = () -> normalCsvWriter.saveToFile(path, sheetContent);
             assertExecutableException(executable1, expectedException, expectedMessage);
@@ -420,7 +421,7 @@ class CsvWriterTest {
             File file = location != null ? new File(location) : null;
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
-            SheetContent sheetContent = new SheetContent(matrix);
+            SheetContent sheetContent = new BasicSheetContent(matrix);
 
             Executable executable1 = () -> normalCsvWriter.saveToFile(file, sheetContent);
             assertExecutableException(executable1, expectedException, expectedMessage);
