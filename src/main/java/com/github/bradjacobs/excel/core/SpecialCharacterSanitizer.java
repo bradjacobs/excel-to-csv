@@ -24,8 +24,8 @@ import static java.util.stream.Collectors.toMap;
 
 /**
  * Used to convert some special Unicode characters into basic equivalent.
- * examples: convert 'smart quotes' into normal quotes  (e.g. “” --> "")
- *   or convert special space characters (i.e. NBSP characters) to normal spaces.
+ * Examples: convert 'smart quotes' into normal quotes (e.g. “” --> "")
+ *   or convert special space characters (i.e., NBSP characters) to normal spaces.
  */
 public class SpecialCharacterSanitizer {
 
@@ -71,11 +71,13 @@ public class SpecialCharacterSanitizer {
     }
 
     /**
-     * Generate replacement map for the given charSanitizeFlags.
+     * Generate a replacement map for the given charSanitizeFlags.
      */
     private static Map<Character, Character> buildReplacementMap(Collection<SanitizeType> sanitizeTypes) {
         Map<Character, Character> map = new HashMap<>();
         for (SanitizeType sanitizeType : sanitizeTypes) {
+            Map<Character, Character> typeMap = REPLACEMENT_MAP_BY_TYPE.get(sanitizeType);
+            Validate.isTrue(typeMap != null, "No replacement map registered for SanitizeType: %s", sanitizeType);
             map.putAll(REPLACEMENT_MAP_BY_TYPE.get(sanitizeType));
         }
         return map;
@@ -131,7 +133,7 @@ public class SpecialCharacterSanitizer {
     // 'wavy' characters, tildes, vertical dashes, etc.
     // The criteria for what qualifies as a dash here is obviously VERY subjective.
     private static final Character[] DASH_CHARS = {
-            //'\u00AD', // soft hyphen (Note: include or not?  usually invisible)
+            //'\u00AD', // soft hyphen (Note: include or not? usually invisible)
             '\u02D7', // modifier letter minus sign
             '\u05A8', // Armenian hyphen
             '\u05BE', // Hebrew punctuation maqaf
@@ -163,8 +165,7 @@ public class SpecialCharacterSanitizer {
             '\uFF0D', // fullwidth hyphen-minus
     };
 
-    private static final
-    Map<SanitizeType, Map<Character, Character>> REPLACEMENT_MAP_BY_TYPE
+    private static final Map<SanitizeType, Map<Character, Character>> REPLACEMENT_MAP_BY_TYPE
             = Map.of(
                     SPACES, generateSpaceReplacementMap(),
                     QUOTES, generateQuoteReplacementMap(),
@@ -206,7 +207,7 @@ public class SpecialCharacterSanitizer {
     /**
      * Creates a lookup replacement map for characters with accents
      * to the 'normal looking' counterpart.
-     * Examples:  'é' -> 'e', 'Ç' -> 'C', 'ö' -> 'o'
+     * Examples: 'é' -> 'e', 'Ç' -> 'C', 'ö' -> 'o'
      * NOTE1: this only considers replacement characters that are in
      * the basic/extended ascii range < 255
      * NOTE2: this does not replace most characters that have 'hooks' or 'slashes'
@@ -230,7 +231,7 @@ public class SpecialCharacterSanitizer {
             }
         }
 
-        // avoid converting a "not equals" to an "equals", etc
+        // avoid converting a "not equals" to an "equals", etc.
         replacementMap.remove('\u2260'); // remove "not equals"
         replacementMap.remove('\u226E'); // remove "not less than"
         replacementMap.remove('\u226F'); // remove "not greater than"
