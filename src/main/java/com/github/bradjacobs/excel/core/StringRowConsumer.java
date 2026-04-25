@@ -6,7 +6,6 @@ package com.github.bradjacobs.excel.core;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -96,21 +95,23 @@ public class StringRowConsumer implements Consumer<List<String>> {
         rows.add(normalizeRow(row));
     }
 
-    public List<List<String>> generateMatrixList() {
+    private void performFinalRowCleanUpIfNeeded() {
         removeTrailingBlankRows();
-
         // Ensure all rows have uniform width before potentially filtering columns.
         for (List<String> row : rows) {
             padRowRightToWidth(row, maxColumnCount);
         }
-
         filterBlankColumnsIfNeeded();
+    }
+
+    public List<List<String>> generateMatrixList() {
+        performFinalRowCleanUpIfNeeded();
         return List.copyOf(rows);
     }
 
     public String[][] generateMatrix() {
-        List<List<String>> matrixList = generateMatrixList();
-        return matrixList.stream()
+        performFinalRowCleanUpIfNeeded();
+        return rows.stream()
                 .map(inner -> inner.toArray(new String[0]))
                 .toArray(String[][]::new);
     }
