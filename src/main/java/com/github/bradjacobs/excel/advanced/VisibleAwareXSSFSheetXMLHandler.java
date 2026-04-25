@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel.advanced;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.SharedStrings;
@@ -85,9 +86,7 @@ class VisibleAwareXSSFSheetXMLHandler extends XSSFSheetXMLHandler {
 
     private int getIntAttribute(Attributes attributes, String attrName) {
         String value = attributes.getValue(attrName);
-        if (value == null) {
-            throw new IllegalArgumentException("Missing required attribute: " + attrName);
-        }
+        Validate.isTrue(value != null, "Missing required attribute: " + attrName);
         return Integer.parseInt(value);
     }
 }
