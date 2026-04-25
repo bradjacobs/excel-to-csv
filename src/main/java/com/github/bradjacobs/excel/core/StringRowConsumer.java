@@ -105,7 +105,7 @@ public class StringRowConsumer implements Consumer<List<String>> {
         }
 
         filterBlankColumnsIfNeeded();
-        return Collections.unmodifiableList(rows);
+        return List.copyOf(rows);
     }
 
     public String[][] generateMatrix() {
