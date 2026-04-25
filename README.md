@@ -240,7 +240,7 @@ Certain items that I _WILL NOT_ get around to.
   <summary>Won't Fix... (Click To Expand)</summary>
 
 * XLSB support (Excel 2016+)
-  * looks like a pain to implement, specially for a format i've rarely come across.
+  * looks like a pain to implement, especially for a format i've rarely come across.
 * Date/Time formatting 
   * too many considerations of format, timezone shifting, etc
 * Numeric formatting 
