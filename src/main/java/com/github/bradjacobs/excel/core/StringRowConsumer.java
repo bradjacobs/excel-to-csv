@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 
 /**
  * StringRowConsumer handles processing of String rows from Excel files.
@@ -60,7 +59,6 @@ public class StringRowConsumer implements Consumer<List<String>> {
      */
     private final List<Boolean> keepColumnsFlags = new ArrayList<>();
     private int keepColumnsCount = 0;
-
 
     public static StringRowConsumer of(BlankRemoval removal) {
         if (removal == null) {
@@ -198,7 +196,16 @@ public class StringRowConsumer implements Consumer<List<String>> {
         if (!shouldFilterBlankColumns()) {
             return;
         }
-        rows.replaceAll(new FilterColumnsOperator(keepColumnsFlags, keepColumnsCount));
+
+        // iterate over all the flags, and remove
+        // any columns that are not marked as 'keep'
+        for (int i = keepColumnsFlags.size() - 1; i >= 0; i--) {
+            if (! keepColumnsFlags.get(i)) {
+                for (List<String> row : rows) {
+                    row.remove(i);
+                }
+            }
+        }
     }
 
     /**
@@ -209,29 +216,6 @@ public class StringRowConsumer implements Consumer<List<String>> {
         return skipBlankColumns
                 && !rows.isEmpty()
                 && keepColumnsCount < keepColumnsFlags.size();
-    }
-
-    // Helper class to filter out blank column(s) from each row
-    private static class FilterColumnsOperator implements UnaryOperator<List<String>> {
-        private final List<Boolean> keepColumnsFlags;
-        private final int keepColumnsCount;
-
-        public FilterColumnsOperator(List<Boolean> keepColumnsFlags, int keepColumnsCount) {
-            this.keepColumnsFlags = keepColumnsFlags;
-            this.keepColumnsCount = keepColumnsCount;
-        }
-
-        @Override
-        public List<String> apply(List<String> row) {
-            List<String> filtered = new ArrayList<>(keepColumnsCount);
-            int limit = Math.min(row.size(), keepColumnsFlags.size());
-            for (int i = 0; i < limit; i++) {
-                if (Boolean.TRUE.equals(keepColumnsFlags.get(i))) {
-                    filtered.add(row.get(i));
-                }
-            }
-            return filtered;
-        }
     }
 
     /**
