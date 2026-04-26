@@ -48,7 +48,6 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
                     .map(this::toSheetContent)
                     .collect(Collectors.toList());
         }
-
     }
 
     /**
@@ -71,7 +70,6 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         return new BasicSheetContent(sheetInfo.getName(), sheetDataMatrix);
     }
 
-
     // todo: change to non-public unless reason to keep public.
     /**
      * Create 2-D data matrix from the given Excel Sheet
@@ -80,9 +78,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      * each row will have the same number of columns
      */
     public String[][] convertToSheetContentArray(Sheet sheet) {
-        if (sheet == null) {
-            throw new IllegalArgumentException("Sheet parameter cannot be null.");
-        }
+        Validate.isTrue(sheet != null, "Sheet parameter cannot be null.");
 
         // grab all the rows from the sheet
         RowInfo rowInfo = getRows(sheet);
