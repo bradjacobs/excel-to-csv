@@ -106,6 +106,16 @@ class SpecialCharacterSanitizerTest {
         assertEquals(expected, result, "mismatch expected sanitized diacritics");
     }
 
+    @Test
+    public void unsupportedSanitizeType() {
+        // a 'null' is the only way to test invalid param
+        //   error message for an unsupported enum type
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new SpecialCharacterSanitizer(Arrays.asList(DASHES, null));
+        });
+        assertEquals("No replacement map registered for SanitizeType: null", exception.getMessage());
+    }
+
     @Nested
     @DisplayName("Default Flag Tests")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)

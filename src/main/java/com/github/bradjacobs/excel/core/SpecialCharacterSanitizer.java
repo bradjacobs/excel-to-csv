@@ -166,12 +166,11 @@ public class SpecialCharacterSanitizer {
     };
 
     private static final Map<SanitizeType, Map<Character, Character>> REPLACEMENT_MAP_BY_TYPE
-            = Map.of(
+            = new HashMap<>(Map.of(
                     SPACES, generateSpaceReplacementMap(),
                     QUOTES, generateQuoteReplacementMap(),
                     DASHES, generateDashReplacementMap(),
-                    BASIC_DIACRITICS, generateBasicDiacriticsReplacementMap()
-    );
+                    BASIC_DIACRITICS, generateBasicDiacriticsReplacementMap()));
 
     private static Map<Character,Character> generateSpaceReplacementMap() {
         Map<Character, Character> replacementMap = new LinkedHashMap<>();
