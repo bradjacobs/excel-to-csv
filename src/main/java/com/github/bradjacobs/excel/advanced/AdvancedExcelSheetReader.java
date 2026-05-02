@@ -11,6 +11,7 @@ import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
 import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
 import com.github.bradjacobs.excel.request.SheetInfo;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -67,9 +68,10 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
             try {
                 List<SheetInfoRecord> selectedSheets =
                         request.getSheetSelector().filterSheets(allSheetInfos);
+                List<SheetInfoRecord> unselectedSheets = ListUtils.subtract(allSheetInfos, selectedSheets);
 
                 // close any 'extra' inputStreams that will not be processed.
-                closeInputStreams(getUnselectedSheets(allSheetInfos, selectedSheets));
+                closeInputStreams(unselectedSheets);
 
                 SharedStrings sharedStrings = reader.getSharedStringsTable();
                 StylesTable styles = reader.getStylesTable();
@@ -90,12 +92,6 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         }
 
         return sheetContentList;
-    }
-
-    private List<SheetInfoRecord> getUnselectedSheets(List<SheetInfoRecord> allSheetInfos, List<SheetInfoRecord> selectedSheets) {
-        List<SheetInfoRecord> unselectedSheets = new ArrayList<>(allSheetInfos);
-        unselectedSheets.removeAll(selectedSheets);
-        return unselectedSheets;
     }
 
     private SheetContent extractSheetContent(SheetInfoRecord sheetInfoRecord, SheetXMLReader sheetXmlReader) throws IOException, SAXException {

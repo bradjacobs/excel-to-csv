@@ -17,6 +17,7 @@
 		<apache.poi.version>5.5.1</apache.poi.version>
 		<commons.io.version>2.22.0</commons.io.version>
 		<commons.lang3.version>3.20.0</commons.lang3.version>
+		<commons.collections4.version>4.5.0</commons.collections4.version>
 		<commons.codec.version>1.20.0</commons.codec.version>
 		<!-- Note: will need to up min JDK to be 17+ to use junit 6+ -->
 		<junit.version>5.14.4</junit.version>
@@ -24,7 +25,7 @@
 	</properties>
 
 	<dependencies>
-		<!-- file utils -->
+		<!-- utils -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -34,6 +35,11 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>${commons.lang3.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>${commons.collections4.version}</version>
 		</dependency>
 
 		<!-- for reading Excel file -->
@@ -48,6 +54,7 @@
 			<version>${apache.poi.version}</version>
 		</dependency>
 
+		<!-- test dependencies -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>

@@ -4,29 +4,30 @@
 package com.github.bradjacobs.excel.api;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class BasicSheetContent implements SheetContent {
+public class BasicSheetContent implements SheetContent  {
     private final String sheetName;
-    private final String[][] dataMatrix;
+    private final String[][] matrix;
     private final int rowCount;
     private final int columnCount;
 
-    public static BasicSheetContent of(String sheetName, String[][] dataMatrix) {
-        return new BasicSheetContent(sheetName, dataMatrix);
+    public static SheetContent fromMatrix(String sheetName, String[][] matrix) {
+        return new BasicSheetContent(sheetName, matrix);
     }
 
-    public BasicSheetContent(String[][] dataMatrix) {
-        this("", dataMatrix);
+    public BasicSheetContent(String[][] matrix) {
+        this("", matrix);
     }
 
-    public BasicSheetContent(String sheetName, String[][] dataMatrix) {
+    public BasicSheetContent(String sheetName, String[][] matrix) {
         this.sheetName = sheetName != null ? sheetName : "";
-        this.dataMatrix = dataMatrix != null ? dataMatrix : new String[0][0];
-        this.rowCount = this.dataMatrix.length;
-        this.columnCount = rowCount > 0 ? this.dataMatrix[0].length : 0;
+        this.matrix = matrix != null ? matrix : new String[0][0];
+        this.rowCount = this.matrix.length;
+        this.columnCount = rowCount > 0 ? this.matrix[0].length : 0;
     }
 
     @Override
@@ -53,34 +54,40 @@ public class BasicSheetContent implements SheetContent {
     public String getCellValue(int rowIndex, int columnIndex) {
         validateRowIndex(rowIndex);
         validateColumnIndex(columnIndex);
-        return dataMatrix[rowIndex][columnIndex];
+        return matrix[rowIndex][columnIndex];
     }
 
     @Override
     public List<String> getRow(int rowIndex) {
         validateRowIndex(rowIndex);
-        return List.copyOf(Arrays.asList(dataMatrix[rowIndex]));
+        return toReadOnlyRow(matrix[rowIndex]);
     }
 
     @Override
     public List<List<String>> getRows() {
-        return Arrays.stream(dataMatrix)
-                .map(Arrays::asList)
-                .collect(Collectors.toList());
+        return Arrays.stream(matrix)
+                .map(this::toReadOnlyRow)
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toList(),
+                        Collections::unmodifiableList));
     }
 
+    private List<String> toReadOnlyRow(String[] row) {
+        List<String> readOnlyRow = Arrays.asList(row);
+        return Collections.unmodifiableList(readOnlyRow);
+    }
+    
     @Override
     public String[][] getMatrix() {
         // NOTE: going to forgo making a full copy
         // just for readonly-protection
-        return dataMatrix;
+        return matrix;
     }
 
-    // todo better message
     private void validateRowIndex(int rowIndex) {
         if (rowIndex < 0 || rowIndex >= rowCount) {
             throw new IndexOutOfBoundsException(
-                    "Row index out of bounds: " + rowIndex + " (size: " + rowCount + ")"
+                    "Row index out of range: " + rowIndex + ", size: " + rowCount
             );
         }
     }
@@ -88,7 +95,7 @@ public class BasicSheetContent implements SheetContent {
     private void validateColumnIndex(int columnIndex) {
         if (columnIndex < 0 || columnIndex >= columnCount) {
             throw new IndexOutOfBoundsException(
-                    "Column index out of bounds: " + columnIndex + " (size: " + columnCount + ")"
+                    "Column index out of range: " + columnIndex + ", size: " + columnCount
             );
         }
     }

@@ -4,6 +4,7 @@
 package com.github.bradjacobs.excel.csv;
 
 import com.github.bradjacobs.excel.api.SheetContent;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -85,7 +86,7 @@ public class CsvWriter {
     public void saveToDirectory(Path outputDirectory, List<SheetContent> sheetContentList) throws IOException {
         Validate.isTrue(outputDirectory != null, "Must supply outputDirectory location to save CSV files.");
         Validate.isTrue(Files.isDirectory(outputDirectory), "Must supply a valid directory to write CSV data.");
-        Validate.isTrue(sheetContentList != null && !sheetContentList.isEmpty(), "Must supply at least one sheetContent to write.");
+        Validate.isTrue(!CollectionUtils.isEmpty(sheetContentList), "Must supply at least one sheetContent to write.");
         Validate.isTrue(!containsMissingSheetName(sheetContentList), "Must supply a non-empty sheetName for each sheetContent to write.");
 
         Map<Path, SheetContent> fileToSheetContentMap = new LinkedHashMap<>();
