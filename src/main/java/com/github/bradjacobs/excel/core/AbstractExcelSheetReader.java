@@ -18,7 +18,7 @@ import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
 
 
 // TODO - this abstract class might be removed.
-//   it's usefulness has now become very limited.
+//   its usefulness has now become very limited.
 abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
 
     protected final SheetConfig sheetConfig;

@@ -3,7 +3,6 @@
  */
 package com.github.bradjacobs.excel.config;
 
-import java.util.Collections;
 import java.util.Set;
 
 public class SheetConfig {

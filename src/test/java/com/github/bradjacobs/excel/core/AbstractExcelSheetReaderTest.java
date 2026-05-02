@@ -52,7 +52,6 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
     private static final String TEST_DATA_FILE = "testSheetData.xlsx";
     private static final Path TEST_FILE = TestResourceUtil.getResourceFilePath(TEST_DATA_FILE);
 
-
     private final T defaultSheetReader = createBuilder().build();
 
     abstract protected B createBuilder();

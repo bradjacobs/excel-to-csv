@@ -44,7 +44,6 @@ abstract public class ByCollectionSheetSelector<T> implements SheetSelector {
                 .collect(Collectors.toList());
     }
 
-
     // Each subclass can normalize its key if needed
     protected T normalizeValue(T value) {
         return value; // default = no change

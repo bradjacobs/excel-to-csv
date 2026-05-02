@@ -27,7 +27,6 @@ public class ByNameSheetSelector extends ByCollectionSheetSelector<String> {
         return value.toLowerCase();
     }
 
-
     @Override
     protected void validateCollection(Collection<String> values, String label) {
         super.validateCollection(values, label);
