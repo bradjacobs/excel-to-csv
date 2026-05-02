@@ -11,6 +11,7 @@ import com.github.bradjacobs.excel.core.CellValueReader;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
 import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
 import com.github.bradjacobs.excel.request.SheetInfo;
+import com.github.bradjacobs.excel.request.SheetSelector;
 import org.apache.commons.lang3.Validate;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -40,14 +41,26 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
     @Override
     public List<SheetContent> readSheets(ExcelSheetReadRequest request) throws IOException {
         Validate.isTrue(request != null, "Request cannot be null");
-        InputStream excelFileInputStream = request.getSourceInputStream();
 
-        try (excelFileInputStream; Workbook workbook = WorkbookFactory.create(excelFileInputStream, request.getPassword())) {
-            List<WorkbookSheetInfo> selectedSheets = request.getSheetSelector().filterSheets(readWorkbookSheets(workbook));
-            return selectedSheets.stream()
-                    .map(this::toSheetContent)
-                    .collect(Collectors.toList());
+        String password = request.getPassword();
+        SheetSelector sheetSelector = request.getSheetSelector();
+        InputStream excelInputStream = request.getSourceInputStream();
+
+        try (excelInputStream; Workbook workbook = WorkbookFactory.create(excelInputStream, password)) {
+            List<WorkbookSheetInfo> selectedSheets = selectWorkbookSheets(workbook, sheetSelector);
+            return toSheetContents(selectedSheets);
         }
+    }
+
+    private List<WorkbookSheetInfo> selectWorkbookSheets(Workbook workbook, SheetSelector sheetSelector) {
+        List<WorkbookSheetInfo> workbookSheets = readWorkbookSheets(workbook);
+        return sheetSelector.filterSheets(workbookSheets);
+    }
+
+    private List<SheetContent> toSheetContents(List<WorkbookSheetInfo> selectedSheets) {
+        return selectedSheets.stream()
+                .map(this::toSheetContent)
+                .collect(Collectors.toList());
     }
 
     /**
