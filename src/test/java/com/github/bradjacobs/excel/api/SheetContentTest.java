@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-abstract public class SheetContentTest {
+abstract class SheetContentTest {
 
     protected static final String[][] INPUT_MATRIX = {
             {"dog", "cat", "bird"},

@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-public class MutableSheetContentTest extends SheetContentTest {
+class MutableSheetContentTest extends SheetContentTest {
 
     private static final SheetContent INPUT_SHEET = new BasicSheetContent(INPUT_SHEET_NAME, INPUT_MATRIX);
 
@@ -142,6 +142,71 @@ public class MutableSheetContentTest extends SheetContentTest {
         assertEquals(expectedFirstRow, mutableSheetContent.getRow(0));
     }
 
+    @Test
+    public void setCellValue() {
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        String cellValue = mutableSheetContent.getCellValue(1, 1);
+        assertEquals(INPUT_MATRIX[1][1], cellValue);
+
+        String newCellValue = "UPDATED";
+        mutableSheetContent.setCellValue(1, 1, newCellValue);
+        cellValue = mutableSheetContent.getCellValue(1, 1);
+        assertEquals(newCellValue, cellValue);
+    }
+
+    @Test
+    public void setCellValueWithNull() {
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        mutableSheetContent.setCellValue(1, 1, null);
+        assertEquals("", mutableSheetContent.getCellValue(1, 1));
+    }
+
+    @Test
+    public void transformCellValues() {
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        mutableSheetContent.transformCells(String::toUpperCase);
+
+        List<List<String>> expected = copyOfInput();
+        for (List<String> row : expected) {
+            row.replaceAll(String::toUpperCase);
+        }
+        assertEquals(expected, mutableSheetContent.getRows());
+    }
+
+    // Will allow to update row values without having to call 'setRow'
+    //  (may change mind and not allow later, tbd)
+    @Test
+    public void getRowUpdateValue() {
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        List<String> firstRow = mutableSheetContent.getRow(0);
+
+        String newValue = "UPDATED_VALUE";
+        firstRow.set(1, newValue);
+
+        List<String> refetchedFirstRow = mutableSheetContent.getRow(0);
+        assertEquals(newValue, refetchedFirstRow.get(1));
+        assertEquals(newValue, mutableSheetContent.getCellValue(0,1));
+
+        // try setting to null
+        firstRow.set(1, null);
+        assertEquals("", mutableSheetContent.getCellValue(0,1));
+    }
+
+    // Will allow to update row values without having to call 'setRow'
+    //  (may change mind and not allow later, tbd)
+    @Test
+    public void getRowsUpdateValue() {
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        List<List<String>> rows = mutableSheetContent.getRows();
+
+        String newValue = "UPDATED_VALUE";
+        List<String> firstRow = rows.get(0);
+        firstRow.set(1, newValue);
+
+        List<String> refetchedFirstRow = mutableSheetContent.getRow(0);
+        assertEquals(newValue, refetchedFirstRow.get(1));
+        assertEquals(newValue, mutableSheetContent.getCellValue(0,1));
+    }
 
     enum RowOperation {
         ADD, INSERT, REPLACE, REMOVE, TRANSFORM
@@ -158,6 +223,24 @@ public class MutableSheetContentTest extends SheetContentTest {
                 mutableSheetContent.transformRow(0, null);
             });
             assertEquals("transformer must not be null", exception.getMessage());
+        }
+
+        @Test
+        public void transformCellsMissingTransformer() {
+            MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+                mutableSheetContent.transformCells(null);
+            });
+            assertEquals("transformer must not be null", exception.getMessage());
+        }
+
+        @Test
+        public void getRowsSetRow() {
+            MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+            List<List<String>> rows = mutableSheetContent.getRows();
+            assertThrows(UnsupportedOperationException.class, () -> {
+                rows.set(0, List.of(""));
+            });
         }
 
         @ParameterizedTest
@@ -182,6 +265,42 @@ public class MutableSheetContentTest extends SheetContentTest {
             Executable executable = createExecutable(rowOperation, 1, List.of("a", "b", "c", "d", "e", "f", "g"));
             Exception exception = assertThrows(IllegalArgumentException.class, executable);
             assertEquals("Row contains too many columns: 7 > 3", exception.getMessage());
+        }
+
+        @Test
+        public void setCellWithRowIndexNegative() {
+            MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+            Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
+                mutableSheetContent.setCellValue(-1, 1, "abc");
+            });
+            assertEquals("Row index out of range: -1, size: 2", exception.getMessage());
+        }
+
+        @Test
+        public void setCellWithRowIndexTooLarge() {
+            MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+            Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
+                mutableSheetContent.setCellValue(9999, 1, "abc");
+            });
+            assertEquals("Row index out of range: 9999, size: 2", exception.getMessage());
+        }
+
+        @Test
+        public void setCellWithColumnIndexNegative() {
+            MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+            Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
+                mutableSheetContent.setCellValue(1, -1, "abc");
+            });
+            assertEquals("Column index out of range: -1, size: 3", exception.getMessage());
+        }
+
+        @Test
+        public void setCellWithColumnIndexTooLarge() {
+            MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+            Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
+                mutableSheetContent.setCellValue(1, 9999, "abc");
+            });
+            assertEquals("Column index out of range: 9999, size: 3", exception.getMessage());
         }
 
         private Executable createExecutable(RowOperation rowOperation, int rowIndex, List<String> row) {
@@ -240,21 +359,7 @@ public class MutableSheetContentTest extends SheetContentTest {
         assertEquals(expected, mutableSheetContent.getRows());
     }
 
-    @Test
-    public void setCellValue() {
-        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
-        String cellValue = mutableSheetContent.getCellValue(1, 1);
-        assertEquals(INPUT_MATRIX[1][1], cellValue);
-
-        String newCellValue = "UPDATED";
-        mutableSheetContent.setCellValue(1, 1, newCellValue);
-        cellValue = mutableSheetContent.getCellValue(1, 1);
-        assertEquals(newCellValue, cellValue);
-    }
 
     // TODO -
-    //   add setCellValue out of bounds cases
-    //   add setCellValue with null value
-    //   add test cases manipulating getRow and getRows
     //   add test cases for remove columns
 }

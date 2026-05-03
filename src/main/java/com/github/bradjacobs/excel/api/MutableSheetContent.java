@@ -8,6 +8,7 @@ import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -78,14 +79,12 @@ public class MutableSheetContent implements SheetContent {
     public void setCellValue(int rowIndex, int columnIndex, String value) {
         List<String> row = internalGetRow(rowIndex);
         validateColumnIndex(columnIndex);
-        row.set(columnIndex, value);
+        row.set(columnIndex, value != null ? value : EMPTY_VALUE);
     }
 
     @Override
     public List<String> getRow(int rowIndex) {
-        //return internalGetRow(rowIndex);
-        return new FixedSizeRow(internalGetRow(rowIndex));
-        //return copyRow(internalGetRow(rowIndex));
+        return toFixedRow(internalGetRow(rowIndex));
     }
 
     private List<String> internalGetRow(int rowIndex) {
@@ -94,7 +93,7 @@ public class MutableSheetContent implements SheetContent {
     }
 
     public void addRow(List<String> rowValues) {
-        rowContent.add(copyRow(rowValues));
+        rowContent.add(copyInputRow(rowValues));
     }
 
     public void insertRow(int rowIndex, List<String> rowValues) {
@@ -103,13 +102,13 @@ public class MutableSheetContent implements SheetContent {
         }
         else {
             validateRowIndex(rowIndex);
-            rowContent.add(rowIndex, copyRow(rowValues));
+            rowContent.add(rowIndex, copyInputRow(rowValues));
         }
     }
 
     public void replaceRow(int rowIndex, List<String> rowValues) {
         validateRowIndex(rowIndex);
-        rowContent.set(rowIndex, copyRow(rowValues));
+        rowContent.set(rowIndex, copyInputRow(rowValues));
     }
 
     public void transformRow(int rowIndex, Function<String, String> transformer) {
@@ -126,10 +125,11 @@ public class MutableSheetContent implements SheetContent {
 
     @Override
     public List<List<String>> getRows() {
-        return List.copyOf(
-                rowContent.stream()
-                        .map(List::copyOf)
-                        .collect(Collectors.toList()));
+        return rowContent.stream()
+                .map(this::toFixedRow)
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toList(),
+                        Collections::unmodifiableList));
     }
 
     @Override
@@ -203,8 +203,7 @@ public class MutableSheetContent implements SheetContent {
         }
     }
 
-    // todo rename method
-    private List<String> copyRow(List<String> rowValues) {
+    private List<String> copyInputRow(List<String> rowValues) {
         if (rowValues == null) {
             rowValues = List.of();
         }
@@ -215,6 +214,7 @@ public class MutableSheetContent implements SheetContent {
                 .map(s -> (s == null) ? "" : s)
                 .collect(Collectors.toCollection(ArrayList::new));
 
+        // expand to full width if necessary
         while (copyRow.size() < columnWidth) {
             copyRow.add(EMPTY_VALUE);
         }
@@ -253,10 +253,18 @@ public class MutableSheetContent implements SheetContent {
                 .toArray();
     }
 
+    public List<String> toFixedRow(List<String> inputRow) {
+        return new FixedSizeRow(inputRow);
+    }
 
     private static class FixedSizeRow extends FixedSizeList<String> {
         protected FixedSizeRow(List<String> list) {
             super(list);
+        }
+
+        @Override
+        public String set(int index, String object) {
+            return super.set(index, object != null ? object : EMPTY_VALUE);
         }
     }
 }

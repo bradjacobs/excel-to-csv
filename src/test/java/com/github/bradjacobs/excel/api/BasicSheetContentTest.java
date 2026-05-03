@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class BasicSheetContentTest extends SheetContentTest {
+class BasicSheetContentTest extends SheetContentTest {
 
     private static final SheetContent DEFAULT_INPUT_SHEET = new BasicSheetContent(INPUT_SHEET_NAME, INPUT_MATRIX);
     private static final SheetContent EMPTY_INPUT_SHEET = new BasicSheetContent("", new String[][]{});
