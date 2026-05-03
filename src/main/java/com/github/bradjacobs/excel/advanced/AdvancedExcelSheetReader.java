@@ -178,9 +178,9 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-            SheetInfoRecord that = (SheetInfoRecord) o;
+        public boolean equals(Object object) {
+            if (object == null || getClass() != object.getClass()) return false;
+            SheetInfoRecord that = (SheetInfoRecord) object;
             return sheetIndex == that.sheetIndex;
         }
 
