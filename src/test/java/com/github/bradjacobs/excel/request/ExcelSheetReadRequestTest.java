@@ -231,7 +231,7 @@ class ExcelSheetReadRequestTest {
             // NOTE: don't need a real Excel file for this testcase
             //  so just use a simple text file.
             String fileContent = "hello world";
-            Path tempFile = createTextFile(fileContent);
+            Path tempFile = createTempTextFile(fileContent);
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(tempFile).build();
 
             try (InputStream inputStream = request.getSourceInputStream()) {
@@ -247,7 +247,7 @@ class ExcelSheetReadRequestTest {
             // NOTE: don't need a real Excel file for this testcase
             //  so just use a simple text file.
             String fileContent = "hello world";
-            Path tempFile = createTextFile(fileContent);
+            Path tempFile = createTempTextFile(fileContent);
             URL url = tempFile.toUri().toURL();
 
             // the request should recognized that the URL is a file, and read it.
@@ -261,7 +261,7 @@ class ExcelSheetReadRequestTest {
         }
     }
 
-    private Path createTextFile(String content) {
+    private Path createTempTextFile(String content) {
         Path tempFile = tempDir.resolve("test_"+System.currentTimeMillis()+".txt");
         try {
             Files.writeString(tempFile, content);
