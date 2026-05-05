@@ -19,7 +19,7 @@ import java.util.List;
 class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     private static final String EMPTY_CELL_VALUE = "";
     private static final String EXCEL_ERROR_PREFIX = "ERROR:";
-    private static final String MISSING_CELL_REF_MSG = "Unable to parse Excel Sheet. " +
+    private static final String MISSING_CELL_REFERENCE_MESSAGE = "Unable to parse Excel Sheet. " +
             "A cell value was encountered without a cellReference.  " +
             "See 'Known Issues' for more details.";
 
@@ -50,17 +50,33 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     @Override
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
-        // cellReference must exist to determine cell position.
-        Validate.isTrue(StringUtils.isNotEmpty(cellReference),
-                MISSING_CELL_REF_MSG);
-
-        CellAddress cellAddress = new CellAddress(cellReference);
+        CellAddress cellAddress = toCellAddress(cellReference);
         cell(cellAddress.getRow(), cellAddress.getColumn(), formattedValue, comment);
     }
 
+    /**
+     * A cell, with the given formatted value (may be null),
+     * and possibly a comment (may be null), was encountered.
+     */
     protected void cell(int rowNum, int columnIndex, String formattedValue, XSSFComment comment) {
         appendMissingColumnsBefore(columnIndex);
+        appendCellValue(formattedValue);
+    }
+
+    protected void appendCellValue(String formattedValue) {
         currentRowValues.add(sanitizeCellValue(formattedValue));
+    }
+
+    /**
+     * Appends an empty cell value to the current row.
+     */
+    protected void appendEmptyCellValue() {
+        appendCellValue(EMPTY_CELL_VALUE);
+    }
+
+    private CellAddress toCellAddress(String cellReference) {
+        Validate.isTrue(StringUtils.isNotEmpty(cellReference), MISSING_CELL_REFERENCE_MESSAGE);
+        return new CellAddress(cellReference);
     }
 
     /**
@@ -71,13 +87,13 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         stringRowConsumer.accept(currentRowValues);
     }
 
-    // todo: better naming required (inverted)
-    protected boolean shouldRetainBlankRows() {
+    // todo: better name?? (inverted)
+    protected boolean shouldIncludeBlankRows() {
         return !sheetConfig.skipBlankRows();
     }
 
     protected void appendMissingRowsBefore(int rowNum) {
-        if (shouldRetainBlankRows()) {
+        if (shouldIncludeBlankRows()) {
             // add any filler blank rows (if necessary)
             while (stringRowConsumer.getRowCount() < rowNum) {
                 appendEmptyRow();
@@ -90,13 +106,6 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
      */
     protected void appendEmptyRow() {
         stringRowConsumer.accept(null);
-    }
-
-    /**
-     * Appends an empty cell value to the current row.
-     */
-    protected void appendEmptyCellValue() {
-        currentRowValues.add(EMPTY_CELL_VALUE);
     }
 
     /**
@@ -114,7 +123,7 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         }
     }
 
-    protected String sanitizeCellValue(String cellValue) {
+    private String sanitizeCellValue(String cellValue) {
         return stripExcelErrorPrefix(cellValueSanitizer.sanitizeCellValue(cellValue));
     }
 
@@ -129,7 +138,7 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         return input;
     }
 
-    protected void clearCurrentRow() {
+    private void clearCurrentRow() {
         currentRowValues.clear();
     }
 }

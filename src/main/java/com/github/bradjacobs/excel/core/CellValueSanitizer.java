@@ -4,6 +4,7 @@
 package com.github.bradjacobs.excel.core;
 
 import com.github.bradjacobs.excel.config.SanitizeType;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
 
@@ -18,7 +19,7 @@ public class CellValueSanitizer {
     }
 
     public String sanitizeCellValue(String inputValue) {
-        if (inputValue == null) {
+        if (StringUtils.isEmpty(inputValue)) {
             return "";
         }
         // if there are any certain special Unicode characters (like nbsp or smart quotes),

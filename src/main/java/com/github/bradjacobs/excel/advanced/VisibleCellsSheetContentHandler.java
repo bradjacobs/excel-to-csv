@@ -44,7 +44,7 @@ class VisibleCellsSheetContentHandler extends SheetContentHandler {
      * @param currentRowIndex current row index
      */
     private void fillMissingVisibleRows(int previousRowIndex, int currentRowIndex) {
-        if (shouldRetainBlankRows()) {
+        if (shouldIncludeBlankRows()) {
             int firstMissingRowIndex = previousRowIndex + 1;
             for (int rowIndex = firstMissingRowIndex; rowIndex < currentRowIndex; rowIndex++) {
                 if (isRowVisible(rowIndex)) {
