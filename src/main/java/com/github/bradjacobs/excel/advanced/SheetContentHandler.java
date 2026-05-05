@@ -38,13 +38,13 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     }
 
     @Override
-    public void startRow(int rowNum) {
-        appendMissingRowsBefore(rowNum);
+    public void startRow(int rowIndex) {
+        appendMissingRowsBefore(rowIndex);
     }
 
     @Override
-    public void endRow(int rowNum) {
-        emitCurrentRow(rowNum);
+    public void endRow(int rowIndex) {
+        emitCurrentRow(rowIndex);
         clearCurrentRow();
     }
 
@@ -58,7 +58,7 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
      * A cell, with the given formatted value (may be null),
      * and possibly a comment (may be null), was encountered.
      */
-    protected void cell(int rowNum, int columnIndex, String formattedValue, XSSFComment comment) {
+    protected void cell(int rowIndex, int columnIndex, String formattedValue, XSSFComment comment) {
         appendMissingColumnsBefore(columnIndex);
         appendCellValue(formattedValue);
     }
@@ -81,9 +81,9 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
     /**
      * Emits the current row to the consumer
-     * @param rowNum current row number (for reference)
+     * @param rowIndex current row number (for reference)
      */
-    protected void emitCurrentRow(int rowNum) {
+    protected void emitCurrentRow(int rowIndex) {
         stringRowConsumer.accept(currentRowValues);
     }
 
@@ -92,10 +92,10 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         return !sheetConfig.skipBlankRows();
     }
 
-    protected void appendMissingRowsBefore(int rowNum) {
+    protected void appendMissingRowsBefore(int rowIndex) {
         if (shouldIncludeBlankRows()) {
             // add any filler blank rows (if necessary)
-            while (stringRowConsumer.getRowCount() < rowNum) {
+            while (stringRowConsumer.getRowCount() < rowIndex) {
                 appendEmptyRow();
             }
         }

@@ -30,10 +30,10 @@ class VisibleCellsSheetContentHandler extends SheetContentHandler {
     }
 
     @Override
-    public void startRow(int rowNum) {
+    public void startRow(int rowIndex) {
         int previousRowIndex = lastProcessedRowIndex;
-        lastProcessedRowIndex = rowNum;
-        fillMissingVisibleRows(previousRowIndex, rowNum);
+        lastProcessedRowIndex = rowIndex;
+        fillMissingVisibleRows(previousRowIndex, rowIndex);
     }
 
     /**
@@ -55,11 +55,11 @@ class VisibleCellsSheetContentHandler extends SheetContentHandler {
     }
 
     @Override
-    public void cell(int rowNum, int columnIndex, String formattedValue, XSSFComment comment) {
-        if (!shouldEmitCell(rowNum, columnIndex)) {
+    public void cell(int rowIndex, int columnIndex, String formattedValue, XSSFComment comment) {
+        if (!shouldEmitCell(rowIndex, columnIndex)) {
             return;
         }
-        super.cell(rowNum, columnIndex, formattedValue, comment);
+        super.cell(rowIndex, columnIndex, formattedValue, comment);
     }
 
     @Override
@@ -73,19 +73,19 @@ class VisibleCellsSheetContentHandler extends SheetContentHandler {
     }
 
     @Override
-    protected void emitCurrentRow(int rowNum) {
+    protected void emitCurrentRow(int rowIndex) {
         // only emit a row if it's visible
-        if (isRowVisible(rowNum)) {
-            super.emitCurrentRow(rowNum);
+        if (isRowVisible(rowIndex)) {
+            super.emitCurrentRow(rowIndex);
         }
     }
 
-    private boolean shouldEmitCell(int rowNum, int columnIndex) {
-        return isRowVisible(rowNum) && isColumnVisible(columnIndex);
+    private boolean shouldEmitCell(int rowIndex, int columnIndex) {
+        return isRowVisible(rowIndex) && isColumnVisible(columnIndex);
     }
 
-    private boolean isRowVisible(int rowNum) {
-        return !sheetContext.isRowHidden(rowNum);
+    private boolean isRowVisible(int rowIndex) {
+        return !sheetContext.isRowHidden(rowIndex);
     }
 
     private boolean isColumnVisible(int columnIndex) {
