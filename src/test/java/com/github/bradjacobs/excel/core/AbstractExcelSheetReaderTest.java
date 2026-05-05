@@ -7,7 +7,6 @@ import com.github.bradjacobs.excel.api.ExcelSheetReader;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
-import com.github.bradjacobs.excel.standard.StandardExcelSheetReader;
 import com.github.bradjacobs.excel.util.TestExcelFileSheetUtils;
 import com.github.bradjacobs.excel.util.TestResourceUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -572,33 +571,15 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         assertExecutableException(executable, expectedException, expectedMessage);
     }
 
-    /**
-     * Junit run the executable and check that it throws the expected exception and msg.
-     * @param executable executable
-     * @param expectedException expectedException
-     * @param expectedMessage expectedMessage
-     */
-    private void assertExecutableException(
-            Executable executable,
-            Class<? extends Exception> expectedException,
-            String expectedMessage) {
-        Exception exception = assertThrows(Exception.class, executable);
-        assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
-        if (expectedMessage != null) {
-            assertEquals(expectedMessage, exception.getMessage());
-        }
-    }
 
     // todo - consolidate password tests
     private static final Path VALID_TEST_INPUT_PSWD_PATH = getResourceFilePath("test_data_w_pswd_1234.xlsx");
 
-    // NOTE - at the moment only the standard reader handles password files.
-    // Happy Path testcase reading an Excel file that is password-protected.
     @Test
     public void testReadPasswordProtectedFile() throws Exception {
         URL resourceUrl = getResourceFileUrl("test_data_w_pswd_1234.xlsx");
 
-        StandardExcelSheetReader sheetReader = StandardExcelSheetReader.builder().build();
+        T sheetReader = createBuilder().build();
         ExcelSheetReadRequest req = ExcelSheetReadRequest
                 .from(resourceUrl)
                 .password("1234")
@@ -621,7 +602,7 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
                 "'',no password was supplied" // first param is empty string password
         })
         public void invalidPasswordCheck(String password, String expectedMessageSubstring) {
-            StandardExcelSheetReader sheetReader = StandardExcelSheetReader.builder().build();
+            T sheetReader = createBuilder().build();
             ExcelSheetReadRequest req = ExcelSheetReadRequest
                     .from(VALID_TEST_INPUT_PSWD_PATH)
                     .password(password)
@@ -637,7 +618,23 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
             assertTrue(mainString.contains(subString),
                     String.format("Expected to find substring '%s' in string '%s'.", subString, mainString));
         }
+    }
 
+    /**
+     * Junit run the executable and check that it throws the expected exception and msg.
+     * @param executable executable
+     * @param expectedException expectedException
+     * @param expectedMessage expectedMessage
+     */
+    private void assertExecutableException(
+            Executable executable,
+            Class<? extends Exception> expectedException,
+            String expectedMessage) {
+        Exception exception = assertThrows(Exception.class, executable);
+        assertEquals(expectedException, exception.getClass(), "Mismatch expected exception thrown");
+        if (expectedMessage != null) {
+            assertEquals(expectedMessage, exception.getMessage());
+        }
     }
 
     private static final String[][] EXPECTED_TEST_DATA = new String[][] {
