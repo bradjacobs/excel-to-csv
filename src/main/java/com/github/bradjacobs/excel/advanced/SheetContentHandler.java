@@ -116,9 +116,12 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
         return currentRowValues.size();
     }
 
+    /**
+     * Appends any missing columns (if necessary)
+     * @param columnIndex fill columns up to this index
+     */
     protected void appendMissingColumnsBefore(int columnIndex) {
-        // fill in any blanks between values in a row (if necessary)
-        for (int col = currentRowValues.size(); col < columnIndex; col++) {
+        for (int columnToFill = currentRowValues.size(); columnToFill < columnIndex; columnToFill++) {
             appendEmptyCellValue();
         }
     }

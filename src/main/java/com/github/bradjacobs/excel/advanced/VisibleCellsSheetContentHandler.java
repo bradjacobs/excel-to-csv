@@ -33,7 +33,7 @@ class VisibleCellsSheetContentHandler extends SheetContentHandler {
     public void startRow(int rowIndex) {
         int previousRowIndex = lastProcessedRowIndex;
         lastProcessedRowIndex = rowIndex;
-        fillMissingVisibleRows(previousRowIndex, rowIndex);
+        appendMissingVisibleRowsBetween(previousRowIndex, rowIndex);
     }
 
     /**
@@ -43,12 +43,12 @@ class VisibleCellsSheetContentHandler extends SheetContentHandler {
      * @param previousRowIndex previous row index
      * @param currentRowIndex current row index
      */
-    private void fillMissingVisibleRows(int previousRowIndex, int currentRowIndex) {
+    private void appendMissingVisibleRowsBetween(int previousRowIndex, int currentRowIndex) {
         if (shouldIncludeBlankRows()) {
             int firstMissingRowIndex = previousRowIndex + 1;
             for (int rowIndex = firstMissingRowIndex; rowIndex < currentRowIndex; rowIndex++) {
                 if (isRowVisible(rowIndex)) {
-                    appendEmptyRow(); // add the blank row
+                    appendEmptyRow();
                 }
             }
         }
@@ -62,11 +62,13 @@ class VisibleCellsSheetContentHandler extends SheetContentHandler {
         super.cell(rowIndex, columnIndex, formattedValue, comment);
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     protected void appendMissingColumnsBefore(int columnIndex) {
-        // fill in any blanks between values in a row (if necessary)
-        for (int col = getCurrentRowSize(); col < columnIndex; col++) {
-            if (isColumnVisible(col)) {
+        for (int columnToFill = getCurrentRowSize(); columnToFill < columnIndex; columnToFill++) {
+            if (isColumnVisible(columnToFill)) {
                 appendEmptyCellValue();
             }
         }
@@ -85,10 +87,10 @@ class VisibleCellsSheetContentHandler extends SheetContentHandler {
     }
 
     private boolean isRowVisible(int rowIndex) {
-        return !sheetContext.isRowHidden(rowIndex);
+        return sheetContext.isRowVisible(rowIndex);
     }
 
     private boolean isColumnVisible(int columnIndex) {
-        return !sheetContext.isColumnHidden(columnIndex);
+        return sheetContext.isColumnVisible(columnIndex);
     }
 }

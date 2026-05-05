@@ -13,12 +13,12 @@ final class SheetContext {
     private final Set<Integer> hiddenRows = new HashSet<>();
     private final Set<Integer> hiddenColumns = new HashSet<>();
 
-    public boolean isRowHidden(int rowIndex) {
-        return hiddenRows.contains(rowIndex);
+    public boolean isRowVisible(int rowIndex) {
+        return !hiddenRows.contains(rowIndex);
     }
 
-    public boolean isColumnHidden(int columnIndex) {
-        return hiddenColumns.contains(columnIndex);
+    public boolean isColumnVisible(int columnIndex) {
+        return !hiddenColumns.contains(columnIndex);
     }
 
     public void addHiddenRow(int rowIndex) {
