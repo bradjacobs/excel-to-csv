@@ -37,15 +37,20 @@ class ExcelSheetReadRequestTest {
             TestSheetInfoUtil.sheet("CCC", 2)
     );
 
+    private Path getSampleFilePath() {
+        return tempDir.resolve("sample.xlsx");
+    }
+
+
     @Nested
     @DisplayName("factory methods")
     class FactoryMethodsTests {
         @Test
         void forPathCreatesRequestWithDefaultSheetSelectorAndNoPassword() {
-            Path path = tempDir.resolve("sample.xlsx");
-            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path).build();
+            Path filePath = getSampleFilePath();
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath).build();
 
-            assertEquals(path, request.getPath());
+            assertEquals(filePath, request.getPath());
             assertNull(request.getUrl());
             assertNotNull(request.getSheetSelector());
 
@@ -58,7 +63,7 @@ class ExcelSheetReadRequestTest {
 
         @Test
         void forFileCreatesRequestUsingFilePath() {
-            Path filePath = tempDir.resolve("sample.xlsx");
+            Path filePath = getSampleFilePath();
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath.toFile()).build();
 
             assertEquals(filePath, request.getPath());
@@ -96,10 +101,10 @@ class ExcelSheetReadRequestTest {
 
         @Test
         void allowsOverridingDefaultSheetSelector() {
-            Path path = tempDir.resolve("sample.xlsx");
+            Path filePath = getSampleFilePath();
             SheetSelector selector = new ByIndexSheetSelector(2);
 
-            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
                     .sheetSelector(selector)
                     .build();
 
@@ -111,10 +116,22 @@ class ExcelSheetReadRequestTest {
         }
 
         @Test
-        void byIndexSheetSelection() {
-            Path path = tempDir.resolve("sample.xlsx");
+        void selectAllSheets() {
+            Path filePath = getSampleFilePath();
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
+                    .allSheets()
+                    .build();
 
-            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
+            // confirm our custom sheet selector was applied.
+            List<SheetInfo> filteredSheetList = request.getSheetSelector().filterSheets(TEST_SHEETS);
+            assertEquals(TEST_SHEETS.size(), filteredSheetList.size());
+            assertEquals(TEST_SHEETS, filteredSheetList);
+        }
+
+        @Test
+        void byIndexSheetSelection() {
+            Path filePath = getSampleFilePath();
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
                     .bySheetIndex(2)
                     .build();
 
@@ -126,9 +143,8 @@ class ExcelSheetReadRequestTest {
 
         @Test
         void byIndexVarArgsSheetSelection() {
-            Path path = tempDir.resolve("sample.xlsx");
-
-            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
+            Path filePath = getSampleFilePath();
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
                     .bySheetIndexes(2, 1)
                     .build();
 
@@ -141,9 +157,8 @@ class ExcelSheetReadRequestTest {
 
         @Test
         void byIndexCollectionSheetSelection() {
-            Path path = tempDir.resolve("sample.xlsx");
-
-            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
+            Path filePath = getSampleFilePath();
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
                     .bySheetIndexes(List.of(2, 1))
                     .build();
 
@@ -156,9 +171,8 @@ class ExcelSheetReadRequestTest {
 
         @Test
         void byNameSheetSelection() {
-            Path path = tempDir.resolve("sample.xlsx");
-
-            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
+            Path filePath = getSampleFilePath();
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
                     .bySheetName("BBB")
                     .build();
 
@@ -170,9 +184,8 @@ class ExcelSheetReadRequestTest {
 
         @Test
         void byNameVarArgsSheetSelection() {
-            Path path = tempDir.resolve("sample.xlsx");
-
-            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
+            Path filePath = getSampleFilePath();
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
                     .bySheetNames("CCC", "aaa")
                     .build();
 
@@ -185,9 +198,8 @@ class ExcelSheetReadRequestTest {
 
         @Test
         void byNameCollectionSheetSelection() {
-            Path path = tempDir.resolve("sample.xlsx");
-
-            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
+            Path filePath = getSampleFilePath();
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
                     .bySheetNames(List.of("CCC", "aaa"))
                     .build();
 
@@ -200,9 +212,9 @@ class ExcelSheetReadRequestTest {
 
         @Test
         void setsDefaultWithNullSheetSelector() {
-            Path path = tempDir.resolve("sample.xlsx");
+            Path filePath = getSampleFilePath();
 
-            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
                     .sheetSelector(null)
                     .build();
 
@@ -212,14 +224,23 @@ class ExcelSheetReadRequestTest {
             assertEquals(0, filteredSheetList.get(0).getIndex());
         }
 
-
         @Test
         void allowsSettingPassword() {
-            Path path = tempDir.resolve("sample.xlsx");
-            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(path)
+            Path filePath = getSampleFilePath();
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
                     .password("secret")
                     .build();
             assertEquals("secret", request.getPassword());
+        }
+
+        @Test
+        void setPasswordAsEmptyIsNull() {
+            // setting password as empty string results in "no password".
+            Path filePath = getSampleFilePath();
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
+                    .password("")
+                    .build();
+            assertEquals(null, request.getPassword());
         }
     }
 
