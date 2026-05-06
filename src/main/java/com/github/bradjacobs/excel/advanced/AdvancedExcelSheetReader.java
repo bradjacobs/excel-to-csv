@@ -87,7 +87,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
                 closeInputStreams(allSheetInfos);
             }
         }
-        catch (OpenXML4JException | ParserConfigurationException | SAXException e) {
+        catch (OpenXML4JException | ParserConfigurationException | SAXException | IOException e) {
             throw new IOException("Failed to read Excel sheet data: " + e.getMessage(), e);
         }
 

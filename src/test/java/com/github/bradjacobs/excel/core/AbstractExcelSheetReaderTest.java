@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -544,6 +545,19 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
             });
         }
     }
+
+    @Test
+    public void corruptInputFile(@TempDir Path tempDir) throws IOException {
+        Path badFilePath = tempDir.resolve("bad.xlsx");
+        Files.writeString(badFilePath, "bad");
+
+        assertThrows(IOException.class, () -> {
+            T sheetReader = createBuilder().build();
+            ExcelSheetReadRequest req = createRequest(badFilePath, 0);
+            sheetReader.readSheet(req);
+        });
+    }
+
 
     @ParameterizedTest
     @MethodSource("invalidInputPaths")
