@@ -110,14 +110,14 @@ class ByNameSheetSelectorTest {
             values.add(null);
             Exception e = assertThrows(IllegalArgumentException.class,
                     () -> new ByNameSheetSelector(values));
-            assertEquals("Names cannot have null values", e.getMessage());
+            assertEquals("Names cannot contain null values", e.getMessage());
         }
 
         @Test
         void throwsWhenVarArgsContainNull() {
             Exception e = assertThrows(IllegalArgumentException.class,
                     () -> new ByNameSheetSelector("foo", null, "bar"));
-            assertEquals("Names cannot have null values", e.getMessage());
+            assertEquals("Names cannot contain null values", e.getMessage());
         }
 
         @Test
@@ -129,7 +129,7 @@ class ByNameSheetSelectorTest {
 
         @Test
         void throwsWhenRequestedNameMissing() {
-            // NOTE:  want the throw message to have sheetName case that was passed in.
+            // NOTE: want the throw message to have sheetName case that was passed in.
             ByNameSheetSelector selector = new ByNameSheetSelector(List.of("one", "FAKE"));
             IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                     () -> selector.filterSheets(sheets(

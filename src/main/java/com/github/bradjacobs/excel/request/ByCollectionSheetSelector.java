@@ -52,7 +52,7 @@ abstract public class ByCollectionSheetSelector<T> implements SheetSelector {
     protected void validateCollection(Collection<T> values, String label) {
         Validate.isTrue(values != null, label + " cannot be null");
         Validate.isTrue(!values.isEmpty(), label + " cannot be empty");
-        Validate.isTrue(values.stream().noneMatch(Objects::isNull), label + " cannot have null values");
+        Validate.isTrue(values.stream().noneMatch(Objects::isNull), label + " cannot contain null values");
         Set<T> valueSet = values.stream()
                 .map(this::normalizeValue)
                 .collect(Collectors.toSet());

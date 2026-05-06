@@ -69,7 +69,6 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         return ExcelSheetReadRequest.from(path).bySheetIndexes(sheetIndex).build();
     }
 
-
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class GeneralTests {
@@ -156,7 +155,6 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
         @Test
         public void readMultipleSheets() throws IOException {
-
             List<String> sheetNames = List.of("GrowingColumnLength", "withTwoBlankColumns", "WithThreeBlankRows");
             List<String> expectedFirstCell = List.of("aa", "aa11", "Name");
 
@@ -491,58 +489,54 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
         @Test
         public void negativeSheetIndex() {
-            // todo - check message
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();
                 ExcelSheetReadRequest req = createRequest(Path.of("fake.xlsx"), -2);
                 sheetReader.readSheet(req);
             });
+            assertEquals("Indexes cannot contain negative values", thrown.getMessage());
         }
 
         @Test
         public void nullSheetName() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
-                // todo check message
                 T sheetReader = createBuilder().build();
-                // fake inputStream, but expect the negative index to be detected first.
                 ExcelSheetReadRequest req = createRequest(Path.of("fake.xlsx"), null);
                 sheetReader.readSheet(req);
             });
+            assertEquals("Names cannot contain null values", thrown.getMessage());
         }
 
         @Test
         public void emptySheetName() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
-                // todo check message
                 T sheetReader = createBuilder().build();
-                // fake inputStream, but expect the negative index to be detected first.
                 ExcelSheetReadRequest req = createRequest(TEST_FILE, "");
                 sheetReader.readSheet(req);
             });
+            assertEquals("Names cannot contain empty values", thrown.getMessage());
         }
 
         @Test
         public void unknownSheetName() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
-                // todo check message
                 T sheetReader = createBuilder().build();
                 ExcelSheetReadRequest req = createRequest(TEST_FILE, "UnknownSheetName");
                 sheetReader.readSheet(req);
             });
-
             assertEquals("Requested Excel sheet not found: 'UnknownSheetName'", thrown.getMessage());
         }
 
         @Test
         public void requestManySheetsOnSingleSheetCall() throws IOException {
             ExcelSheetReadRequest req = ExcelSheetReadRequest.from(TEST_FILE).bySheetIndexes(0,1).build();
-            // readSheet is convenienct when expect exactly 1 sheet.
+            // readSheet is convenience method when expect exactly 1 sheet.
             //  any other number of sheet data from the requests results in exception.
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
-                // todo check message
                 T sheetReader = createBuilder().build();
                 sheetReader.readSheet(req);
             });
+            assertEquals("Expected exactly one sheet but found 2", thrown.getMessage());
         }
     }
 
@@ -557,7 +551,6 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
             sheetReader.readSheet(req);
         });
     }
-
 
     @ParameterizedTest
     @MethodSource("invalidInputPaths")

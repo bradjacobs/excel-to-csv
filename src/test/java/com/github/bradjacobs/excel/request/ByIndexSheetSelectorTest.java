@@ -77,7 +77,7 @@ class ByIndexSheetSelectorTest {
             values.add(null);
             Exception e = assertThrows(IllegalArgumentException.class,
                     () -> new ByIndexSheetSelector(values));
-            assertEquals("Indexes cannot have null values", e.getMessage());
+            assertEquals("Indexes cannot contain null values", e.getMessage());
         }
 
         @Test
