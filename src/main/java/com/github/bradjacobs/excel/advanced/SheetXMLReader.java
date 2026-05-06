@@ -31,6 +31,7 @@ class SheetXMLReader extends XMLFilterImpl {
         );
         XMLReader reader = createXmlReader(
                 sheetConfig,
+                this.stringRowConsumer,
                 sharedStrings,
                 styles,
                 dataFormatter);
@@ -49,6 +50,7 @@ class SheetXMLReader extends XMLFilterImpl {
 
     private XMLReader createXmlReader(
             SheetConfig sheetConfig,
+            StringRowConsumer stringRowConsumer,
             SharedStrings sharedStrings,
             StylesTable styles,
             DataFormatter dataFormatter
