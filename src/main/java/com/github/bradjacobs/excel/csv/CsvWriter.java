@@ -237,7 +237,7 @@ public class CsvWriter {
         }
 
         /**
-         * Use a BOM when writing output file if data contains 'Unicode characters'
+         * Use a BOM when writing an output file if data contains 'Unicode characters'
          * @param saveUnicodeFileWithBom (defaults to true)
          */
         public Builder saveUnicodeFileWithBom(boolean saveUnicodeFileWithBom) {
