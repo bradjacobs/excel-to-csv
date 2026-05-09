@@ -196,17 +196,17 @@ public class MutableSheetContent implements SheetContent {
     }
 
     private void validateRowIndex(int rowIndex) {
-        if (rowIndex < 0 || rowIndex >= rowContent.size()) {
-            throw new IndexOutOfBoundsException(
-                    "Row index out of range: " + rowIndex + ", size: " +  rowContent.size()
-            );
-        }
+        validateIndex(rowIndex, rowContent.size(), "Row");
     }
 
     private void validateColumnIndex(int columnIndex) {
-        if (columnIndex < 0 || columnIndex >= columnWidth) {
+        validateIndex(columnIndex, columnWidth, "Column");
+    }
+
+    private void validateIndex(int index, int size, String label) {
+        if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException(
-                    "Column index out of range: " + columnIndex + ", size: " +  columnWidth
+                    label + " index out of range: " + index + ", size: " + size
             );
         }
     }
