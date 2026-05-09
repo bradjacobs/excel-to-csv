@@ -70,12 +70,14 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      * @return list of workbook sheets
      */
     private List<WorkbookSheetInfo> readWorkbookSheets(Workbook workbook) {
-        List<WorkbookSheetInfo> workbookSheets = new ArrayList<>();
-        for (int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) {
+        int sheetCount = workbook.getNumberOfSheets();
+        List<WorkbookSheetInfo> sheetInfos = new ArrayList<>(sheetCount);
+
+        for (int sheetIndex = 0; sheetIndex < sheetCount; sheetIndex++) {
             Sheet sheet = workbook.getSheetAt(sheetIndex);
-            workbookSheets.add(new WorkbookSheetInfo(sheet.getSheetName(), sheetIndex, sheet));
+            sheetInfos.add(new WorkbookSheetInfo(sheet.getSheetName(), sheetIndex, sheet));
         }
-        return workbookSheets;
+        return sheetInfos;
     }
 
     private SheetContent toSheetContent(WorkbookSheetInfo sheetInfo) {
@@ -183,11 +185,20 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
             Row row = sheet.getRow(i);
             if (isRowVisible(row)) {
                 rowList.add(row);
-                maxColumnCount = Math.max(maxColumnCount, row != null ? row.getLastCellNum() : 0);
+                maxColumnCount = Math.max(maxColumnCount, getColumnCount(row));
             }
         }
         return new RowInfo(rowList, maxColumnCount);
     }
+
+    private int getColumnCount(Row row) {
+        if (row == null) {
+            return 0;
+        }
+        short lastCellIndexExclusive = row.getLastCellNum();
+        return Math.max(lastCellIndexExclusive, 0);
+    }
+
 
     private boolean isRowVisible(Row row) {
         if (!sheetConfig.skipInvisibleCells()) {
