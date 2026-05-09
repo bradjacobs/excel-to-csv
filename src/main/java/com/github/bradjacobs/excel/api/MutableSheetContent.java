@@ -59,7 +59,7 @@ public class MutableSheetContent implements SheetContent {
     }
 
     public void setSheetName(String sheetName) {
-        this.sheetName = sheetName != null ? sheetName : EMPTY_VALUE;
+        this.sheetName = normalizeStringValue(sheetName);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class MutableSheetContent implements SheetContent {
     public void setCellValue(int rowIndex, int columnIndex, String value) {
         List<String> row = internalGetRow(rowIndex);
         validateColumnIndex(columnIndex);
-        row.set(columnIndex, value != null ? value : EMPTY_VALUE);
+        row.set(columnIndex, normalizeStringValue(value));
     }
 
     @Override
@@ -161,7 +161,7 @@ public class MutableSheetContent implements SheetContent {
     }
 
     public void addColumn(String fillerValue) {
-        fillerValue = fillerValue != null ? fillerValue : EMPTY_VALUE;
+        fillerValue = normalizeStringValue(fillerValue);
         for (List<String> row : rowContent) {
             row.add(fillerValue);
         }
@@ -214,7 +214,7 @@ public class MutableSheetContent implements SheetContent {
     private List<String> copyInputRow(List<String> rowValues) {
         List<String> copyRow = (rowValues == null) ? new ArrayList<>() : new ArrayList<>(rowValues);
         // replace any 'nulls' with empty string for consistency.
-        copyRow.replaceAll(s -> s == null ? EMPTY_VALUE : s);
+        copyRow.replaceAll(MutableSheetContent::normalizeStringValue);
 
         if (copyRow.size() != columnWidth) {
             int effectiveRowWidth = getEffectiveRowWidth(copyRow);
@@ -297,7 +297,7 @@ public class MutableSheetContent implements SheetContent {
         }
         List<String> rowList = new ArrayList<>(row.length);
         for (String rowValue : row) {
-            rowList.add(rowValue == null ? EMPTY_VALUE : rowValue);
+            rowList.add(normalizeStringValue(rowValue));
         }
         return rowList;
     }
@@ -313,7 +313,17 @@ public class MutableSheetContent implements SheetContent {
 
         @Override
         public String set(int index, String object) {
-            return super.set(index, object != null ? object : EMPTY_VALUE);
+            return super.set(index, normalizeStringValue(object));
         }
+    }
+
+    /**
+     * Converts null to empty string.
+     * @param input input value
+     * @return normalized value
+     */
+    private static String normalizeStringValue(String input) {
+        // note: currently does not 'trim'.  TBD if this is desired.
+        return input != null ? input : EMPTY_VALUE;
     }
 }
