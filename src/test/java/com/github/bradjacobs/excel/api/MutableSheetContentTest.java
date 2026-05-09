@@ -27,17 +27,17 @@ class MutableSheetContentTest extends SheetContentTest {
 
     @Override
     protected SheetContent createDefaultSheetContent() {
-        return MutableSheetContent.from(INPUT_SHEET);
+        return MutableSheetContent.copyOf(INPUT_SHEET);
     }
 
     private MutableSheetContent createDefaultMutableSheetContent() {
-        return MutableSheetContent.from(INPUT_SHEET);
+        return MutableSheetContent.copyOf(INPUT_SHEET);
     }
 
     @Override
     protected SheetContent createEmptySheetContent() {
         SheetContent emptySheet = new BasicSheetContent("", new String[][]{});
-        return MutableSheetContent.from(emptySheet);
+        return MutableSheetContent.copyOf(emptySheet);
     }
 
     static Stream<Arguments> listProvider() {
@@ -259,13 +259,14 @@ class MutableSheetContentTest extends SheetContentTest {
             assertEquals("Row index out of range: 200, size: 2", exception.getMessage());
         }
 
-        @ParameterizedTest
-        @EnumSource(value = RowOperation.class, names = {"ADD", "INSERT", "REPLACE"})
-        public void testRowTooLargeException(RowOperation rowOperation) {
-            Executable executable = createExecutable(rowOperation, 1, List.of("a", "b", "c", "d", "e", "f", "g"));
-            Exception exception = assertThrows(IllegalArgumentException.class, executable);
-            assertEquals("Row contains too many columns: 7 > 3", exception.getMessage());
-        }
+        // TODO - need new replacement tests - scenario no longer an error.
+//        @ParameterizedTest
+//        @EnumSource(value = RowOperation.class, names = {"ADD", "INSERT", "REPLACE"})
+//        public void testRowTooLargeException(RowOperation rowOperation) {
+//            Executable executable = createExecutable(rowOperation, 1, List.of("a", "b", "c", "d", "e", "f", "g"));
+//            Exception exception = assertThrows(IllegalArgumentException.class, executable);
+//            assertEquals("Row contains too many columns: 7 > 3", exception.getMessage());
+//        }
 
         @Test
         public void setCellWithRowIndexNegative() {
@@ -358,7 +359,6 @@ class MutableSheetContentTest extends SheetContentTest {
         expected.add(newRow);
         assertEquals(expected, mutableSheetContent.getRows());
     }
-
 
     // TODO -
     //   add test cases for remove columns

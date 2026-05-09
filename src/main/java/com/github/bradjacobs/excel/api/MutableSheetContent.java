@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
  * providing functionalities to manipulate sheet data such as rows, columns,
  * and cell values.
  */
+// TODO - class is functional, but still in 'interim' state
 public class MutableSheetContent implements SheetContent {
 
     private static final String EMPTY_VALUE = "";
@@ -29,20 +30,27 @@ public class MutableSheetContent implements SheetContent {
     private final List<List<String>> rowContent;
     private int columnWidth;
 
-    public static MutableSheetContent from(SheetContent sheetContent) {
-        // TODO refactor
-        String[][] matrix = sheetContent.getMatrix();
-        List<List<String>> listData = new ArrayList<>(matrix.length);
-        for (String[] inner : matrix) {
-            listData.add(new ArrayList<>(Arrays.asList(inner)));
+    public static MutableSheetContent copyOf(SheetContent sheetContent) {
+        Validate.isTrue(sheetContent != null, "sheetContent must not be null");
+        return fromMatrix(sheetContent.getSheetName(), sheetContent.getMatrix());
+    }
+
+    public static MutableSheetContent fromMatrix(String sheetName, String[][] matrix) {
+        List<List<String>> rows = new ArrayList<>();
+
+        if (matrix != null) {
+            for (String[] row : matrix) {
+                rows.add(copyMatrixRow(row));
+            }
         }
-        return new MutableSheetContent(sheetContent.getSheetName(), listData);
+        return new MutableSheetContent(sheetName, rows);
     }
 
     private MutableSheetContent(String sheetName, List<List<String>> rowContent) {
         setSheetName(sheetName);
         this.rowContent = rowContent;
-        this.columnWidth = rowContent.isEmpty() ? 0 : rowContent.get(0).size();
+        this.columnWidth = discoverEffectiveColumnWidth(this.rowContent);
+        resizeRowsToEffectiveColumnWidth(this.columnWidth);
     }
 
     @Override
@@ -208,15 +216,17 @@ public class MutableSheetContent implements SheetContent {
             rowValues = List.of();
         }
 
-        Validate.isTrue(rowValues.size() <= columnWidth,
-                "Row contains too many columns: " + rowValues.size() + " > " + columnWidth);
         List<String> copyRow = rowValues.stream()
                 .map(s -> (s == null) ? "" : s)
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        // expand to full width if necessary
-        while (copyRow.size() < columnWidth) {
-            copyRow.add(EMPTY_VALUE);
+        if (copyRow.size() != columnWidth) {
+            int effectiveRowWidth = getEffectiveRowWidth(copyRow);
+            if (effectiveRowWidth > columnWidth) {
+                columnWidth = effectiveRowWidth;
+                resizeRowsToEffectiveColumnWidth(columnWidth);
+            }
+            resizeRowWidth(copyRow, columnWidth);
         }
         return copyRow;
     }
@@ -251,6 +261,49 @@ public class MutableSheetContent implements SheetContent {
         return columnIndexes.stream()
                 .mapToInt(Integer::intValue)
                 .toArray();
+    }
+
+    private int discoverEffectiveColumnWidth(List<List<String>> rowContent) {
+        return rowContent.stream()
+                .mapToInt(this::getEffectiveRowWidth)
+                .max()
+                .orElse(0);
+    }
+
+    private void resizeRowsToEffectiveColumnWidth(int columnWidth) {
+        for (List<String> row : rowContent) {
+            resizeRowWidth(row, columnWidth);
+        }
+    }
+
+    private void resizeRowWidth(List<String> row, int desiredWidth) {
+        while (row.size() > desiredWidth) {
+            row.remove(row.size() - 1);
+        }
+
+        while (row.size() < desiredWidth) {
+            row.add(EMPTY_VALUE);
+        }
+    }
+
+    private int getEffectiveRowWidth(List<String> row) {
+        for (int i = row.size() - 1; i >= 0; i--) {
+            if (!EMPTY_VALUE.equals(row.get(i))) {
+                return i + 1;
+            }
+        }
+        return 0;
+    }
+
+    private static List<String> copyMatrixRow(String[] row) {
+        if (row == null) {
+            return new ArrayList<>();
+        }
+
+        // todo: this is a tad duplicate, but worry about it later
+        return Arrays.stream(row)
+                .map(value -> value != null ? value : EMPTY_VALUE)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public List<String> toFixedRow(List<String> inputRow) {

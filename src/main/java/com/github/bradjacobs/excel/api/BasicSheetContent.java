@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class BasicSheetContent implements SheetContent  {
+public class BasicSheetContent implements SheetContent {
+    private static final String DEFAULT_SHEET_NAME = "";
+    private static final String[][] EMPTY_MATRIX = new String[0][0];
+
     private final String sheetName;
     private final String[][] matrix;
     private final int rowCount;
@@ -20,12 +23,12 @@ public class BasicSheetContent implements SheetContent  {
     }
 
     public BasicSheetContent(String[][] matrix) {
-        this("", matrix);
+        this(DEFAULT_SHEET_NAME, matrix);
     }
 
     public BasicSheetContent(String sheetName, String[][] matrix) {
-        this.sheetName = sheetName != null ? sheetName : "";
-        this.matrix = matrix != null ? matrix : new String[0][0];
+        this.sheetName = normalizeSheetName(sheetName);
+        this.matrix = normalizeMatrix(matrix);
         this.rowCount = this.matrix.length;
         this.columnCount = rowCount > 0 ? this.matrix[0].length : 0;
     }
@@ -60,23 +63,18 @@ public class BasicSheetContent implements SheetContent  {
     @Override
     public List<String> getRow(int rowIndex) {
         validateRowIndex(rowIndex);
-        return toReadOnlyRow(matrix[rowIndex]);
+        return toUnmodifiableRow(matrix[rowIndex]);
     }
 
     @Override
     public List<List<String>> getRows() {
         return Arrays.stream(matrix)
-                .map(this::toReadOnlyRow)
+                .map(this::toUnmodifiableRow)
                 .collect(Collectors.collectingAndThen(
                         Collectors.toList(),
                         Collections::unmodifiableList));
     }
 
-    private List<String> toReadOnlyRow(String[] row) {
-        List<String> readOnlyRow = Arrays.asList(row);
-        return Collections.unmodifiableList(readOnlyRow);
-    }
-    
     @Override
     public String[][] getMatrix() {
         // NOTE: going to forgo making a full copy
@@ -84,18 +82,31 @@ public class BasicSheetContent implements SheetContent  {
         return matrix;
     }
 
+    private static String normalizeSheetName(String sheetName) {
+        return sheetName != null ? sheetName : DEFAULT_SHEET_NAME;
+    }
+
+    private static String[][] normalizeMatrix(String[][] matrix) {
+        SheetContentValidation.validateRectangularMatrix(matrix);
+        return matrix != null ? matrix : EMPTY_MATRIX;
+    }
+
+    private List<String> toUnmodifiableRow(String[] row) {
+        return Collections.unmodifiableList(Arrays.asList(row));
+    }
+
     private void validateRowIndex(int rowIndex) {
-        if (rowIndex < 0 || rowIndex >= rowCount) {
-            throw new IndexOutOfBoundsException(
-                    "Row index out of range: " + rowIndex + ", size: " + rowCount
-            );
-        }
+        validateIndex(rowIndex, rowCount, "Row");
     }
 
     private void validateColumnIndex(int columnIndex) {
-        if (columnIndex < 0 || columnIndex >= columnCount) {
+        validateIndex(columnIndex, columnCount, "Column");
+    }
+
+    private void validateIndex(int index, int size, String label) {
+        if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException(
-                    "Column index out of range: " + columnIndex + ", size: " + columnCount
+                    label + " index out of range: " + index + ", size: " + size
             );
         }
     }

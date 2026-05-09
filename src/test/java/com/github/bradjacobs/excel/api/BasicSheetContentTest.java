@@ -58,4 +58,18 @@ class BasicSheetContentTest extends SheetContentTest {
             rows.set(0, List.of("new value"));
         });
     }
+
+    @Test
+    public void invalidInputMatrixShape() {
+        // matrix must be rectangular
+        String[][] invalidMatrix = new String[][]{
+                {"A1", "B1"},
+                {"A2", "B2", "C2"}
+        };
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new BasicSheetContent("sheet", invalidMatrix);
+        });
+    }
 }
+
