@@ -5,6 +5,7 @@ package com.github.bradjacobs.excel.request;
 
 import com.github.bradjacobs.excel.io.InputStreamGenerator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,9 +55,8 @@ public class ExcelSheetReadRequest {
 
         // Constructor enforces at least one required field
         private Builder(Path path, URL url) {
-            if (path == null && url == null) {
-                throw new IllegalArgumentException("Either file path or url must be provided");
-            }
+            Validate.isTrue(path != null || url != null,
+                    "Either file path or url must be provided");
             this.path = path;
             this.url = url;
         }
