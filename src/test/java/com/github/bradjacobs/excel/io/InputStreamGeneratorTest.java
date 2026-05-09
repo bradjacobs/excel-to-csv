@@ -195,16 +195,21 @@ class InputStreamGeneratorTest {
         return new String(input.readAllBytes(), StandardCharsets.UTF_8);
     }
 
-    private Path createTempTextFile(String textBody) {
+    private static final String TEMP_TEXT_FILE_PREFIX = "temp_";
+    private static final String TEXT_FILE_EXTENSION = ".txt";
+
+    private Path createTempTextFile(String content) {
         try {
-            String tempFileName = "temp_" + System.currentTimeMillis() + ".txt";
-            Path tempFile = Files.createFile(tempDir.resolve(tempFileName));
-            Files.writeString(tempFile, textBody);
-            assertTrue(Files.exists(tempFile));
-            return tempFile;
+            Path tempTextFile = Files.createTempFile(
+                    tempDir,
+                    TEMP_TEXT_FILE_PREFIX,
+                    TEXT_FILE_EXTENSION
+            );
+            Files.writeString(tempTextFile, content);
+            return tempTextFile;
         }
         catch (IOException e) {
-            throw new UncheckedIOException("Unable to create temp file: " + e.getMessage(), e);
+            throw new UncheckedIOException("Unable to create temp text file.", e);
         }
     }
 }
