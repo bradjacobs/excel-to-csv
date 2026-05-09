@@ -41,7 +41,6 @@ class ExcelSheetReadRequestTest {
         return tempDir.resolve("sample.xlsx");
     }
 
-
     @Nested
     @DisplayName("factory methods")
     class FactoryMethodsTests {

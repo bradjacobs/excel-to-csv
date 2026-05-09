@@ -13,37 +13,37 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CellValueSanitizerTest {
 
-    // the advanced implementation can pass in a null to
-    //   this method, so ensure it's handled correctly.
+    private static final String ASSERTION_MESSAGE = "mismatch expected cell value string";
+
     @Test
-    public void sanitizeCellNullValue() {
+    public void sanitizeCellValueReturnsEmptyStringForNullInput() {
         CellValueSanitizer sanitizer = new CellValueSanitizer(true, Set.of(QUOTES));
         String result = sanitizer.sanitizeCellValue(null);
-        assertEquals("", result, "mismatch expected cell value");
+        assertEquals("", result, ASSERTION_MESSAGE);
     }
 
     @Test
-    public void withTrim() {
+    public void sanitizeCellValueTrimsInputWhenTrimEnabled() {
         CellValueSanitizer sanitizer = new CellValueSanitizer(true, Set.of(QUOTES));
         String inputString = "  dog  ";
         String expectedString = inputString.trim();
         String result = sanitizer.sanitizeCellValue(inputString);
-        assertEquals(expectedString, result, "mismatch expected cell value string");
+        assertEquals(expectedString, result, ASSERTION_MESSAGE);
     }
 
     @Test
-    public void withoutTrim() {
+    public void sanitizeCellValuePreservesWhitespaceWhenTrimDisabled() {
         CellValueSanitizer sanitizer = new CellValueSanitizer(false, Set.of(QUOTES));
         String inputString = "  dog  ";
         String result = sanitizer.sanitizeCellValue(inputString);
-        assertEquals(inputString, result, "mismatch expected cell value string");
+        assertEquals(inputString, result, ASSERTION_MESSAGE);
     }
 
     @Test
-    public void withDiacriticsSet() {
+    public void sanitizeCellValueRemovesBasicDiacriticsWhenConfigured() {
         CellValueSanitizer sanitizer = new CellValueSanitizer(true, Set.of(BASIC_DIACRITICS));
         String inputString = "Façade";
         String result = sanitizer.sanitizeCellValue(inputString);
-        assertEquals("Facade", result, "mismatch expected cell value string");
+        assertEquals("Facade", result, ASSERTION_MESSAGE);
     }
 }

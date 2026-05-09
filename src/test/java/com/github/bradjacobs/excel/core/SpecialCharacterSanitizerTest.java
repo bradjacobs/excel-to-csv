@@ -8,13 +8,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.FieldSource;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +29,11 @@ import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class SpecialCharacterSanitizerTest {
+    private static final String SANITIZED_STRING_MISMATCH = "mismatch expected sanitized string";
+    private static final String UNCHANGED_STRING_EXPECTED = "expected input string to remain unchanged.";
+    private static final String NON_NULL_SANITIZE_TYPES_REQUIRED = "Must provide non-null sanitizeTypes.";
+    private static final Set<SanitizeType> NO_SANITIZATION_TYPES = Set.of();
+
     private static final List<Arguments> spaceChars = Arrays.asList(
             arguments(named("NON_BREAKING SPACE", "\u00a0")),
             arguments(named("EN SPACE", "\u2002")),
@@ -47,49 +52,34 @@ class SpecialCharacterSanitizerTest {
     //   becomes a "normal" space character
     @ParameterizedTest
     @FieldSource("spaceChars")
-    public void sanitizeSpacialSpaceCharacter(String spaceChar) {
-        String inputString = "a" + spaceChar + "b";
-        String expectedResult = "a b";
-        String result = new SpecialCharacterSanitizer(SPACES).sanitize(inputString);
-        assertEquals(expectedResult, result, "mismatch result of whitespace char substitution");
+    public void sanitizeSpecialSpaceCharacter(String spaceChar) {
+        assertSanitizedEquals("a b", "a" + spaceChar + "b", SPACES);
     }
 
     @Test
     public void sanitizeWithDoubleCurlyQuotes() {
-        String inputCurlyDoubleQuotes = "she said “hi” to my dog";
-        String expectedResult = "she said \"hi\" to my dog";
-        String result = new SpecialCharacterSanitizer(QUOTES).sanitize(inputCurlyDoubleQuotes);
-        assertEquals(expectedResult, result, "mismatch result of quote character replacement");
+        assertSanitizedEquals("she said \"hi\" to my dog", "she said “hi” to my dog", QUOTES);
     }
 
     @Test
     public void sanitizeWithSingleCurlyQuotes() {
-        String inputCurlySingleQuotes = "she said ‘hi’ to my dog";
-        String expectedResult = "she said 'hi' to my dog";
-        String result = new SpecialCharacterSanitizer(QUOTES).sanitize(inputCurlySingleQuotes);
-        assertEquals(expectedResult, result, "mismatch result of quote character replacement");
+        assertSanitizedEquals("she said 'hi' to my dog", "she said ‘hi’ to my dog", QUOTES);
     }
 
     @Test
     public void validateDisablingWhitespaceSanitization() {
-        String inputString = "has \u00a0 special space";
-        String result = new SpecialCharacterSanitizer(new HashSet<>()).sanitize(inputString);
-        assertEquals(inputString, result, "expected input string to remain unchanged.");
+        assertUnchanged("has \u00a0 special space", NO_SANITIZATION_TYPES);
     }
 
     @Test
     public void validateDisablingQuoteSanitization() {
-        String inputString = "has special \u201C quote";
-        String result = new SpecialCharacterSanitizer(new HashSet<>()).sanitize(inputString);
-        assertEquals(inputString, result, "expected input string to remain unchanged.");
+        assertUnchanged("has special \u201C quote", NO_SANITIZATION_TYPES);
     }
 
     @Test
     public void sanitizeDashCharacters() {
-        String inputCurlySingleQuotes = "aaa–bbb－ccc˗d−e";
-        String expectedResult = "aaa-bbb-ccc-d-e";
-        String result = new SpecialCharacterSanitizer(DASHES).sanitize(inputCurlySingleQuotes);
-        assertEquals(expectedResult, result, "mismatch result of quote character replacement");
+        String inputWithDashCharacters = "aaa–bbb－ccc˗d−e";
+        assertSanitizedEquals("aaa-bbb-ccc-d-e", inputWithDashCharacters, DASHES);
     }
 
     @ParameterizedTest
@@ -102,17 +92,16 @@ class SpecialCharacterSanitizerTest {
             "déjà vu, deja vu"
     })
     public void sanitizeBasicDiacritics(String input, String expected) {
-        String result = new SpecialCharacterSanitizer(BASIC_DIACRITICS).sanitize(input);
-        assertEquals(expected, result, "mismatch expected sanitized diacritics");
+        assertSanitizedEquals(expected, input, BASIC_DIACRITICS);
     }
 
     @Test
     public void unsupportedSanitizeType() {
         // a 'null' is the only way to test invalid param
         //   error message for an unsupported enum type
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new SpecialCharacterSanitizer(Arrays.asList(DASHES, null));
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () ->
+                new SpecialCharacterSanitizer(Arrays.asList(DASHES, null))
+        );
         assertEquals("No replacement map registered for SanitizeType: null", exception.getMessage());
     }
 
@@ -123,56 +112,62 @@ class SpecialCharacterSanitizerTest {
         // whitespace sanitization ON by default
         @Test
         public void whitespaceDefaultSanitize() {
-            String input = "good\u00a0day";
-            String expected = "good day";
-            String result = new SpecialCharacterSanitizer().sanitize(input);
-            assertEquals(expected, result, "mismatch expected sanitized string");
+            assertDefaultSanitizedEquals("good day", "good\u00a0day");
         }
 
         // quote sanitization ON by default
         @Test
         public void quoteDefaultSanitize() {
-            String input = "with “doubles” and ‘singles’";
-            String expected = "with \"doubles\" and 'singles'";
-            String result = new SpecialCharacterSanitizer().sanitize(input);
-            assertEquals(expected, result, "mismatch expected sanitized string");
+            assertDefaultSanitizedEquals("with \"doubles\" and 'singles'", "with “doubles” and ‘singles’");
         }
 
         // dash sanitization OFF by default
         @Test
         public void dashDefaultSanitize() {
-            String input = "Foo–Bar";
-            String result = new SpecialCharacterSanitizer().sanitize(input);
-            assertEquals(input, result, "mismatch expected sanitized string");
+            assertDefaultSanitizedEquals("Foo–Bar", "Foo–Bar");
         }
 
         // diacritics sanitization OFF by default
         @Test
         public void diacriticsDefaultSanitize() {
-            String input = "résumé";
-            String result = new SpecialCharacterSanitizer().sanitize(input);
-            assertEquals(input, result, "mismatch expected sanitized string");
+            assertDefaultSanitizedEquals("résumé", "résumé");
         }
     }
 
     @Test
     public void validateNullTypesParameter() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new SpecialCharacterSanitizer((Set<SanitizeType>) null);
-        });
-        assertEquals("Must provide non-null sanitizeTypes.", exception.getMessage());
-
-        Exception exception2 = assertThrows(IllegalArgumentException.class, () -> {
-            new SpecialCharacterSanitizer((SanitizeType[]) null);
-        });
-        assertEquals("Must provide non-null sanitizeTypes.", exception2.getMessage());
+        assertInvalidSanitizeTypes(() -> new SpecialCharacterSanitizer((Set<SanitizeType>) null));
+        assertInvalidSanitizeTypes(() -> new SpecialCharacterSanitizer((SanitizeType[]) null));
     }
 
     @Test
     public void sanitizeNullString() {
         // normal usage won't try to sanitize a 'null', but test for completeness.
-        String result = new SpecialCharacterSanitizer(SPACES).sanitize(null);
-        assertNull(result, "expected a 'null' to be sanitized to a 'null'");
+        assertNull(sanitize(null, SPACES), "expected a 'null' to be sanitized to a 'null'");
     }
 
+    private static String sanitize(String input, SanitizeType... sanitizeTypes) {
+        return new SpecialCharacterSanitizer(sanitizeTypes).sanitize(input);
+    }
+
+    private static String sanitize(String input, Set<SanitizeType> sanitizeTypes) {
+        return new SpecialCharacterSanitizer(sanitizeTypes).sanitize(input);
+    }
+
+    private static void assertSanitizedEquals(String expected, String input, SanitizeType... sanitizeTypes) {
+        assertEquals(expected, sanitize(input, sanitizeTypes), SANITIZED_STRING_MISMATCH);
+    }
+
+    private static void assertUnchanged(String input, Set<SanitizeType> sanitizeTypes) {
+        assertEquals(input, sanitize(input, sanitizeTypes), UNCHANGED_STRING_EXPECTED);
+    }
+
+    private static void assertDefaultSanitizedEquals(String expected, String input) {
+        assertEquals(expected, new SpecialCharacterSanitizer().sanitize(input), SANITIZED_STRING_MISMATCH);
+    }
+
+    private static void assertInvalidSanitizeTypes(Executable constructorCall) {
+        Exception exception = assertThrows(IllegalArgumentException.class, constructorCall);
+        assertEquals(NON_NULL_SANITIZE_TYPES_REQUIRED, exception.getMessage());
+    }
 }
