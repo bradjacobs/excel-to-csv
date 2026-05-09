@@ -182,7 +182,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         List<Row> rowList = new ArrayList<>(rowCount);
         for (int i = 0; i < rowCount; i++) {
             Row row = sheet.getRow(i);
-            if (isRowVisible(row)) {
+            if (shouldIncludeRow(row)) {
                 rowList.add(row);
                 maxColumnCount = Math.max(maxColumnCount, getColumnCount(row));
             }
@@ -198,8 +198,16 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         return Math.max(lastCellIndexExclusive, 0);
     }
 
-
-    private boolean isRowVisible(Row row) {
+    /**
+     * Determines whether a row should be included in the generated sheet content.
+     * <p>
+     * When invisible cells are not being skipped, all rows are included.
+     * When invisible cells are being skipped, hidden rows are excluded.
+     *
+     * @param row Excel row to evaluate; may be {@code null} for default, unaltered rows
+     * @return {@code true} if the row should be included; {@code false} otherwise
+     */
+    private boolean shouldIncludeRow(Row row) {
         if (!sheetConfig.skipInvisibleCells()) {
             return true;
         }
