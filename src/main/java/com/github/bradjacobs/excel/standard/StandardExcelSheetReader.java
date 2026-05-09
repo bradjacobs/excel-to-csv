@@ -140,9 +140,8 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
                                  int maxRequestedColumnIndex) {
         List<String> rowValues = new ArrayList<>();
 
-        // must check for null because a blank/empty row can (sometimes) be null.
-        if (row != null) {
-            int rowCellCount = Math.max(row.getLastCellNum(), 0);
+        int rowCellCount = getColumnCount(row);
+        if (rowCellCount > 0) {
             int lastRowColumnIndex = Math.min(rowCellCount-1, maxRequestedColumnIndex);
 
             for (int currentColumnToRead : columnsToRead) {
