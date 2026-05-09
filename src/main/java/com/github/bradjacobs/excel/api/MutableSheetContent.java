@@ -212,13 +212,9 @@ public class MutableSheetContent implements SheetContent {
     }
 
     private List<String> copyInputRow(List<String> rowValues) {
-        if (rowValues == null) {
-            rowValues = List.of();
-        }
-
-        List<String> copyRow = rowValues.stream()
-                .map(s -> (s == null) ? "" : s)
-                .collect(Collectors.toCollection(ArrayList::new));
+        List<String> copyRow = (rowValues == null) ? new ArrayList<>() : new ArrayList<>(rowValues);
+        // replace any 'nulls' with empty string for consistency.
+        copyRow.replaceAll(s -> s == null ? EMPTY_VALUE : s);
 
         if (copyRow.size() != columnWidth) {
             int effectiveRowWidth = getEffectiveRowWidth(copyRow);
@@ -299,11 +295,11 @@ public class MutableSheetContent implements SheetContent {
         if (row == null) {
             return new ArrayList<>();
         }
-
-        // todo: this is a tad duplicate, but worry about it later
-        return Arrays.stream(row)
-                .map(value -> value != null ? value : EMPTY_VALUE)
-                .collect(Collectors.toCollection(ArrayList::new));
+        List<String> rowList = new ArrayList<>(row.length);
+        for (String rowValue : row) {
+            rowList.add(rowValue == null ? EMPTY_VALUE : rowValue);
+        }
+        return rowList;
     }
 
     public List<String> toFixedRow(List<String> inputRow) {
