@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.github.bradjacobs.excel.util.RowDataUtil.toArray;
+
 /**
  * Represents a mutable implementation of the {@link SheetContent} interface,
  * providing functionalities to manipulate sheet data such as rows, columns,
@@ -38,7 +40,8 @@ public class MutableSheetContent implements SheetContent {
     public static MutableSheetContent fromMatrix(String sheetName, String[][] matrix) {
         List<List<String>> rows = new ArrayList<>();
 
-        // todo: fix making 'extra copies' of a large data matrix
+        // TODO: fix making 'extra copies' of a large data matrix
+        //   should read and modify from input rows instead.
         if (matrix != null) {
             for (String[] row : matrix) {
                 rows.add(copyMatrixRow(row));
@@ -93,7 +96,7 @@ public class MutableSheetContent implements SheetContent {
 
     @Override
     public List<String> getRow(int rowIndex) {
-        return toFixedRow(internalGetRow(rowIndex));
+        return toFixedSizedRow(internalGetRow(rowIndex));
     }
 
     private List<String> internalGetRow(int rowIndex) {
@@ -134,18 +137,12 @@ public class MutableSheetContent implements SheetContent {
 
     @Override
     public List<List<String>> getRows() {
-        return rowContent.stream()
-                .map(this::toFixedRow)
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toList(),
-                        Collections::unmodifiableList));
+        return toFixedSizedRows(rowContent);
     }
 
     @Override
     public String[][] getMatrix() {
-        return rowContent.stream()
-                .map(inner -> inner.toArray(new String[0]))
-                .toArray(String[][]::new);
+        return toArray(rowContent);
     }
 
     public void transformCells(Function<String, String> transformer) {
@@ -303,7 +300,15 @@ public class MutableSheetContent implements SheetContent {
         return rowList;
     }
 
-    public List<String> toFixedRow(List<String> inputRow) {
+    private List<List<String>> toFixedSizedRows(List<List<String>> inputRows) {
+        return inputRows.stream()
+                .map(this::toFixedSizedRow)
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toList(),
+                        Collections::unmodifiableList));
+    }
+
+    private List<String> toFixedSizedRow(List<String> inputRow) {
         return new FixedSizeRow(inputRow);
     }
 
