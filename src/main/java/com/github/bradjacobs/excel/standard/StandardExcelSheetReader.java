@@ -81,18 +81,23 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
     }
 
     private SheetContent toSheetContent(WorkbookSheetInfo sheetInfo) {
-        String[][] sheetDataMatrix = convertToSheetContentArray(sheetInfo.getSheet());
-        return new BasicSheetContent(sheetInfo.getName(), sheetDataMatrix);
+        return toSheetContent(sheetInfo.getSheet());
+    }
+
+    // TODO - temp interim method until tests can be refactored
+    protected SheetContent toSheetContent(Sheet sheet) {
+        List<List<String>> sheetDataRows = convertToSheetDataRows(sheet);
+        return new BasicSheetContent(sheet.getSheetName(), sheetDataRows);
     }
 
     // todo: change to non-public unless reason to keep public.
     /**
-     * Create 2-D data matrix from the given Excel Sheet
+     * Create row data list from the given Excel Sheet
      * @param sheet Excel Sheet
      * @return 2-D array representing CSV format
      * each row will have the same number of columns
      */
-    public String[][] convertToSheetContentArray(Sheet sheet) {
+    public List<List<String>> convertToSheetDataRows(Sheet sheet) {
         Validate.isTrue(sheet != null, "Sheet parameter cannot be null.");
 
         // grab all the rows from the sheet
@@ -103,13 +108,13 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         // get all the column (indexes) that are to be read
         int[] availableColumns = getAvailableColumns(sheet, maxColumn);
 
-        return convertToSheetContentArray(rowList, availableColumns);
+        return convertToSheetDataRows(rowList, availableColumns);
     }
 
-    private String[][] convertToSheetContentArray(List<Row> rowList, int[] columnsToRead) {
+    private List<List<String>> convertToSheetDataRows(List<Row> rowList, int[] columnsToRead) {
         // if there are no available columns then bail early.
         if (columnsToRead.length == 0) {
-            return new String[0][0];
+            return List.of();
         }
 
         final int columnCount = columnsToRead.length;
@@ -125,7 +130,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
             stringRowConsumer.accept(rowValuesList);
         }
 
-        return stringRowConsumer.generateMatrix();
+        return stringRowConsumer.generateMatrixList();
     }
 
     /**

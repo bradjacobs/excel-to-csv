@@ -16,6 +16,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.List;
 
 class SheetXMLReader extends XMLFilterImpl {
     private final StringRowConsumer stringRowConsumer;
@@ -60,8 +61,8 @@ class SheetXMLReader extends XMLFilterImpl {
         getParent().parse(input);
     }
 
-    public String[][] getSheetContentArray() {
-        return this.stringRowConsumer.generateMatrix();
+    public List<List<String>> getSheetDataRows() {
+        return this.stringRowConsumer.generateMatrixList();
     }
 
     private XMLReader createXmlReader(

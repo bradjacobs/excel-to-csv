@@ -24,7 +24,7 @@ class StandardExcelSheetReaderTest extends AbstractExcelSheetReaderTest<Standard
     public void nullSheetParameter() throws Exception {
         StandardExcelSheetReader sheetReader = StandardExcelSheetReader.builder().build();
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            sheetReader.convertToSheetContentArray(null);
+            sheetReader.convertToSheetDataRows(null);
         });
     }
 }

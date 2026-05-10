@@ -3,34 +3,34 @@
  */
 package com.github.bradjacobs.excel.api;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.github.bradjacobs.excel.util.RowDataUtil.toArray;
+import static com.github.bradjacobs.excel.util.RowDataUtil.toUnmodifiableRow;
+import static com.github.bradjacobs.excel.util.RowDataUtil.toUnmodifiableRows;
 
 
 public class BasicSheetContent implements SheetContent {
     private static final String DEFAULT_SHEET_NAME = "";
-    private static final String[][] EMPTY_MATRIX = new String[0][0];
 
     private final String sheetName;
-    private final String[][] matrix;
+    private final List<List<String>> rows;
     private final int rowCount;
     private final int columnCount;
-
-    public static SheetContent fromMatrix(String sheetName, String[][] matrix) {
-        return new BasicSheetContent(sheetName, matrix);
-    }
 
     public BasicSheetContent(String[][] matrix) {
         this(DEFAULT_SHEET_NAME, matrix);
     }
 
     public BasicSheetContent(String sheetName, String[][] matrix) {
+        this(sheetName, toUnmodifiableRows(matrix));
+    }
+
+    public BasicSheetContent(String sheetName, List<List<String>> rows) {
         this.sheetName = normalizeSheetName(sheetName);
-        this.matrix = normalizeMatrix(matrix);
-        this.rowCount = this.matrix.length;
-        this.columnCount = rowCount > 0 ? this.matrix[0].length : 0;
+        this.rows = toUnmodifiableRows(rows);
+        this.rowCount = rows.size();
+        this.columnCount = rowCount > 0 ? this.rows.get(0).size() : 0;
     }
 
     @Override
@@ -57,52 +57,28 @@ public class BasicSheetContent implements SheetContent {
     public String getCellValue(int rowIndex, int columnIndex) {
         validateRowIndex(rowIndex);
         validateColumnIndex(columnIndex);
-        return matrix[rowIndex][columnIndex];
+        List<String> row = rows.get(rowIndex);
+        return row.get(columnIndex);
     }
 
     @Override
     public List<String> getRow(int rowIndex) {
         validateRowIndex(rowIndex);
-        return toUnmodifiableRow(matrix[rowIndex]);
+        return toUnmodifiableRow(rows.get(rowIndex));
     }
 
     @Override
     public List<List<String>> getRows() {
-        return Arrays.stream(matrix)
-                .map(this::toUnmodifiableRow)
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toList(),
-                        Collections::unmodifiableList));
+        return toUnmodifiableRows(rows);
     }
 
     @Override
     public String[][] getMatrix() {
-
-        // TODO - return a copy of the matrix
-        //   mainly to avoid a 'spotbugs' warning
-        //   but need an alternate solution to avoid
-        //   copying the data so much
-        String[][] copy = new String[matrix.length][];
-
-        for (int i = 0; i < matrix.length; i++) {
-            String[] row = matrix[i];
-            copy[i] = Arrays.copyOf(row, row.length);
-        }
-
-        return copy;
+        return toArray(rows);
     }
 
     private static String normalizeSheetName(String sheetName) {
         return sheetName != null ? sheetName : DEFAULT_SHEET_NAME;
-    }
-
-    private static String[][] normalizeMatrix(String[][] matrix) {
-        SheetContentValidation.validateRectangularMatrix(matrix);
-        return matrix != null ? matrix : EMPTY_MATRIX;
-    }
-
-    private List<String> toUnmodifiableRow(String[] row) {
-        return Collections.unmodifiableList(Arrays.asList(row));
     }
 
     private void validateRowIndex(int rowIndex) {

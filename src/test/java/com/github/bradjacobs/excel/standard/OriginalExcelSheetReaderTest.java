@@ -58,7 +58,7 @@ class OriginalExcelSheetReaderTest {
             //     ccc,ccc,ccc
             // ALL rows should have a length of 3
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "GrowingColumnLength");
-            String[][] dataMatrix = DEFAULT_SHEET_READER.convertToSheetContentArray(testSheet);
+            String[][] dataMatrix = DEFAULT_SHEET_READER.toSheetContent(testSheet).getMatrix();
             for (String[] rowValues : dataMatrix) {
                 assertEquals(3, rowValues.length);
             }
@@ -67,7 +67,7 @@ class OriginalExcelSheetReaderTest {
         @Test
         public void readBlankSheet() {
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "BlankSheet");
-            String[][] dataMatrix = DEFAULT_SHEET_READER.convertToSheetContentArray(testSheet);
+            String[][] dataMatrix = DEFAULT_SHEET_READER.toSheetContent(testSheet).getMatrix();
             assertEquals(0, dataMatrix.length, "Mismatch expected row count");
         }
 
@@ -79,7 +79,7 @@ class OriginalExcelSheetReaderTest {
         @Test
         public void negativeRowCellNumberRepro() {
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "BadRow");
-            String[][] csvMatrix = DEFAULT_SHEET_READER.convertToSheetContentArray(testSheet);
+            String[][] csvMatrix = DEFAULT_SHEET_READER.toSheetContent(testSheet).getMatrix();
             assertEquals("aaa", csvMatrix[0][0]);
             assertEquals("bbb", csvMatrix[0][1]);
             assertEquals("ccc", csvMatrix[2][0]);
@@ -95,7 +95,7 @@ class OriginalExcelSheetReaderTest {
         @Test
         public void handleExtraBlankWhitespaceColumn() {
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "LastColWhitespace");
-            String[][] dataMatrix = DEFAULT_SHEET_READER.convertToSheetContentArray(testSheet);
+            String[][] dataMatrix = DEFAULT_SHEET_READER.toSheetContent(testSheet).getMatrix();
             assertEquals(1, dataMatrix[0].length, "mismatch of expected number of columns in csv output.");
         }
 
@@ -105,7 +105,7 @@ class OriginalExcelSheetReaderTest {
         @Test
         public void nullSheetParamCheck() {
             assertThrows(IllegalArgumentException.class, () -> {
-                DEFAULT_SHEET_READER.convertToSheetContentArray(null);
+                DEFAULT_SHEET_READER.convertToSheetDataRows(null);
             });
         }
     }
@@ -120,7 +120,7 @@ class OriginalExcelSheetReaderTest {
             StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
                     .trimStringValues(true)
                     .build();
-            String[][] dataMatrix = standardExcelSheetReader1.convertToSheetContentArray(testSheet);
+            String[][] dataMatrix = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
             assertEquals(testValue.trim(), dataMatrix[0][0]);
         }
 
@@ -131,7 +131,7 @@ class OriginalExcelSheetReaderTest {
             StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
                     .trimStringValues(false)
                     .build();
-            String[][] dataMatrix = standardExcelSheetReader1.convertToSheetContentArray(testSheet);
+            String[][] dataMatrix = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
             assertEquals(testValue, dataMatrix[0][0]);
         }
 
@@ -139,7 +139,7 @@ class OriginalExcelSheetReaderTest {
         public void trimStringValuesDefault(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Sheet testSheet = createSingleCellExcelSheet(tempDir, testValue);
-            String[][] dataMatrix = DEFAULT_SHEET_READER.convertToSheetContentArray(testSheet);
+            String[][] dataMatrix = DEFAULT_SHEET_READER.toSheetContent(testSheet).getMatrix();
             assertEquals(testValue.trim(), dataMatrix[0][0]);
         }
     }
@@ -160,8 +160,8 @@ class OriginalExcelSheetReaderTest {
             StandardExcelSheetReader standardExcelSheetReader2 = StandardExcelSheetReader.builder()
                     .skipBlankRows(true)
                     .build();
-            String[][] dataMatrixRetainBlankRows = standardExcelSheetReader1.convertToSheetContentArray(testSheet);
-            String[][] dataMatrixSkipBlankRows = standardExcelSheetReader2.convertToSheetContentArray(testSheet);
+            String[][] dataMatrixRetainBlankRows = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
+            String[][] dataMatrixSkipBlankRows = standardExcelSheetReader2.toSheetContent(testSheet).getMatrix();
             int rowDifference = dataMatrixRetainBlankRows.length - dataMatrixSkipBlankRows.length;
             assertEquals(3, rowDifference, "Mismatch expected row count");
         }
@@ -173,8 +173,8 @@ class OriginalExcelSheetReaderTest {
             StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
                     .skipBlankRows(false)
                     .build();
-            String[][] dataMatrixRetainBlankRows = standardExcelSheetReader1.convertToSheetContentArray(testSheet);
-            String[][] dataMatrixDefault = DEFAULT_SHEET_READER.convertToSheetContentArray(testSheet);
+            String[][] dataMatrixRetainBlankRows = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
+            String[][] dataMatrixDefault = DEFAULT_SHEET_READER.toSheetContent(testSheet).getMatrix();
             assertEquals(dataMatrixRetainBlankRows.length, dataMatrixDefault.length, "Mismatch expected row count");
         }
 
@@ -188,7 +188,7 @@ class OriginalExcelSheetReaderTest {
             StandardExcelSheetReader standardExcelSheetReader = StandardExcelSheetReader.builder()
                     .skipBlankRows(false)
                     .build();
-            String[][] dataMatrix = standardExcelSheetReader.convertToSheetContentArray(testSheet);
+            String[][] dataMatrix = standardExcelSheetReader.toSheetContent(testSheet).getMatrix();
             assertEquals(2, dataMatrix.length, "Mismatch expected row count");
         }
     }
@@ -209,8 +209,8 @@ class OriginalExcelSheetReaderTest {
             StandardExcelSheetReader standardExcelSheetReader2 = StandardExcelSheetReader.builder()
                     .skipBlankColumns(true)
                     .build();
-            String[][] dataMatrixRetainBlankColumns = standardExcelSheetReader1.convertToSheetContentArray(testSheet);
-            String[][] dataMatrixSkipBlankColumns = standardExcelSheetReader2.convertToSheetContentArray(testSheet);
+            String[][] dataMatrixRetainBlankColumns = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
+            String[][] dataMatrixSkipBlankColumns = standardExcelSheetReader2.toSheetContent(testSheet).getMatrix();
             int columnDifference = dataMatrixRetainBlankColumns[0].length - dataMatrixSkipBlankColumns[0].length;
             assertEquals(2, columnDifference, "Mismatch expected column count");
         }
@@ -222,8 +222,8 @@ class OriginalExcelSheetReaderTest {
             StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
                     .skipBlankColumns(false)
                     .build();
-            String[][] dataMatrixRetainBlankColumns = standardExcelSheetReader1.convertToSheetContentArray(testSheet);
-            String[][] dataMatrixDefault = DEFAULT_SHEET_READER.convertToSheetContentArray(testSheet);
+            String[][] dataMatrixRetainBlankColumns = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
+            String[][] dataMatrixDefault = DEFAULT_SHEET_READER.toSheetContent(testSheet).getMatrix();
             assertEquals(dataMatrixRetainBlankColumns[0].length, dataMatrixDefault[0].length, "Mismatch expected column count");
         }
     }
@@ -264,14 +264,14 @@ class OriginalExcelSheetReaderTest {
                     .skipInvisibleCells(true)
                     .build();
 
-            String[][] actualMatrix = skipHiddenCellsSheetReader.convertToSheetContentArray(testDataSheet);
+            String[][] actualMatrix = skipHiddenCellsSheetReader.toSheetContent(testDataSheet).getMatrix();
             if (actualMatrix.length > 0) {
                 String[] firstRow = actualMatrix[0];
                 // check to make sure we don't have rows that contain zero-length arrays (need only check the first)
                 assertTrue(firstRow.length > 0, "Matrix return rows with zero-length arrays");
             }
 
-            String[][] expectedMatrix = DEFAULT_SHEET_READER.convertToSheetContentArray(expectedDataSheet);
+            String[][] expectedMatrix = DEFAULT_SHEET_READER.toSheetContent(expectedDataSheet).getMatrix();
             assertArrayEquals(expectedMatrix, actualMatrix);
         }
     }
@@ -304,9 +304,9 @@ class OriginalExcelSheetReaderTest {
             StandardExcelSheetReader disabledSheetReader = createSanitizeSheetReader(type, false);
 
             // ensure that each reader returns correct expected value.
-            String[][] enabledMatrix = enabledSheetReader.convertToSheetContentArray(testSheet);
-            String[][] disabledMatrix = disabledSheetReader.convertToSheetContentArray(testSheet);
-            String[][] defaultMatrix = DEFAULT_SHEET_READER.convertToSheetContentArray(testSheet);
+            String[][] enabledMatrix = enabledSheetReader.toSheetContent(testSheet).getMatrix();
+            String[][] disabledMatrix = disabledSheetReader.toSheetContent(testSheet).getMatrix();
+            String[][] defaultMatrix = DEFAULT_SHEET_READER.toSheetContent(testSheet).getMatrix();
             assertEquals(sanitizedValue, enabledMatrix[0][0]);
             assertEquals(origValue, disabledMatrix[0][0]);
 

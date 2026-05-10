@@ -21,10 +21,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -59,12 +59,12 @@ class SheetXMLReaderTest {
                 Set.of()
         );
 
-        String[][] matrix = parseFirstSheet(workbookBytes, cfg);
+        List<List<String>> rows = parseFirstSheet(workbookBytes, cfg);
 
-        assertNotNull(matrix, "matrix must not be null");
-        assertEquals(2, matrix.length, "expected two rows");
-        assertArrayEquals(new String[]{"A1", "B1"}, matrix[0], "row 0 mismatch");
-        assertArrayEquals(new String[]{"A2", "B2"}, matrix[1], "row 1 mismatch");
+        assertNotNull(rows, "rows must not be null");
+        assertEquals(2, rows.size(), "expected two rows");
+        assertEquals(List.of("A1", "B1"), rows.get(0), "row 0 mismatch");
+        assertEquals(List.of("A2", "B2"), rows.get(1), "row 1 mismatch");
     }
 
     @Test
@@ -97,11 +97,11 @@ class SheetXMLReaderTest {
                 Set.of()
         );
 
-        String[][] matrix = parseFirstSheet(workbookBytes, cfg);
+        List<List<String>> rows = parseFirstSheet(workbookBytes, cfg);
 
-        assertNotNull(matrix, "matrix must not be null");
-        assertEquals(1, matrix.length, "hidden row should be excluded entirely");
-        assertArrayEquals(new String[]{"VISIBLE_A1"}, matrix[0], "hidden column should be excluded");
+        assertNotNull(rows, "rows must not be null");
+        assertEquals(1, rows.size(), "hidden row should be excluded entirely");
+        assertEquals(List.of("VISIBLE_A1"), rows.get(0), "hidden column should be excluded");
     }
 
     @Test
@@ -129,12 +129,12 @@ class SheetXMLReaderTest {
                 Set.of()
         );
 
-        String[][] matrix = parseFirstSheet(workbookBytes, cfg);
+        List<List<String>> rows = parseFirstSheet(workbookBytes, cfg);
 
-        assertNotNull(matrix, "matrix must not be null");
-        assertEquals(2, matrix.length, "when not removing invisible cells, hidden row should remain");
-        assertArrayEquals(new String[]{"VISIBLE_A1", "HIDDEN_COL_B1"}, matrix[0], "row 0 mismatch");
-        assertArrayEquals(new String[]{"HIDDEN_ROW_A2", "HIDDEN_ROW_AND_COL_B2"}, matrix[1], "row 1 mismatch");
+        assertNotNull(rows, "rows must not be null");
+        assertEquals(2, rows.size(), "when not removing invisible cells, hidden row should remain");
+        assertEquals(List.of("VISIBLE_A1", "HIDDEN_COL_B1"), rows.get(0), "row 0 mismatch");
+        assertEquals(List.of("HIDDEN_ROW_A2", "HIDDEN_ROW_AND_COL_B2"), rows.get(1), "row 1 mismatch");
     }
 
     @Test
@@ -161,12 +161,12 @@ class SheetXMLReaderTest {
                 Set.of()
         );
 
-        String[][] matrix = parseFirstSheet(workbookBytes, cfg);
+        List<List<String>> rows = parseFirstSheet(workbookBytes, cfg);
 
-        assertNotNull(matrix, "matrix must not be null");
-        assertEquals(3, matrix.length, "missing row should be represented as a filler row when skipBlankRows=false");
-        assertEquals("R0C0", matrix[0][0], "row 0 value mismatch");
-        assertEquals("R2C0", matrix[2][0], "row 2 value mismatch");
+        assertNotNull(rows, "rows must not be null");
+        assertEquals(3, rows.size(), "missing row should be represented as a filler row when skipBlankRows=false");
+        assertEquals("R0C0", rows.get(0).get(0), "row 0 value mismatch");
+        assertEquals("R2C0", rows.get(2).get(0), "row 2 value mismatch");
     }
 
     @Test
@@ -191,12 +191,12 @@ class SheetXMLReaderTest {
                 Set.of()
         );
 
-        String[][] matrix = parseFirstSheet(workbookBytes, cfg);
+        List<List<String>> rows = parseFirstSheet(workbookBytes, cfg);
 
-        assertNotNull(matrix, "matrix must not be null");
-        assertEquals(2, matrix.length, "missing row should not be synthesized when skipBlankRows=true");
-        assertEquals("R0C0", matrix[0][0], "row 0 value mismatch");
-        assertEquals("R2C0", matrix[1][0], "row 1 (originally row 2) value mismatch");
+        assertNotNull(rows, "rows must not be null");
+        assertEquals(2, rows.size(), "missing row should not be synthesized when skipBlankRows=true");
+        assertEquals("R0C0", rows.get(0).get(0), "row 0 value mismatch");
+        assertEquals("R2C0", rows.get(1).get(0), "row 1 (originally row 2) value mismatch");
     }
 
     @Test
@@ -238,7 +238,7 @@ class SheetXMLReaderTest {
         }
     }
 
-    private static String[][] parseFirstSheet(byte[] workbookBytes, SheetConfig cfg) throws Exception {
+    private static List<List<String>> parseFirstSheet(byte[] workbookBytes, SheetConfig cfg) throws Exception {
         try (OPCPackage pkg = OPCPackage.open(new ByteArrayInputStream(workbookBytes))) {
             XSSFReader reader = new XSSFReader(pkg);
 
@@ -249,7 +249,7 @@ class SheetXMLReaderTest {
             try (InputStream sheetStream = firstSheetStream(reader)) {
                 SheetXMLReader parser = SheetXMLReader.create(cfg, sharedStrings, styles, TEST_DATA_FORMATTER);
                 parser.parse(new InputSource(sheetStream));
-                return parser.getSheetContentArray();
+                return parser.getSheetDataRows();
             }
         }
     }

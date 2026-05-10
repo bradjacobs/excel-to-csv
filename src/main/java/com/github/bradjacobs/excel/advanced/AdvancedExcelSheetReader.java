@@ -99,8 +99,8 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
             // actually parse the sheetInputStream for the data
             InputSource sheetSource = new InputSource(sheetInputStream);
             sheetXmlReader.parse(sheetSource);
-            String[][] sheetValuesMatrix = sheetXmlReader.getSheetContentArray();
-            return new BasicSheetContent(sheetInfoRecord.sheetName, sheetValuesMatrix);
+            List<List<String>> sheetDataRows = sheetXmlReader.getSheetDataRows();
+            return new BasicSheetContent(sheetInfoRecord.sheetName, sheetDataRows);
         }
     }
 

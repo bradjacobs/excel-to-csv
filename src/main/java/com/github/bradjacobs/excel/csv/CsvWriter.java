@@ -119,21 +119,50 @@ public class CsvWriter {
      * @return csv file string
      */
     public String toCsv(SheetContent sheetContent) {
-        String[][] dataMatrix = sheetContent != null ? sheetContent.getMatrix() : null;
-        if (isEmptyDataMatrix(dataMatrix)) {
+        if (sheetContent == null || sheetContent.isEmpty()) {
             return "";
         }
+        List<List<String>> rows = sheetContent.getRows();
 
         StringBuilder sb = new StringBuilder();
-        int columnCount = dataMatrix[0].length;
+        int columnCount = sheetContent.getColumnCount();
         int lastColumnIndex = columnCount - 1;
 
-        for (String[] rowData : dataMatrix) {
+        for (List<String> row : rows) {
             if (sb.length() != 0) {
                 sb.append(NEW_LINE);
             }
             for (int i = 0; i < columnCount; i++) {
-                String cellValue = rowData[i];
+                String cellValue = row.get(i);
+                if (quoteRule.test(cellValue)) {
+                    // must first escape double quotes
+                    cellValue = escapeDoubleQuotes(cellValue);
+                    sb.append('\"').append(cellValue).append('\"');
+                }
+                else {
+                    sb.append(cellValue);
+                }
+
+                if (i != lastColumnIndex) {
+                    sb.append(this.delimiter);
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    public String toCsvFromList(List<List<String>> dataList) {
+        StringBuilder sb = new StringBuilder();
+        int columnCount = dataList.get(0).size();
+        int lastColumnIndex = columnCount - 1;
+
+        for (List<String> rowData : dataList) {
+            if (sb.length() != 0) {
+                sb.append(NEW_LINE);
+            }
+
+            for (int i = 0; i < columnCount; i++) {
+                String cellValue = rowData.get(i);
                 if (quoteRule.test(cellValue)) {
                     // must first escape double quotes
                     cellValue = escapeDoubleQuotes(cellValue);
@@ -156,15 +185,6 @@ public class CsvWriter {
             return value.replace("\"", "\"\"");
         }
         return value;
-    }
-
-    /**
-     * checks if the data matrix array is empty
-     * @param dataMatrix dataMatrix
-     * @return true if dataMatrix is considered 'empty'
-     */
-    private boolean isEmptyDataMatrix(String[][] dataMatrix) {
-        return dataMatrix == null || dataMatrix.length == 0 || dataMatrix[0].length == 0;
     }
 
     private void saveToFile(Path outputPath, String csvContent) throws IOException {
