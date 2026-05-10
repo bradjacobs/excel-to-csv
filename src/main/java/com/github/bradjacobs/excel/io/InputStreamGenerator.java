@@ -26,7 +26,8 @@ public class InputStreamGenerator {
     private static final String USER_AGENT_VALUE = "javaClient/" + System.getProperty("java.version");
 
     public InputStream getInputStream(File inputFile) throws IOException {
-        return getInputStream(inputFile != null ? inputFile.toPath() : null);
+        Validate.isTrue(inputFile != null, "Must provide an input file.");
+        return getInputStream(inputFile.toPath());
     }
 
     public InputStream getInputStream(Path inputFile) throws IOException {

@@ -40,11 +40,11 @@ public class SpecialCharacterSanitizer {
     }
 
     public SpecialCharacterSanitizer(SanitizeType... sanitizeTypes) {
-        this(sanitizeTypes != null ? Arrays.asList(sanitizeTypes) : null);
+        this(toCollection(sanitizeTypes));
     }
 
     public SpecialCharacterSanitizer(Collection<SanitizeType> sanitizeTypes) {
-        Validate.isTrue(sanitizeTypes != null, "Must provide non-null sanitizeTypes.");
+        requireNonNullSanitizeTypes(sanitizeTypes);
         this.replacementMap = buildReplacementMap(sanitizeTypes);
     }
 
@@ -236,5 +236,14 @@ public class SpecialCharacterSanitizer {
         replacementMap.remove('\u226F'); // remove "not greater than"
 
         return replacementMap;
+    }
+
+    private static Collection<SanitizeType> toCollection(SanitizeType[] sanitizeTypes) {
+        requireNonNullSanitizeTypes(sanitizeTypes);
+        return Arrays.asList(sanitizeTypes);
+    }
+
+    private static <T> void requireNonNullSanitizeTypes(T value) {
+        Validate.isTrue(value != null, "Must provide non-null sanitizeTypes.");
     }
 }

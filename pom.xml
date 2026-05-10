@@ -136,6 +136,28 @@
 				</executions>
 			</plugin>
 
+			<!-- performs misc code checks
+			     TBD what are the 'desired' settings -->
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>4.9.8.3</version>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+
+				<configuration>
+					<failOnError>true</failOnError>
+					<threshold>Low</threshold>
+					<effort>Max</effort>
+				</configuration>
+			</plugin>
+
 			<!-- Dependency Plugin for checking used/unused dependencies -->
 			<!--   set phase=validate because prefer this to be run first -->
 			<plugin>

@@ -20,15 +20,31 @@ import java.io.IOException;
 class SheetXMLReader extends XMLFilterImpl {
     private final StringRowConsumer stringRowConsumer;
 
-    public SheetXMLReader(
+    public static SheetXMLReader create(
             SheetConfig sheetConfig,
             SharedStrings sharedStrings,
             StylesTable styles,
-            DataFormatter dataFormatter) throws ParserConfigurationException, SAXException {
+            DataFormatter dataFormatter)
+            throws ParserConfigurationException, SAXException {
+        SheetXMLReader reader = new SheetXMLReader(sheetConfig);
+        reader.init(sheetConfig, sharedStrings, styles, dataFormatter);
+        return reader;
+    }
+
+    private SheetXMLReader(SheetConfig sheetConfig) {
         this.stringRowConsumer = StringRowConsumer.of(
                 sheetConfig.skipBlankRows(),
                 sheetConfig.skipBlankColumns()
         );
+    }
+
+    private void init(
+            SheetConfig sheetConfig,
+            SharedStrings sharedStrings,
+            StylesTable styles,
+            DataFormatter dataFormatter)
+            throws ParserConfigurationException, SAXException {
+
         XMLReader reader = createXmlReader(
                 sheetConfig,
                 this.stringRowConsumer,

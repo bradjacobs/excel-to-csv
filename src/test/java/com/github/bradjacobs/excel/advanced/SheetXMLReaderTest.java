@@ -219,7 +219,7 @@ class SheetXMLReaderTest {
             StylesTable styles = reader.getStylesTable();
 
             // todo this test needs to be redone
-            SheetXMLReader parser = new SheetXMLReader(cfg, sharedStrings, styles, TEST_DATA_FORMATTER);
+            SheetXMLReader parser = SheetXMLReader.create(cfg, sharedStrings, styles, TEST_DATA_FORMATTER);
 
             InputSource bad = new InputSource(new ByteArrayInputStream("<worksheet><row>".getBytes()));
             assertThrows(SAXException.class, () -> parser.parse(bad), "expected SAXException for malformed XML");
@@ -247,7 +247,7 @@ class SheetXMLReaderTest {
 
             // todo - refactor because of weird false param
             try (InputStream sheetStream = firstSheetStream(reader)) {
-                SheetXMLReader parser = new SheetXMLReader(cfg, sharedStrings, styles, TEST_DATA_FORMATTER);
+                SheetXMLReader parser = SheetXMLReader.create(cfg, sharedStrings, styles, TEST_DATA_FORMATTER);
                 parser.parse(new InputSource(sheetStream));
                 return parser.getSheetContentArray();
             }

@@ -79,7 +79,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
                 DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
 
                 for (SheetInfoRecord selectedSheet : selectedSheets) {
-                    SheetXMLReader sheetXmlReader = new SheetXMLReader(this.sheetConfig, sharedStrings, styles, dataFormatter);
+                    SheetXMLReader sheetXmlReader = SheetXMLReader.create(this.sheetConfig, sharedStrings, styles, dataFormatter);
                     sheetContentList.add(extractSheetContent(selectedSheet, sheetXmlReader));
                 }
             }

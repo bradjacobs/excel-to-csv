@@ -7,14 +7,13 @@ import org.apache.commons.lang3.Validate;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ByIndexSheetSelector extends ByCollectionSheetSelector<Integer> {
 
     public ByIndexSheetSelector(int... values) {
-        this(values == null ? null : Arrays.stream(values)
-                .boxed()
-                .collect(Collectors.toList()));
+        this(toIntCollection(values));
     }
 
     public ByIndexSheetSelector(Collection<Integer> values) {
@@ -31,5 +30,11 @@ public class ByIndexSheetSelector extends ByCollectionSheetSelector<Integer> {
         super.validateCollection(values, label);
         Validate.isTrue(values.stream().allMatch(n -> n >= 0),
                 label + " cannot contain negative values");
+    }
+
+    private static List<Integer> toIntCollection(int... values) {
+        return values == null ? null : Arrays.stream(values)
+                .boxed()
+                .collect(Collectors.toList());
     }
 }

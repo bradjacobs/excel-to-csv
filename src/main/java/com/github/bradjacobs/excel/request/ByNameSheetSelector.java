@@ -6,6 +6,7 @@ package com.github.bradjacobs.excel.request;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Collection;
+import java.util.Locale;
 
 public class ByNameSheetSelector extends ByCollectionSheetSelector<String> {
 
@@ -24,7 +25,7 @@ public class ByNameSheetSelector extends ByCollectionSheetSelector<String> {
 
     @Override
     protected String normalizeValue(String value) {
-        return value.toLowerCase();
+        return value.toLowerCase(Locale.ROOT);
     }
 
     @Override

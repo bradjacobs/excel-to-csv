@@ -38,6 +38,7 @@ public class MutableSheetContent implements SheetContent {
     public static MutableSheetContent fromMatrix(String sheetName, String[][] matrix) {
         List<List<String>> rows = new ArrayList<>();
 
+        // todo: fix making 'extra copies' of a large data matrix
         if (matrix != null) {
             for (String[] row : matrix) {
                 rows.add(copyMatrixRow(row));
@@ -307,6 +308,8 @@ public class MutableSheetContent implements SheetContent {
     }
 
     private static class FixedSizeRow extends FixedSizeList<String> {
+        private static final long serialVersionUID = 1L;
+
         protected FixedSizeRow(List<String> list) {
             super(list);
         }

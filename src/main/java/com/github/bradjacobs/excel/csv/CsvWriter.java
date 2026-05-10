@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -99,10 +100,11 @@ public class CsvWriter {
         }
 
         // do the file writes.
-        for (Path filePath : fileToSheetContentMap.keySet()) {
-            SheetContent sheetContent = fileToSheetContentMap.get(filePath);
+        for (Map.Entry<Path, SheetContent> entry : fileToSheetContentMap.entrySet()) {
+            Path outputPath = entry.getKey();
+            SheetContent sheetContent = entry.getValue();
             String csvContent = toCsv(sheetContent);
-            saveToFile(filePath, csvContent);
+            saveToFile(outputPath, csvContent);
         }
     }
 
@@ -192,9 +194,11 @@ public class CsvWriter {
         Validate.isTrue(outputFile != null, "Must supply outputFile location to save CSV data.");
         Validate.isTrue(!Files.isDirectory(outputFile), "The outputFile cannot be an existing directory.");
 
+        Path fileNamePath = outputFile.getFileName();
+        String fileName = fileNamePath != null ? fileNamePath.toString() : "";
         // confirm the output file has an allowed file extension
-        String ext = FilenameUtils.getExtension(outputFile.toString());
-        Validate.isTrue(ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase()),
+        String ext = FilenameUtils.getExtension(fileName);
+        Validate.isTrue(ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase(Locale.ROOT)),
                 "Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext);
 
         Path parentDirectory = outputFile.toAbsolutePath().normalize().getParent();
@@ -202,7 +206,7 @@ public class CsvWriter {
                 "Attempted to save CSV output file in a non-existent directory: " + outputFile);
 
         Validate.isTrue(allowOverwriteFile || !Files.exists(outputFile),
-                "Attempted to overwrite an existing file: " + outputFile.getFileName().toString());
+                "Attempted to overwrite an existing file: " + fileName);
     }
 
     private boolean containsMissingSheetName(List<SheetContent> sheetContentList) {

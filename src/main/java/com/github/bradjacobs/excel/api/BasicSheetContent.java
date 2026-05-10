@@ -77,9 +77,19 @@ public class BasicSheetContent implements SheetContent {
 
     @Override
     public String[][] getMatrix() {
-        // NOTE: going to forgo making a full copy
-        // just for readonly-protection
-        return matrix;
+
+        // TODO - return a copy of the matrix
+        //   mainly to avoid a 'spotbugs' warning
+        //   but need an alternate solution to avoid
+        //   copying the data so much
+        String[][] copy = new String[matrix.length][];
+
+        for (int i = 0; i < matrix.length; i++) {
+            String[] row = matrix[i];
+            copy[i] = Arrays.copyOf(row, row.length);
+        }
+
+        return copy;
     }
 
     private static String normalizeSheetName(String sheetName) {
