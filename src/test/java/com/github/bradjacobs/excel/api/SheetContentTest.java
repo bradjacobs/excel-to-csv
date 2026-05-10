@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class SheetContentTest {
 
+    protected static final String BLANK = "";
     protected static final String[][] INPUT_MATRIX = {
             {"dog", "cat", "bird"},
             {"frog", "cow", "elephant"}
@@ -33,9 +34,19 @@ abstract class SheetContentTest {
     protected static final String INPUT_SHEET_NAME = "mySheet";
 
     protected static List<List<String>> copyOfInput() {
+        return copyOfInput(null);
+    }
+
+    protected static List<List<String>> copyOfInput(Integer minWidth) {
         List<List<String>> copy = new ArrayList<>();
         for (List<String> inner : INPUT_LIST) {
-            copy.add(new ArrayList<>(inner));
+            List<String> copyInnerRow = new ArrayList<>(inner);
+            if (minWidth != null) {
+                while (copyInnerRow.size() < minWidth) {
+                    copyInnerRow.add(BLANK);
+                }
+            }
+            copy.add(copyInnerRow);
         }
         return copy;
     }

@@ -390,7 +390,8 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
             if (isDefaultEnabled) {
                 assertEquals(enabledMatrix[0][0], defaultMatrix[0][0]);
-            } else {
+            }
+            else {
                 assertEquals(disabledMatrix[0][0], defaultMatrix[0][0]);
             }
         }

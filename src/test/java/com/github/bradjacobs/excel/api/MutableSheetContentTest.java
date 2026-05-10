@@ -45,6 +45,8 @@ class MutableSheetContentTest extends SheetContentTest {
                 row("simple row", List.of("foo","bar","baz"), List.of("foo","bar","baz")),
                 row("row contains a null", list("foo", null, "baz"), List.of("foo","", "baz")),
                 row("row too short", List.of("foo"), List.of("foo","","")),
+                row("row long with blanks", List.of("cat","dog","rat","",""), List.of("cat","dog","rat")),
+                row("row long expands columns", List.of("cat","dog","rat","cow","hen"), List.of("cat","dog","rat","cow","hen")),
                 row("row with leading blank", List.of("", "cow", "cat"), List.of("","cow","cat")),
                 row("row with special characters", List.of("Façade", "\"cat's\"", "[dogs]{}"), List.of("Façade", "\"cat's\"", "[dogs]{}")),
                 row("null input row list", null, List.of("","","")),
@@ -66,7 +68,10 @@ class MutableSheetContentTest extends SheetContentTest {
         MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
         mutableSheetContent.addRow(inputList);
 
-        List<List<String>> expected = copyOfInput();
+        List<String> fetchedRow = mutableSheetContent.getRow(mutableSheetContent.getRowCount() - 1);
+        assertEquals(expectedList, fetchedRow);
+
+        List<List<String>> expected = copyOfInput(expectedList.size());
         expected.add(expectedList);
         assertEquals(expected, mutableSheetContent.getRows());
     }
@@ -77,7 +82,10 @@ class MutableSheetContentTest extends SheetContentTest {
         MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
         mutableSheetContent.insertRow(1, inputList);
 
-        List<List<String>> expected = copyOfInput();
+        List<String> fetchedRow = mutableSheetContent.getRow(1);
+        assertEquals(expectedList, fetchedRow);
+
+        List<List<String>> expected = copyOfInput(expectedList.size());
         expected.add(1, expectedList);
         assertEquals(expected, mutableSheetContent.getRows());
     }
@@ -110,7 +118,10 @@ class MutableSheetContentTest extends SheetContentTest {
         MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
         mutableSheetContent.replaceRow(1, inputList);
 
-        List<List<String>> expected = copyOfInput();
+        List<String> fetchedRow = mutableSheetContent.getRow(1);
+        assertEquals(expectedList, fetchedRow);
+
+        List<List<String>> expected = copyOfInput(expectedList.size());
         expected.set(1, expectedList);
         assertEquals(expected, mutableSheetContent.getRows());
     }
@@ -217,6 +228,14 @@ class MutableSheetContentTest extends SheetContentTest {
     class ExceptionRowOperationsTests {
 
         @Test
+        public void copyOfNullSheetContent() {
+            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+                MutableSheetContent.copyOf(null);
+            });
+            assertEquals("sheetContent must not be null", exception.getMessage());
+        }
+
+        @Test
         public void transformRowMissingTransformer() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -239,7 +258,7 @@ class MutableSheetContentTest extends SheetContentTest {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             List<List<String>> rows = mutableSheetContent.getRows();
             assertThrows(UnsupportedOperationException.class, () -> {
-                rows.set(0, List.of(""));
+                rows.set(0, List.of("temp"));
             });
         }
 
@@ -258,15 +277,6 @@ class MutableSheetContentTest extends SheetContentTest {
             Exception exception = assertThrows(IndexOutOfBoundsException.class, executable);
             assertEquals("Row index out of range: 200, size: 2", exception.getMessage());
         }
-
-        // TODO - need new replacement tests - scenario no longer an error.
-//        @ParameterizedTest
-//        @EnumSource(value = RowOperation.class, names = {"ADD", "INSERT", "REPLACE"})
-//        public void testRowTooLargeException(RowOperation rowOperation) {
-//            Executable executable = createExecutable(rowOperation, 1, List.of("a", "b", "c", "d", "e", "f", "g"));
-//            Exception exception = assertThrows(IllegalArgumentException.class, executable);
-//            assertEquals("Row contains too many columns: 7 > 3", exception.getMessage());
-//        }
 
         @Test
         public void setCellWithRowIndexNegative() {
@@ -335,7 +345,7 @@ class MutableSheetContentTest extends SheetContentTest {
 
         List<List<String>> expected = copyOfInput();
         for (List<String> exRow : expected) {
-            exRow.add("");
+            exRow.add(BLANK);
         }
         expected.add(newRow);
         assertEquals(expected, mutableSheetContent.getRows());
