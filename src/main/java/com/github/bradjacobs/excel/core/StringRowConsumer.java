@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static com.github.bradjacobs.excel.util.RowDataUtil.toArray;
 import static com.github.bradjacobs.excel.util.RowDataUtil.toUnmodifiableRows;
 
 /**
@@ -111,9 +112,7 @@ public class StringRowConsumer implements Consumer<List<String>> {
 
     public String[][] generateMatrix() {
         performFinalRowCleanUpIfNeeded();
-        return rows.stream()
-                .map(inner -> inner.toArray(new String[0]))
-                .toArray(String[][]::new);
+        return toArray(rows);
     }
 
     private List<String> normalizeRow(List<String> input) {
