@@ -17,13 +17,13 @@ class WorkbookPropsHandler extends DefaultHandler {
      * Used to grab the 1904DateWindowing value from the Excel workbook.
      */
     @Override
-    public void startElement(String uri, String localName, String qName, Attributes attrs) {
+    public void startElement(String uri, String localName, String qName, Attributes attributes) {
         boolean isWorkbookPropertiesElement =
                 WORKBOOK_PROPERTIES_ELEMENT.equals(localName) ||
                         WORKBOOK_PROPERTIES_ELEMENT.equals(qName);
 
         if (isWorkbookPropertiesElement) {
-            uses1904DateWindowing = isEnabled(attrs.getValue(DATE_1904_ATTRIBUTE));
+            uses1904DateWindowing = isEnabled(attributes.getValue(DATE_1904_ATTRIBUTE));
         }
     }
 
