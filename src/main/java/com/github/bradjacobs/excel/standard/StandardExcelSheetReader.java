@@ -130,7 +130,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
             stringRowConsumer.accept(rowValuesList);
         }
 
-        return stringRowConsumer.generateMatrixList();
+        return stringRowConsumer.generateRowDataList();
     }
 
     /**

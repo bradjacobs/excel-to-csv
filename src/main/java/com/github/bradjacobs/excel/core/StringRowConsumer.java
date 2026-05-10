@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static com.github.bradjacobs.excel.util.RowDataUtil.toUnmodifiableRows;
+
 /**
  * StringRowConsumer handles processing of String rows from Excel files.
  * Specifically:
@@ -102,9 +104,9 @@ public class StringRowConsumer implements Consumer<List<String>> {
         filterBlankColumnsIfNeeded();
     }
 
-    public List<List<String>> generateMatrixList() {
+    public List<List<String>> generateRowDataList() {
         performFinalRowCleanUpIfNeeded();
-        return List.copyOf(rows);
+        return toUnmodifiableRows(rows);
     }
 
     public String[][] generateMatrix() {

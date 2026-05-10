@@ -62,7 +62,7 @@ class SheetXMLReader extends XMLFilterImpl {
     }
 
     public List<List<String>> getSheetDataRows() {
-        return this.stringRowConsumer.generateMatrixList();
+        return this.stringRowConsumer.generateRowDataList();
     }
 
     private XMLReader createXmlReader(
