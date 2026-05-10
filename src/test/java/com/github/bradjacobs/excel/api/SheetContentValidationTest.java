@@ -1,3 +1,6 @@
+/*
+ * This file is subject to the terms and conditions defined in the 'LICENSE' file.
+ */
 package com.github.bradjacobs.excel.api;
 
 import org.junit.jupiter.params.ParameterizedTest;
