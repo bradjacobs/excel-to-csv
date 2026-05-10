@@ -25,7 +25,6 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.model.SharedStrings;
 import org.apache.poi.xssf.model.StylesTable;
-import org.apache.xmlbeans.impl.common.IOUtil;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -56,9 +55,8 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         InputStream sourceInputStream = request.getSourceInputStream();
         List<SheetContent> sheetContentList = new ArrayList<>();
 
-        OPCPackage pkg = null;
-        try (InputStream inputStream = preprocessFileInputStream(sourceInputStream, request.getPassword())) {
-            pkg = OPCPackage.open(inputStream);
+        try (InputStream inputStream = preprocessFileInputStream(sourceInputStream, request.getPassword());
+            OPCPackage pkg = OPCPackage.open(inputStream)) {
             XSSFReader reader = new XSSFReader(pkg);
 
             // NOTE: Docs say readOnlySharedStringsTable saves memory on large files,
@@ -91,9 +89,6 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         }
         catch (OpenXML4JException | ParserConfigurationException | SAXException | IOException e) {
             throw new IOException("Failed to read Excel sheet data: " + e.getMessage(), e);
-        }
-        finally {
-            IOUtils.closeQuietly(pkg);
         }
 
         return sheetContentList;
