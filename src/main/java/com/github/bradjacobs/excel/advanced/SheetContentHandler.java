@@ -55,8 +55,8 @@ class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     }
 
     /**
-     * A cell, with the given formatted value (may be null),
-     * and possibly a comment (may be null), was encountered.
+     * A cell, with the given formatted value (which may be null),
+     * and possibly a comment (also may be null), was encountered.
      */
     protected void cell(int rowIndex, int columnIndex, String formattedValue, XSSFComment comment) {
         appendMissingColumnsBefore(columnIndex);

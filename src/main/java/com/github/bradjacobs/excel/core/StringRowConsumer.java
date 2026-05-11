@@ -19,7 +19,7 @@ import static com.github.bradjacobs.excel.util.RowDataUtil.toUnmodifiableRows;
  * - pruning blank rows (if configured)
  * - pruning blank columns (if configured)
  * - any special case logic regarding nulls
- * - Ensure the last row and last column have some data (i.e. not empty)
+ * - Ensure the last row and last column have some data (i.e., not empty)
  * <p>
  * This consumer does _not_ include:
  * - any logic regarding if rows/columns are 'visible' in Excel
@@ -98,7 +98,7 @@ public class StringRowConsumer implements Consumer<List<String>> {
 
     private void performFinalRowCleanUpIfNeeded() {
         removeTrailingBlankRows();
-        // Ensure all rows have uniform width before potentially filtering columns.
+        // Ensure all rows have are uniform width before potentially filtering columns.
         for (List<String> row : rows) {
             padRowRightToWidth(row, maxColumnCount);
         }
@@ -198,7 +198,7 @@ public class StringRowConsumer implements Consumer<List<String>> {
             return;
         }
 
-        // iterate over all the flags, and remove
+        // iterate over all the flags and remove
         // any columns that are not marked as 'keep'
         for (int i = keepColumnsFlags.size() - 1; i >= 0; i--) {
             if (! keepColumnsFlags.get(i)) {
@@ -229,7 +229,7 @@ public class StringRowConsumer implements Consumer<List<String>> {
     }
 
     /**
-     * Check if row is considered to be 'blank/empty'
+     * Check if a row is considered to be 'blank/empty'
      */
     private static boolean isEmptyRow(List<String> rowData) {
         return rowData == null || rowData.stream().allMatch(StringUtils::isEmpty);
