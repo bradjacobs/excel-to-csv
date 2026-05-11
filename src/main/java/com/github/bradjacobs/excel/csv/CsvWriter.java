@@ -151,35 +151,6 @@ public class CsvWriter {
         return sb.toString();
     }
 
-    public String toCsvFromList(List<List<String>> dataList) {
-        StringBuilder sb = new StringBuilder();
-        int columnCount = dataList.get(0).size();
-        int lastColumnIndex = columnCount - 1;
-
-        for (List<String> rowData : dataList) {
-            if (sb.length() != 0) {
-                sb.append(NEW_LINE);
-            }
-
-            for (int i = 0; i < columnCount; i++) {
-                String cellValue = rowData.get(i);
-                if (quoteRule.test(cellValue)) {
-                    // must first escape double quotes
-                    cellValue = escapeDoubleQuotes(cellValue);
-                    sb.append('\"').append(cellValue).append('\"');
-                }
-                else {
-                    sb.append(cellValue);
-                }
-
-                if (i != lastColumnIndex) {
-                    sb.append(this.delimiter);
-                }
-            }
-        }
-        return sb.toString();
-    }
-
     private String escapeDoubleQuotes(String value) {
         if (value.contains("\"")) {
             return value.replace("\"", "\"\"");
