@@ -34,27 +34,26 @@ public class MutableSheetContent implements SheetContent {
 
     public static MutableSheetContent copyOf(SheetContent sheetContent) {
         Validate.isTrue(sheetContent != null, "sheetContent must not be null");
-        return fromMatrix(sheetContent.getSheetName(), sheetContent.getMatrix());
-    }
-
-    public static MutableSheetContent fromMatrix(String sheetName, String[][] matrix) {
-        List<List<String>> rows = new ArrayList<>();
-
-        // TODO: fix making 'extra copies' of a large data matrix
-        //   should read and modify from input rows instead.
-        if (matrix != null) {
-            for (String[] row : matrix) {
-                rows.add(copyMatrixRow(row));
-            }
-        }
-        return new MutableSheetContent(sheetName, rows);
+        return new MutableSheetContent(sheetContent.getSheetName(), sheetContent.getRows());
     }
 
     private MutableSheetContent(String sheetName, List<List<String>> rowContent) {
         setSheetName(sheetName);
-        this.rowContent = rowContent;
+        // generate modifiable copy of input rows
+        this.rowContent = generateInternalRowData(rowContent);
+        // discover the effective column width, and resize rows to match
         this.columnWidth = discoverEffectiveColumnWidth(this.rowContent);
         resizeRowsToEffectiveColumnWidth(this.columnWidth);
+    }
+
+    private static List<List<String>> generateInternalRowData(List<List<String>> inputRows) {
+        List<List<String>> rows = new ArrayList<>();
+        if (inputRows != null) {
+            for (List<String> inputRow : inputRows) {
+                rows.add(normalizedRowCopy(inputRow));
+            }
+        }
+        return rows;
     }
 
     @Override
@@ -209,22 +208,6 @@ public class MutableSheetContent implements SheetContent {
         }
     }
 
-    private List<String> copyInputRow(List<String> rowValues) {
-        List<String> copyRow = (rowValues == null) ? new ArrayList<>() : new ArrayList<>(rowValues);
-        // replace any 'nulls' with empty string for consistency.
-        copyRow.replaceAll(MutableSheetContent::normalizeStringValue);
-
-        if (copyRow.size() != columnWidth) {
-            int effectiveRowWidth = getEffectiveRowWidth(copyRow);
-            if (effectiveRowWidth > columnWidth) {
-                columnWidth = effectiveRowWidth;
-                resizeRowsToEffectiveColumnWidth(columnWidth);
-            }
-            resizeRowWidth(copyRow, columnWidth);
-        }
-        return copyRow;
-    }
-
     // todo - behavior if pass in a header that doesn't exist?
     //   probably just ignore.
     public void removeColumn(String... headerNames) {
@@ -289,15 +272,38 @@ public class MutableSheetContent implements SheetContent {
         return 0;
     }
 
-    private static List<String> copyMatrixRow(String[] row) {
-        if (row == null) {
-            return new ArrayList<>();
+    /**
+     * Make an editable copy of the input row, and replace any 'null' values with empty string.
+     * @param inputRow input row
+     * @return copy of input row
+     */
+    private static List<String> normalizedRowCopy(List<String> inputRow) {
+        List<String> copyRow = (inputRow == null) ? new ArrayList<>() : new ArrayList<>(inputRow);
+        // replace any 'nulls' with empty string for consistency.
+        copyRow.replaceAll(MutableSheetContent::normalizeStringValue);
+        return copyRow;
+    }
+
+    /**
+     * Creates a copy of the input row, adjusts its width to match the required column width,
+     * and updates the column width if necessary. Any 'null' values in the input row are
+     * replaced with empty strings.
+     *
+     * @param rowValues the input row to copy and adjust
+     * @return a copy of the input row with its width adjusted to the required column width
+     */
+    private List<String> copyInputRow(List<String> rowValues) {
+        List<String> copyRow = normalizedRowCopy(rowValues);
+
+        if (copyRow.size() != columnWidth) {
+            int effectiveRowWidth = getEffectiveRowWidth(copyRow);
+            if (effectiveRowWidth > columnWidth) {
+                columnWidth = effectiveRowWidth;
+                resizeRowsToEffectiveColumnWidth(columnWidth);
+            }
+            resizeRowWidth(copyRow, columnWidth);
         }
-        List<String> rowList = new ArrayList<>(row.length);
-        for (String rowValue : row) {
-            rowList.add(normalizeStringValue(rowValue));
-        }
-        return rowList;
+        return copyRow;
     }
 
     private List<List<String>> toFixedSizedRows(List<List<String>> inputRows) {
