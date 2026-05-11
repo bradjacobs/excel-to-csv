@@ -62,12 +62,19 @@ public class SpecialCharacterSanitizer {
 
         int length = input.length();
         StringBuilder sb = new StringBuilder(length);
+        boolean replacementsFound = false;
         for (int i = 0; i < length; i++) {
             char inputCharacter = input.charAt(i);
             Character replacementCharacter = replacementMap.get(inputCharacter);
-            sb.append(replacementCharacter != null ? replacementCharacter : inputCharacter);
+            if (replacementCharacter != null) {
+                replacementsFound = true;
+                sb.append(replacementCharacter);
+            }
+            else {
+                sb.append(inputCharacter);
+            }
         }
-        return sb.toString();
+        return (replacementsFound ? sb.toString() : input);
     }
 
     /**
