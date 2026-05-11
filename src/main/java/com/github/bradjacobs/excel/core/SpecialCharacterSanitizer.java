@@ -68,7 +68,7 @@ public class SpecialCharacterSanitizer {
             Character replacementCharacter = replacementMap.get(inputCharacter);
             if (replacementCharacter != null) {
                 replacementsFound = true;
-                sb.append((char)replacementCharacter);
+                sb.append(replacementCharacter.charValue());
             }
             else {
                 sb.append(inputCharacter);
