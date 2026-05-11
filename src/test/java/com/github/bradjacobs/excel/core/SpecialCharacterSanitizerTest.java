@@ -67,6 +67,11 @@ class SpecialCharacterSanitizerTest {
     }
 
     @Test
+    public void sanitizeLeadingTrailingQuotes() {
+        assertSanitizedEquals("\"\"Hi there\"\"", "““Hi there””", QUOTES);
+    }
+
+    @Test
     public void validateDisablingWhitespaceSanitization() {
         assertUnchanged("has \u00a0 special space", NO_SANITIZATION_TYPES);
     }

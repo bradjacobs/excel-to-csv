@@ -60,21 +60,32 @@ public class SpecialCharacterSanitizer {
             return input;
         }
 
+        int lastIdx = 0;
         int length = input.length();
-        StringBuilder sb = new StringBuilder(length);
-        boolean replacementsFound = false;
+        StringBuilder sb = null;
         for (int i = 0; i < length; i++) {
             char inputCharacter = input.charAt(i);
-            Character replacementCharacter = replacementMap.get(inputCharacter);
-            if (replacementCharacter != null) {
-                replacementsFound = true;
-                sb.append(replacementCharacter.charValue());
-            }
-            else {
-                sb.append(inputCharacter);
+
+            // only bother with the map replacement lookup if the
+            // current character is in the right range.
+            if (inputCharacter >= MIN_REPLACEMENT_CHAR) {
+                Character replacementCharacter = replacementMap.get(inputCharacter);
+                if (replacementCharacter != null) {
+                    if (sb == null) {
+                        sb = new StringBuilder(length);
+                    }
+                    sb.append(input, lastIdx, i);
+                    sb.append(replacementCharacter.charValue());
+                    lastIdx = i + 1;
+                }
             }
         }
-        return (replacementsFound ? sb.toString() : input);
+
+        if (sb != null) {
+            sb.append(input.substring(lastIdx));
+            return sb.toString();
+        }
+        return input;
     }
 
     /**
@@ -115,7 +126,7 @@ public class SpecialCharacterSanitizer {
     };
 
     private static final Character[] DOUBLE_QUOTE_CHARS = {
-            '\u0022', // Ditto
+            //'\u0022', // Ditto (aka a normal quote) no sub required
             '\u00AB', // Double Angle Quote (Guillemet) - Left
             '\u00BB', // Double Angle Quote (Guillemet) - Right
             '\u201C', // "Smart" Double Curved Quote - Left
@@ -178,6 +189,22 @@ public class SpecialCharacterSanitizer {
                     QUOTES, generateQuoteReplacementMap(),
                     DASHES, generateDashReplacementMap(),
                     BASIC_DIACRITICS, generateBasicDiacriticsReplacementMap()));
+
+    // calculate the minimum character that could be replaced.
+    private static final char MIN_REPLACEMENT_CHAR = calculateMinReplacementChar(REPLACEMENT_MAP_BY_TYPE);
+
+    private static char calculateMinReplacementChar(Map<SanitizeType, Map<Character, Character>> replacementMapByType) {
+        char minChar = Character.MAX_VALUE;
+        for (Map<Character, Character> replacementMap : replacementMapByType.values()) {
+            for (Character c : replacementMap.keySet()) {
+                if (c < minChar) {
+                    minChar = c;
+                }
+            }
+        }
+        return minChar;
+    }
+
 
     private static Map<Character,Character> generateSpaceReplacementMap() {
         Map<Character, Character> replacementMap = new LinkedHashMap<>();
