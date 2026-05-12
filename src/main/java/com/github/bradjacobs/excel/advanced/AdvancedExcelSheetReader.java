@@ -74,18 +74,8 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
                 // close any 'extra' inputStreams that will not be processed.
                 closeInputStreams(unselectedSheets);
 
-                SharedStrings sharedStrings = reader.getSharedStringsTable();
-                StylesTable styles = reader.getStylesTable();
-
-                // create sharedStrings and styles if not provided
-                //  to be consistent with the standard implementation.
-                // TODO: need to add new unit tests for these cases below
-                if (sharedStrings == null) {
-                    sharedStrings = new SharedStringsTable();
-                }
-                if (styles == null) {
-                    styles = new StylesTable();
-                }
+                SharedStrings sharedStrings = getSharedStrings(reader);
+                StylesTable styles = getStylesTable(reader);
 
                 boolean uses1904DateWindowing = Date1904Util.is1904DateWindowing(reader);
                 DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
@@ -104,6 +94,35 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         }
 
         return sheetContentList;
+    }
+
+    /**
+     * Get the shared strings table.
+     * @param reader the XSSFReader
+     * @return the shared strings table
+     * TODO: check if underlying SharedStringsTable needs explicit close.
+     */
+    private SharedStrings getSharedStrings(XSSFReader reader) throws IOException, InvalidFormatException {
+        SharedStrings sharedStrings = reader.getSharedStringsTable();
+        if (sharedStrings == null) {
+            // TODO: add unit test for this case
+            sharedStrings = new SharedStringsTable();
+        }
+        return sharedStrings;
+    }
+
+    /**
+     * Get the styles table.
+     * @param reader the XSSFReader
+     * @return the styles table
+     */
+    private StylesTable getStylesTable(XSSFReader reader) throws IOException, InvalidFormatException {
+        StylesTable stylesTable = reader.getStylesTable();
+        if (stylesTable == null) {
+            // TODO: add unit test for this case
+            stylesTable = new StylesTable();
+        }
+        return stylesTable;
     }
 
     private SheetContent extractSheetContent(SheetInfoRecord sheetInfoRecord, SheetXMLReader sheetXmlReader) throws IOException, SAXException {
