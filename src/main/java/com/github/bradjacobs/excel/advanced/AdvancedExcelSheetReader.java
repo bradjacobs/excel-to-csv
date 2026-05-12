@@ -24,6 +24,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.model.SharedStrings;
+import org.apache.poi.xssf.model.SharedStringsTable;
 import org.apache.poi.xssf.model.StylesTable;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -75,6 +76,17 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
 
                 SharedStrings sharedStrings = reader.getSharedStringsTable();
                 StylesTable styles = reader.getStylesTable();
+
+                // create sharedStrings and styles if not provided
+                //  to be consistent with the standard implementation.
+                // TODO: need to add new unit tests for these cases below
+                if (sharedStrings == null) {
+                    sharedStrings = new SharedStringsTable();
+                }
+                if (styles == null) {
+                    styles = new StylesTable();
+                }
+
                 boolean uses1904DateWindowing = Date1904Util.is1904DateWindowing(reader);
                 DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
 

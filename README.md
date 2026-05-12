@@ -127,8 +127,6 @@ Opening the Excel file and then 'resaving' can sometimes resolve issues.
 
 Most cases below appear to be pretty rare (subjectively)
 
-* Sometimes simple numeric values will be returned in a decimal format (and vice versa).
-    * i.e. expected "7" but got "7.0" or expected "7.00" but got "7"
 * Sometimes 'zero' and 'blank' can get mixed up.
     * i.e. expected "" but got "0.0"
 * Advanced parser can throw an exception if encounters a cell without a CellReference
@@ -140,8 +138,6 @@ Most cases below appear to be pretty rare (subjectively)
 * Number precision can sometimes be off (appears to be rare).
     * Examples:
         * "33.8192973" vs "33.8192974"
-        * "0.1245" vs "0.124500000"
-        * "0.29999" vs "0.2999900001"
 * Cells of type DataBar or IconSet will show a value, even if marked as "icon only"
 
 Also note the following _IS_ 'Expected Behavior'
