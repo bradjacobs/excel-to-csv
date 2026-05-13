@@ -59,7 +59,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
 
     private List<SheetContent> toSheetContents(List<WorkbookSheetInfo> selectedSheets) {
         return selectedSheets.stream()
-                .map(this::toSheetContent)
+                .map(wsi -> toSheetContent(wsi.getSheet()))
                 .collect(Collectors.toList());
     }
 
@@ -80,11 +80,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         return sheetInfos;
     }
 
-    private SheetContent toSheetContent(WorkbookSheetInfo sheetInfo) {
-        return toSheetContent(sheetInfo.getSheet());
-    }
-
-    // TODO - temp interim method until tests can be refactored
+    // TODO - perhaps temp interim method until tests can be refactored
     protected SheetContent toSheetContent(Sheet sheet) {
         List<List<String>> sheetDataRows = convertToSheetDataRows(sheet);
         return new BasicSheetContent(sheet.getSheetName(), sheetDataRows);
