@@ -96,7 +96,7 @@ public class SpecialCharacterSanitizer {
         for (SanitizeType sanitizeType : sanitizeTypes) {
             Map<Character, Character> typeMap = REPLACEMENT_MAP_BY_TYPE.get(sanitizeType);
             Validate.isTrue(typeMap != null, "No replacement map registered for SanitizeType: %s", sanitizeType);
-            map.putAll(REPLACEMENT_MAP_BY_TYPE.get(sanitizeType));
+            map.putAll(typeMap);
         }
         return map;
     }
