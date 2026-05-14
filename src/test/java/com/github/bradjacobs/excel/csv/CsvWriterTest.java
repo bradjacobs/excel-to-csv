@@ -143,23 +143,14 @@ class CsvWriterTest {
         void quoteMinimalSpecialDelimiter(String delimiter) {
             char delimiterChar = delimiter.charAt(0);
 
-            String valueWithDelimiter = "aa" + delimiter + "bb";
-            String valueWithNormalSafeChars = "abc";
-
-            String[][] matrix = {
-                    {valueWithDelimiter},
-                    {valueWithNormalSafeChars}
-            };
+            String[][] matrix = {{"aa" + delimiter + "bb", "abc"}};
+            String expected = "\"aa" + delimiter + "bb\"" + delimiter + "abc";
 
             CsvWriter csvWriter = CsvWriter.builder()
                     .quoteMode(QuoteMode.MINIMAL)
                     .delimiter(delimiterChar)
                     .build();
             String output = csvWriter.toCsv(sheetContent(matrix));
-
-            String expected = "\"" + valueWithDelimiter + "\""
-                    + System.lineSeparator()
-                    + valueWithNormalSafeChars;
             assertEquals(expected, output);
         }
     }
@@ -309,7 +300,7 @@ class CsvWriterTest {
             DEFAULT_CSV_WRITER.saveToFile(testOutputFile.toFile(), sheetContent);
             assertTrue(Files.exists(testOutputFile), "the expected csv file was NOT created");
 
-            // by default, allow Overwrite file = false
+            // by default, allow to Overwrite a file should be false
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 DEFAULT_CSV_WRITER.saveToFile(testOutputFile.toFile(), sheetContent);
             });
@@ -388,6 +379,7 @@ class CsvWriterTest {
             });
             assertEquals("Must supply a non-empty sheetName for each sheetContent to write.", exception.getMessage());
         }
+
         @Test
         public void emptyNullInListOnMultiSave() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
