@@ -109,16 +109,57 @@ class CsvWriterTest {
             assertEquals(expected, csvResult, "Mismatch expected CSV output");
         }
 
-        @ParameterizedTest(name = "Delimiter Quote test with input ''{0}''")
-        @ValueSource(strings = { ",", "\t", ";", ":", "|" })
-        void quoteSpecialDelimiter(String delimiter) {
-            String inputString = "aa" + delimiter + "bb";
-            String expected = "\"" + inputString + "\"";
+        @ParameterizedTest(name = "Delimiter Quote test Normal Mode with input ''{0}''")
+        @ValueSource(strings = {",", "\t", ";", ":", "|"})
+        void quoteNormalSpecialDelimiter(String delimiter) {
+            char delimiterChar = delimiter.charAt(0);
 
-            String[][] matrix = { { inputString } };
+            String valueWithDelimiter = "aa" + delimiter + "bb";
+            String valueWithNormalSafeChars = "abc";
+            String valueWithUnsafeCharBelowThreshold = "aa bb";
 
-            CsvWriter csvWriter = CsvWriter.builder().delimiter(delimiter.charAt(0)).build();
+            String[][] matrix = {
+                    {valueWithDelimiter},
+                    {valueWithNormalSafeChars},
+                    {valueWithUnsafeCharBelowThreshold}
+            };
+
+            CsvWriter csvWriter = CsvWriter.builder()
+                    .quoteMode(QuoteMode.NORMAL)
+                    .delimiter(delimiterChar)
+                    .build();
             String output = csvWriter.toCsv(sheetContent(matrix));
+
+            String expected = "\"" + valueWithDelimiter + "\""
+                    + System.lineSeparator()
+                    + valueWithNormalSafeChars
+                    + System.lineSeparator()
+                    + "\"" + valueWithUnsafeCharBelowThreshold + "\"";
+            assertEquals(expected, output);
+        }
+
+        @ParameterizedTest(name = "Delimiter Quote test Minimal Mode with input ''{0}''")
+        @ValueSource(strings = {",", "\t", ";", ":", "|"})
+        void quoteMinimalSpecialDelimiter(String delimiter) {
+            char delimiterChar = delimiter.charAt(0);
+
+            String valueWithDelimiter = "aa" + delimiter + "bb";
+            String valueWithNormalSafeChars = "abc";
+
+            String[][] matrix = {
+                    {valueWithDelimiter},
+                    {valueWithNormalSafeChars}
+            };
+
+            CsvWriter csvWriter = CsvWriter.builder()
+                    .quoteMode(QuoteMode.MINIMAL)
+                    .delimiter(delimiterChar)
+                    .build();
+            String output = csvWriter.toCsv(sheetContent(matrix));
+
+            String expected = "\"" + valueWithDelimiter + "\""
+                    + System.lineSeparator()
+                    + valueWithNormalSafeChars;
             assertEquals(expected, output);
         }
     }
