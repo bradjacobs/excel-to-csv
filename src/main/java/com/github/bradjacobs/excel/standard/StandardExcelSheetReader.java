@@ -78,20 +78,15 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         return sheetInfos;
     }
 
-    // TODO - perhaps temp interim method until tests can be refactored
-    protected SheetContent toSheetContent(Sheet sheet) {
-        List<List<String>> sheetDataRows = convertToSheetDataRows(sheet);
-        return new BasicSheetContent(sheet.getSheetName(), sheetDataRows);
-    }
-
-    // todo: change to non-public unless reason to keep public.
     /**
-     * Create row data list from the given Excel Sheet
+     * Create SheetConent containing row list from the given Excel Sheet
      * @param sheet Excel Sheet
-     * @return 2-D array representing CSV format
+     * @return sheet content data extracted from the sheet.
      * each row will have the same number of columns
      */
-    public List<List<String>> convertToSheetDataRows(Sheet sheet) {
+    // TODO - tbd if should be private or public
+    //   (private requires test refactoring)
+    protected SheetContent toSheetContent(Sheet sheet) {
         Validate.isTrue(sheet != null, "Sheet parameter cannot be null.");
 
         // grab all the rows from the sheet
@@ -102,7 +97,8 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         // get all the column (indexes) that are to be read
         int[] availableColumns = getAvailableColumns(sheet, maxColumn);
 
-        return convertToSheetDataRows(rowList, availableColumns);
+        List<List<String>> sheetDataRows = convertToSheetDataRows(rowList, availableColumns);
+        return new BasicSheetContent(sheet.getSheetName(), sheetDataRows);
     }
 
     private List<List<String>> convertToSheetDataRows(List<Row> rowList, int[] columnsToRead) {

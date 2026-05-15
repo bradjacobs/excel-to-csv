@@ -105,7 +105,7 @@ class OriginalExcelSheetReaderTest {
         @Test
         public void nullSheetParamCheck() {
             assertThrows(IllegalArgumentException.class, () -> {
-                DEFAULT_SHEET_READER.convertToSheetDataRows(null);
+                DEFAULT_SHEET_READER.toSheetContent(null);
             });
         }
     }
