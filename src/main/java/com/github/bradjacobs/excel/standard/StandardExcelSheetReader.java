@@ -70,12 +70,10 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      * @return list of workbook sheets
      */
     private List<WorkbookSheetInfo> readWorkbookSheets(Workbook workbook) {
-        int sheetCount = workbook.getNumberOfSheets();
-        List<WorkbookSheetInfo> sheetInfos = new ArrayList<>(sheetCount);
-
-        for (int sheetIndex = 0; sheetIndex < sheetCount; sheetIndex++) {
-            Sheet sheet = workbook.getSheetAt(sheetIndex);
-            sheetInfos.add(new WorkbookSheetInfo(sheet.getSheetName(), sheetIndex, sheet));
+        List<WorkbookSheetInfo> sheetInfos = new ArrayList<>();
+        int sheetIndex = 0;
+        for (Sheet sheet : workbook) {
+            sheetInfos.add(new WorkbookSheetInfo(sheet.getSheetName(), sheetIndex++, sheet));
         }
         return sheetInfos;
     }
