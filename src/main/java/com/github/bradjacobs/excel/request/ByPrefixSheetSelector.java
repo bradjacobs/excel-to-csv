@@ -31,5 +31,15 @@ public class ByPrefixSheetSelector extends ByNameSheetSelector {
             }
         }
         return resultList;
+
+        // todo - note this method could technically be implemented like below.
+        //   but would need persuasion b/c imho it looks worse.
+        // return valueList.stream()
+        //         .map(this::normalizeValue)
+        //         .flatMap(normalizedValue -> sheetMap.entrySet().stream()
+        //                 .filter(entry -> entry.getKey().startsWith(normalizedValue))
+        //                 .map(Map.Entry::getValue))
+        //         .distinct()
+        //         .collect(Collectors.toList());
     }
 }

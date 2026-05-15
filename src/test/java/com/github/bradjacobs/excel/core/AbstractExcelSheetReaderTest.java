@@ -72,11 +72,11 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
     }
 
     private ExcelSheetReadRequest createRequest(Path path, String sheetName) {
-        return ExcelSheetReadRequest.from(path).bySheetNames(sheetName).build();
+        return ExcelSheetReadRequest.from(path).bySheetName(sheetName).build();
     }
 
     private ExcelSheetReadRequest createRequest(Path path, int sheetIndex) {
-        return ExcelSheetReadRequest.from(path).bySheetIndexes(sheetIndex).build();
+        return ExcelSheetReadRequest.from(path).bySheetIndex(sheetIndex).build();
     }
 
     private String[][] readMatrix(T sheetReader, ExcelSheetReadRequest request) throws IOException {
@@ -513,7 +513,7 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
         @Test
         public void requestManySheetsOnSingleSheetCall() throws IOException {
-            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(TEST_FILE).bySheetIndexes(0, 1).build();
+            ExcelSheetReadRequest request = ExcelSheetReadRequest.from(TEST_FILE).bySheetIndex(0, 1).build();
 
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();

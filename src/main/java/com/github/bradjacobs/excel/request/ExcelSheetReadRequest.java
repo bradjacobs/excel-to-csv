@@ -62,30 +62,21 @@ public class ExcelSheetReadRequest {
         }
 
         // Optional setters
-        public Builder bySheetName(String name) {
-            return bySheetNames(name);
-        }
-        public Builder bySheetNames(String ... names) {
+        public Builder bySheetName(String ... names) {
             return sheetSelector(new ByNameSheetSelector(names));
         }
         public Builder bySheetNames(Collection<String> names) {
             return sheetSelector(new ByNameSheetSelector(names));
         }
 
-        public Builder bySheetPrefix(String prefix) {
-            return bySheetPrefixes(prefix);
-        }
-        public Builder bySheetPrefixes(String ... prefixes) {
+        public Builder bySheetPrefix(String ... prefixes) {
             return sheetSelector(new ByPrefixSheetSelector(prefixes));
         }
         public Builder bySheetPrefixes(Collection<String> prefixes) {
             return sheetSelector(new ByPrefixSheetSelector(prefixes));
         }
 
-        public Builder bySheetIndex(int index) {
-            return bySheetIndexes(index);
-        }
-        public Builder bySheetIndexes(int ... indexes) {
+        public Builder bySheetIndex(int ... indexes) {
             return sheetSelector(new ByIndexSheetSelector(indexes));
         }
         public Builder bySheetIndexes(Collection<Integer> indexes) {

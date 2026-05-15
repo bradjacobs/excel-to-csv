@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
 
-abstract public class ByCollectionSheetSelector<T> implements SheetSelector {
+abstract class ByCollectionSheetSelector<T> implements SheetSelector {
 
     protected final List<T> valueList;
 

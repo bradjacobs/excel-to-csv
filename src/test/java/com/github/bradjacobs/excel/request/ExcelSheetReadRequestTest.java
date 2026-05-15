@@ -144,7 +144,7 @@ class ExcelSheetReadRequestTest {
         void byIndexVarArgsSheetSelection() {
             Path filePath = getSampleFilePath();
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
-                    .bySheetIndexes(2, 1)
+                    .bySheetIndex(2, 1)
                     .build();
 
             // confirm our custom sheet selector was applied.
@@ -185,7 +185,7 @@ class ExcelSheetReadRequestTest {
         void byNameVarArgsSheetSelection() {
             Path filePath = getSampleFilePath();
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(filePath)
-                    .bySheetNames("CCC", "aaa")
+                    .bySheetName("CCC", "aaa")
                     .build();
 
             // confirm our custom sheet selector was applied.
