@@ -15,7 +15,11 @@ public class ByNameSheetSelector extends ByCollectionSheetSelector<String> {
     }
 
     public ByNameSheetSelector(Collection<String> values) {
-        super(values, "Names");
+        this(values, "Names");
+    }
+
+    protected ByNameSheetSelector(Collection<String> values, String label) {
+        super(values, label);
     }
 
     @Override

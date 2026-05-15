@@ -8,6 +8,7 @@ import org.apache.commons.lang3.Validate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,7 +20,7 @@ import static java.util.function.Function.identity;
 
 abstract public class ByCollectionSheetSelector<T> implements SheetSelector {
 
-    private final List<T> valueList;
+    protected final List<T> valueList;
 
     protected ByCollectionSheetSelector(Collection<T> values, String valueTypeLabel) {
         validateCollection(values, valueTypeLabel);
@@ -35,16 +36,22 @@ abstract public class ByCollectionSheetSelector<T> implements SheetSelector {
     @Override
     public <S extends SheetInfo> List<S> filterSheets(List<S> sheets) {
         Map<T, S> sheetMap = sheets.stream().collect(
-                Collectors.toMap(this::mapKey, identity())
-        );
+                Collectors.toMap(this::mapKey,
+                        identity(),
+                        (oldValue, newValue) -> { throw new IllegalStateException("Duplicate key found: " + oldValue); },
+                        LinkedHashMap::new));
+        return filterSheets(sheetMap);
+    }
 
+    public <S extends SheetInfo> List<S> filterSheets(Map<T, S> sheetMap) {
         return valueList.stream()
                 .map(value -> Optional.ofNullable(sheetMap.get(normalizeValue(value)))
                         .orElseThrow(() -> new IllegalArgumentException("Requested Excel sheet not found: '" + value + "'")))
                 .collect(Collectors.toList());
     }
 
-    // Each subclass can normalize its key if needed
+
+        // Each subclass can normalize its key if needed
     protected T normalizeValue(T value) {
         return value; // default = no change
     }

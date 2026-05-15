@@ -72,6 +72,16 @@ public class ExcelSheetReadRequest {
             return sheetSelector(new ByNameSheetSelector(names));
         }
 
+        public Builder bySheetPrefix(String prefix) {
+            return bySheetPrefixes(prefix);
+        }
+        public Builder bySheetPrefixes(String ... prefixes) {
+            return sheetSelector(new ByPrefixSheetSelector(prefixes));
+        }
+        public Builder bySheetPrefixes(Collection<String> prefixes) {
+            return sheetSelector(new ByPrefixSheetSelector(prefixes));
+        }
+
         public Builder bySheetIndex(int index) {
             return bySheetIndexes(index);
         }
