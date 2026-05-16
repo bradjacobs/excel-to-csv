@@ -67,6 +67,7 @@ class VisibleCellsSheetContentHandler extends SheetContentHandler {
      */
     @Override
     protected void appendMissingColumnsBefore(int columnIndex) {
+        // TODO - add tests for this case as it looks like it could be a bug
         for (int columnToFill = getCurrentRowSize(); columnToFill < columnIndex; columnToFill++) {
             if (isColumnVisible(columnToFill)) {
                 appendEmptyCellValue();

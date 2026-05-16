@@ -232,7 +232,7 @@ class MutableSheetContentTest extends SheetContentTest {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 MutableSheetContent.copyOf(null);
             });
-            assertEquals("sheetContent must not be null", exception.getMessage());
+            assertEquals("sheetContent cannot be null", exception.getMessage());
         }
 
         @Test

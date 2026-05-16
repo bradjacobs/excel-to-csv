@@ -104,7 +104,6 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
     private SharedStrings getSharedStrings(XSSFReader reader) throws IOException, InvalidFormatException {
         SharedStrings sharedStrings = reader.getSharedStringsTable();
         if (sharedStrings == null) {
-            // TODO: add unit test for this case
             sharedStrings = new SharedStringsTable();
         }
         return sharedStrings;
@@ -118,7 +117,6 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
     private StylesTable getStylesTable(XSSFReader reader) throws IOException, InvalidFormatException {
         StylesTable stylesTable = reader.getStylesTable();
         if (stylesTable == null) {
-            // TODO: add unit test for this case
             stylesTable = new StylesTable();
         }
         return stylesTable;

@@ -33,7 +33,7 @@ public class MutableSheetContent implements SheetContent {
     private int columnWidth;
 
     public static MutableSheetContent copyOf(SheetContent sheetContent) {
-        Validate.isTrue(sheetContent != null, "sheetContent must not be null");
+        Validate.isTrue(sheetContent != null, "sheetContent cannot be null");
         return new MutableSheetContent(sheetContent.getSheetName(), sheetContent.getRows());
     }
 
@@ -187,6 +187,7 @@ public class MutableSheetContent implements SheetContent {
             }
         }
 
+        // todo - potential invalid check.. can columIndexList every be empty?
         if (!columIndexList.isEmpty()) {
             this.columnWidth = this.rowContent.get(0).size();
         }
@@ -226,6 +227,7 @@ public class MutableSheetContent implements SheetContent {
     }
 
     private int[] findColumnIndexesByHeaderNames(Set<String> headerNames) {
+        // todo - potential index bug below.
         List<String> headerRow = internalGetRow(0);
         List<Integer> columnIndexes = new ArrayList<>();
 
@@ -245,22 +247,6 @@ public class MutableSheetContent implements SheetContent {
                 .mapToInt(this::getEffectiveRowWidth)
                 .max()
                 .orElse(0);
-    }
-
-    private void resizeRowsToEffectiveColumnWidth(int columnWidth) {
-        for (List<String> row : rowContent) {
-            resizeRowWidth(row, columnWidth);
-        }
-    }
-
-    private void resizeRowWidth(List<String> row, int desiredWidth) {
-        while (row.size() > desiredWidth) {
-            row.remove(row.size() - 1);
-        }
-
-        while (row.size() < desiredWidth) {
-            row.add(EMPTY_VALUE);
-        }
     }
 
     private int getEffectiveRowWidth(List<String> row) {
@@ -304,6 +290,22 @@ public class MutableSheetContent implements SheetContent {
             resizeRowWidth(copyRow, columnWidth);
         }
         return copyRow;
+    }
+
+    private void resizeRowsToEffectiveColumnWidth(int columnWidth) {
+        for (List<String> row : rowContent) {
+            resizeRowWidth(row, columnWidth);
+        }
+    }
+
+    private void resizeRowWidth(List<String> row, int desiredWidth) {
+        while (row.size() > desiredWidth) {
+            row.remove(row.size() - 1);
+        }
+
+        while (row.size() < desiredWidth) {
+            row.add(EMPTY_VALUE);
+        }
     }
 
     private List<List<String>> toFixedSizedRows(List<List<String>> inputRows) {
