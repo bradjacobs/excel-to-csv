@@ -176,24 +176,29 @@ public class MutableSheetContent implements SheetContent {
             return;
         }
 
-        List<Integer> columIndexList = Arrays.stream(columnIndexes)
+        int[] columnIndexesToRemove = Arrays.stream(columnIndexes)
                 .distinct()
                 .boxed()
                 .sorted(Comparator.reverseOrder()) // important to be in 'reverse order'!
-                .collect(Collectors.toList());
+                .mapToInt(Integer::intValue)
+                .toArray();
 
         // first ensure all indexes are valid.
-        for (Integer columnIndex : columIndexList) {
+        for (int columnIndex : columnIndexesToRemove) {
             validateColumnIndex(columnIndex);
         }
 
-        for (Integer columnIndex : columIndexList) {
+        // remove the column from each of the rows.
+        for (int columnIndex : columnIndexesToRemove) {
             for (List<String> row : rowContent) {
-                row.remove((int)columnIndex);
+                row.remove(columnIndex);
             }
         }
 
         this.columnWidth = this.rowContent.get(0).size();
+        if (this.columnWidth == 0) {
+            this.rowContent.clear();
+        }
     }
 
     private void validateRowIndex(int rowIndex) {

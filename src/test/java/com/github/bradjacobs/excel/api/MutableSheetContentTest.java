@@ -420,6 +420,42 @@ class MutableSheetContentTest extends SheetContentTest {
     }
 
     @Test
+    public void removeColumnsWithDuplicatesByIndex() {
+        String[][] matrix = {
+                {"Id", "Name", "Age", "Notes"},
+                {"22", "Bo", "22", "foo"},
+                {"33", "Flo", "29", "bar"}
+        };
+        List<List<String>> inputRows = matrixToList(matrix);
+
+        MutableSheetContent mutableSheetContent = new MutableSheetContent("", inputRows);
+        mutableSheetContent.removeColumn(1, 3, 1, 1, 3);
+
+        String[][] expectedMatrix = {
+                {"Id", "Age"},
+                {"22", "22"},
+                {"33", "29"}
+        };
+        List<List<String>> expectedRows = matrixToList(expectedMatrix);
+        assertEquals(expectedRows, mutableSheetContent.getRows());
+    }
+
+    @Test
+    public void removeAllColumnsByIndex() {
+        String[][] matrix = {
+                {"Id", "Name", "Age", "Notes"},
+                {"22", "Bo", "22", "foo"},
+                {"33", "Flo", "29", "bar"}
+        };
+        List<List<String>> inputRows = matrixToList(matrix);
+
+        MutableSheetContent mutableSheetContent = new MutableSheetContent("", inputRows);
+        mutableSheetContent.removeColumn(0,1,2,3);
+
+        assertEquals(List.of(), mutableSheetContent.getRows());
+    }
+
+    @Test
     public void removeColumnsByHeaderName() {
         String[][] matrix = {
                 {"Id", "Name", "Age", "Notes"},
