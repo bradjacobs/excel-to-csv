@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
@@ -37,7 +38,7 @@ public class MutableSheetContent implements SheetContent {
         return new MutableSheetContent(sheetContent.getSheetName(), sheetContent.getRows());
     }
 
-    private MutableSheetContent(String sheetName, List<List<String>> rowContent) {
+    public MutableSheetContent(String sheetName, List<List<String>> rowContent) {
         setSheetName(sheetName);
         // generate modifiable copy of input rows
         this.rowContent = generateInternalRowData(rowContent);
@@ -131,7 +132,12 @@ public class MutableSheetContent implements SheetContent {
 
     public List<String> removeRow(int rowIndex) {
         validateRowIndex(rowIndex);
-        return rowContent.remove(rowIndex);
+        List<String> removedRow = rowContent.remove(rowIndex);
+
+        if (rowContent.isEmpty()) {
+            this.columnWidth = 0;
+        }
+        return removedRow;
     }
 
     @Override
@@ -187,10 +193,7 @@ public class MutableSheetContent implements SheetContent {
             }
         }
 
-        // todo - potential invalid check.. can columIndexList every be empty?
-        if (!columIndexList.isEmpty()) {
-            this.columnWidth = this.rowContent.get(0).size();
-        }
+        this.columnWidth = this.rowContent.get(0).size();
     }
 
     private void validateRowIndex(int rowIndex) {
@@ -209,30 +212,30 @@ public class MutableSheetContent implements SheetContent {
         }
     }
 
-    // todo - behavior if pass in a header that doesn't exist?
-    //   probably just ignore.
     public void removeColumn(String... headerNames) {
         if (headerNames == null || headerNames.length == 0) {
             return;
         }
-
-        Set<String> headersToRemove = toHeaderSet(headerNames);
-        removeColumn(findColumnIndexesByHeaderNames(headersToRemove));
+        int[] columnIndexes = findColumnIndexesByHeaderNames(headerNames);
+        removeColumn(columnIndexes);
     }
 
-    private Set<String> toHeaderSet(String... headerNames) {
-        return Arrays.stream(headerNames)
+    private int[] findColumnIndexesByHeaderNames(String... headerNames) {
+        if (rowContent.isEmpty()) {
+            throw new IllegalStateException("Cannot find column indexes when sheet is empty");
+        }
+        Set<String> lowerHeaderNamesToRemove = Arrays.stream(headerNames)
                 .filter(Objects::nonNull)
+                .map(String::toLowerCase)
+                .map(String::trim)
                 .collect(Collectors.toSet());
-    }
 
-    private int[] findColumnIndexesByHeaderNames(Set<String> headerNames) {
-        // todo - potential index bug below.
         List<String> headerRow = internalGetRow(0);
         List<Integer> columnIndexes = new ArrayList<>();
 
         for (int columnIndex = 0; columnIndex < headerRow.size(); columnIndex++) {
-            if (headerNames.contains(headerRow.get(columnIndex))) {
+            String lowerHeaderName = headerRow.get(columnIndex).trim().toLowerCase(Locale.ROOT);
+            if (lowerHeaderNamesToRemove.contains(lowerHeaderName)) {
                 columnIndexes.add(columnIndex);
             }
         }

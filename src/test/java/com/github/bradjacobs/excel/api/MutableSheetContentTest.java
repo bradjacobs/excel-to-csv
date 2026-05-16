@@ -18,9 +18,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+// TODO - the tests need cleanup refactoring
 class MutableSheetContentTest extends SheetContentTest {
 
     private static final SheetContent INPUT_SHEET = new BasicSheetContent(INPUT_SHEET_NAME, INPUT_MATRIX);
@@ -60,6 +62,19 @@ class MutableSheetContentTest extends SheetContentTest {
 
     static List<String> list(String... values) {
         return new ArrayList<>(Arrays.asList(values)); // allows nulls
+    }
+
+    @Test
+    public void createMutableSheetContentWithNullInput() {
+        MutableSheetContent mutableSheetContent = new MutableSheetContent(null, null);
+        assertEquals("", mutableSheetContent.getSheetName());
+        assertEquals(0, mutableSheetContent.getRowCount());
+        assertEquals(0, mutableSheetContent.getColumnCount());
+        assertEquals(true, mutableSheetContent.isEmpty());
+
+        List<List<String>> rows = mutableSheetContent.getRows();
+        assertNotNull(rows);
+        assertEquals(0, rows.size());
     }
 
     @ParameterizedTest(name = "Add Row: {0}")
@@ -138,6 +153,17 @@ class MutableSheetContentTest extends SheetContentTest {
 
         List<String> theNowFirstRow = mutableSheetContent.getRow(0);
         assertEquals(expected.get(0), theNowFirstRow);
+    }
+
+    @Test
+    public void removeAllRow() {
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        mutableSheetContent.removeRow(0);
+        mutableSheetContent.removeRow(0);
+
+        assertEquals(0, mutableSheetContent.getRowCount(), "mismatch expected row count");
+        assertEquals(0, mutableSheetContent.getColumnCount(), "mismatch expected column count");
+        assertEquals(true, mutableSheetContent.isEmpty());
     }
 
     @Test
@@ -340,6 +366,7 @@ class MutableSheetContentTest extends SheetContentTest {
         assertEquals(INPUT_LIST.size(), mutableSheetContent.getRowCount());
         assertEquals(INPUT_LIST.get(0).size() + 1, mutableSheetContent.getColumnCount());
 
+        // add a new row with the new column count
         List<String> newRow = List.of("foo", "bar", "baz", "zed");
         mutableSheetContent.addRow(newRow);
 
@@ -370,6 +397,152 @@ class MutableSheetContentTest extends SheetContentTest {
         assertEquals(expected, mutableSheetContent.getRows());
     }
 
-    // TODO -
-    //   add test cases for remove columns
+
+    @Test
+    public void removeColumnsByIndex() {
+        String[][] matrix = {
+                {"Id", "Name", "Age", "Notes"},
+                {"22", "Bo", "22", "foo"},
+                {"33", "Flo", "29", "bar"}
+        };
+        List<List<String>> inputRows = matrixToList(matrix);
+
+        MutableSheetContent mutableSheetContent = new MutableSheetContent("", inputRows);
+        mutableSheetContent.removeColumn(1, 3);
+
+        String[][] expectedMatrix = {
+                {"Id", "Age"},
+                {"22", "22"},
+                {"33", "29"}
+        };
+        List<List<String>> expectedRows = matrixToList(expectedMatrix);
+        assertEquals(expectedRows, mutableSheetContent.getRows());
+    }
+
+    @Test
+    public void removeColumnsByHeaderName() {
+        String[][] matrix = {
+                {"Id", "Name", "Age", "Notes"},
+                {"22", "Bo", "22", "foo"},
+                {"33", "Flo", "29", "bar"}
+        };
+        List<List<String>> inputRows = matrixToList(matrix);
+
+        MutableSheetContent mutableSheetContent = new MutableSheetContent("", inputRows);
+        mutableSheetContent.removeColumn("Name", "Notes");
+
+        String[][] expectedMatrix = {
+                {"Id", "Age"},
+                {"22", "22"},
+                {"33", "29"}
+        };
+        List<List<String>> expectedRows = matrixToList(expectedMatrix);
+        assertEquals(expectedRows, mutableSheetContent.getRows());
+    }
+
+    @Test
+    public void removeColumnsByHeaderNameCaseInsensitive() {
+        String[][] matrix = {
+                {"Id", "Name", "Age", "Notes"},
+                {"22", "Bo", "22", "foo"},
+                {"33", "Flo", "29", "bar"}
+        };
+        List<List<String>> inputRows = matrixToList(matrix);
+
+        MutableSheetContent mutableSheetContent = new MutableSheetContent("", inputRows);
+        mutableSheetContent.removeColumn("name", "NOTES");
+
+        String[][] expectedMatrix = {
+                {"Id", "Age"},
+                {"22", "22"},
+                {"33", "29"}
+        };
+        List<List<String>> expectedRows = matrixToList(expectedMatrix);
+        assertEquals(expectedRows, mutableSheetContent.getRows());
+    }
+
+    @Test
+    public void removeColumnsUnknownHeaderNames() {
+        // trying to delete a header that doesn't exist will have no effect
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        mutableSheetContent.removeColumn("FOOBAR");
+        List<List<String>> expected = copyOfInput();
+        assertEquals(expected, mutableSheetContent.getRows());
+    }
+
+    @Test
+    public void testNegativeColumnIndexException() {
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
+            mutableSheetContent.removeColumn(-1);
+        });
+        assertEquals("Column index out of range: -1, size: 3", exception.getMessage());
+    }
+
+    @Test
+    public void testTooBigColumnIndexException() {
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
+            mutableSheetContent.removeColumn(9999);
+        });
+        assertEquals("Column index out of range: 9999, size: 3", exception.getMessage());
+    }
+
+    @Test
+    public void testDeleteColumnWithNameNoRows() {
+        MutableSheetContent mutableSheetContent = new MutableSheetContent("", List.of());
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
+            mutableSheetContent.removeColumn("Name");
+        });
+        assertEquals("Cannot find column indexes when sheet is empty", exception.getMessage());
+    }
+
+    @Test
+    public void removeWithInvalidColumnNoSideEffect() {
+        // if an invalid index was passed in, ensure that NO columns were removed.
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
+            mutableSheetContent.removeColumn(0, -8, 1);
+        });
+        assertEquals("Column index out of range: -8, size: 3", exception.getMessage());
+
+        List<List<String>> expected = copyOfInput();
+        assertEquals(expected, mutableSheetContent.getRows());
+    }
+
+    @Test
+    public void removeNullColumnIndex() {
+        // if an invalid index was passed in, ensure that NO columns were removed.
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        mutableSheetContent.removeColumn((int[])null);
+        List<List<String>> expected = copyOfInput();
+        assertEquals(expected, mutableSheetContent.getRows());
+    }
+
+    @Test
+    public void removeEmptyColumnIndex() {
+        // if an invalid index was passed in, ensure that NO columns were removed.
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        mutableSheetContent.removeColumn(new int[0]);
+        List<List<String>> expected = copyOfInput();
+        assertEquals(expected, mutableSheetContent.getRows());
+    }
+
+    @Test
+    public void removeNullColumnHeaderNames() {
+        // if an invalid index was passed in, ensure that NO columns were removed.
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        mutableSheetContent.removeColumn((String[])null);
+        List<List<String>> expected = copyOfInput();
+        assertEquals(expected, mutableSheetContent.getRows());
+    }
+
+    @Test
+    public void removeEmptyColumnHeaderNames() {
+        // if an invalid index was passed in, ensure that NO columns were removed.
+        MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
+        mutableSheetContent.removeColumn(new String[0]);
+        List<List<String>> expected = copyOfInput();
+        assertEquals(expected, mutableSheetContent.getRows());
+    }
 }

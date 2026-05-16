@@ -28,9 +28,7 @@ abstract class SheetContentTest {
             {"dog", "cat", "bird"},
             {"frog", "cow", "elephant"}
     };
-    protected static final List<List<String>> INPUT_LIST = Arrays.stream(INPUT_MATRIX)
-            .map(Arrays::asList)
-            .collect(Collectors.toList());
+    protected static final List<List<String>> INPUT_LIST = matrixToList(INPUT_MATRIX);
     protected static final String INPUT_SHEET_NAME = "mySheet";
 
     protected static List<List<String>> copyOfInput() {
@@ -49,6 +47,12 @@ abstract class SheetContentTest {
             copy.add(copyInnerRow);
         }
         return copy;
+    }
+
+    protected static List<List<String>> matrixToList(String[][] matrix) {
+        return Arrays.stream(matrix)
+                .map(Arrays::asList)
+                .collect(Collectors.toList());
     }
 
     abstract protected SheetContent createDefaultSheetContent();
