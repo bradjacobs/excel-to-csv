@@ -230,54 +230,6 @@ class OriginalExcelSheetReaderTest {
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    class InvisibleCellsTests {
-        private static final String HIDDEN_CELLS_DATA_FILE = "skipHiddenTestData.xlsx";
-        private static final String INPUT_DATA_SHEET_SUFFIX = "_Data";
-        private static final String EXPECTED_DATA_SHEET_SUFFIX = "_Expected";
-
-        /**
-         * The HiddenCellsDataFile contains multiple sheets in set of 2.
-         *     (TestDataSheet, ExpectedResultsDataSheet)
-         * where the ExpectedResultsDataSheet represents what the
-         * data should look like if were to skip/ignore the 'hidden data'
-         * from the TestDataSheet
-         * @param sheetNamePrefix sheetPrefix
-         */
-        @ParameterizedTest(name = "HiddenTest {index}: Sheet = {0}")
-        @ValueSource(strings = {
-                "BaseCase",
-                "LastColumn",
-                "FirstLastRow",
-                "AllColumnHidden",
-                "FirstLastColumn",
-                "Multi",
-                "LastValueInvisible",
-                "LongestRowInvisible"})
-        public void testMissingRowsAndColumns(String sheetNamePrefix) {
-            String testDataSheetName = sheetNamePrefix + INPUT_DATA_SHEET_SUFFIX;
-            String expectedDataSheetName = sheetNamePrefix + EXPECTED_DATA_SHEET_SUFFIX;
-
-            Sheet testDataSheet = getFileSheet(HIDDEN_CELLS_DATA_FILE, testDataSheetName);
-            Sheet expectedDataSheet = getFileSheet(HIDDEN_CELLS_DATA_FILE, expectedDataSheetName);
-
-            StandardExcelSheetReader skipHiddenCellsSheetReader = StandardExcelSheetReader.builder()
-                    .skipInvisibleCells(true)
-                    .build();
-
-            String[][] actualMatrix = skipHiddenCellsSheetReader.toSheetContent(testDataSheet).getMatrix();
-            if (actualMatrix.length > 0) {
-                String[] firstRow = actualMatrix[0];
-                // check to make sure we don't have rows that contain zero-length arrays (need only check the first)
-                assertTrue(firstRow.length > 0, "Matrix return rows with zero-length arrays");
-            }
-
-            String[][] expectedMatrix = DEFAULT_SHEET_READER.toSheetContent(expectedDataSheet).getMatrix();
-            assertArrayEquals(expectedMatrix, actualMatrix);
-        }
-    }
-
-    @Nested
-    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class SanitizeTests {
         private final List<Arguments> sanitizeCases = Arrays.asList(
                 // sanitizeType, originalValue, sanitizedValue, isDefaultEnabled

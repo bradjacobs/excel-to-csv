@@ -37,7 +37,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
         protected boolean trimStringValues = true;
         protected boolean skipBlankRows = false;
         protected boolean skipBlankColumns = false;
-        protected boolean skipInvisibleCells = false;
+        protected boolean skipHiddenCells = false;
         protected final Set<SanitizeType> sanitizeTypes
                 = new HashSet<>(SpecialCharacterSanitizer.DEFAULT_FLAGS);
 
@@ -83,12 +83,12 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
         }
 
         /**
-         * Whether to prune out invisible cells.
-         *   invisible = cellHeight = 0 or cellWidth = 0
-         * @param skipInvisibleCells (defaults to false)
+         * Whether to prune out hidden cells.
+         *   hidden = cellHeight = 0 or cellWidth = 0
+         * @param skipHiddenCells (defaults to false)
          */
-        public B skipInvisibleCells(boolean skipInvisibleCells) {
-            this.skipInvisibleCells = skipInvisibleCells;
+        public B skipHiddenCells(boolean skipHiddenCells) {
+            this.skipHiddenCells = skipHiddenCells;
             return self();
         }
 
@@ -122,7 +122,7 @@ abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
             return new SheetConfig(
                     skipBlankRows,
                     skipBlankColumns,
-                    skipInvisibleCells,
+                    skipHiddenCells,
                     trimStringValues,
                     sanitizeTypes);
         }

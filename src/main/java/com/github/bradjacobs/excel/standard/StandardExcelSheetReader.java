@@ -194,17 +194,18 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
     /**
      * Determines whether a row should be included in the generated sheet content.
      * <p>
-     * When invisible cells are not being skipped, all rows are included.
-     * When invisible cells are being skipped, hidden rows are excluded.
+     * When hidden cells are not being skipped, all rows are included.
+     * When hidden cells are being skipped, hidden rows are excluded.
      *
      * @param row Excel row to evaluate; may be {@code null} for default, unaltered rows
      * @return {@code true} if the row should be included; {@code false} otherwise
      */
     private boolean shouldIncludeRow(Row row) {
-        if (!sheetConfig.skipInvisibleCells()) {
-            return true;
-        }
-        return row == null || !row.getZeroHeight();
+        return !(sheetConfig.skipHiddenCells() && isHiddenRow(row));
+    }
+
+    private boolean isHiddenRow(Row row) {
+        return row != null && row.getZeroHeight();
     }
 
     /**
@@ -214,7 +215,7 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      * @return int array of column indices to be read
      */
     private int[] getAvailableColumns(Sheet sheet, int maxColumn) {
-        if (!sheetConfig.skipInvisibleCells()) {
+        if (!sheetConfig.skipHiddenCells()) {
             return IntStream.range(0, maxColumn).toArray();
         }
 

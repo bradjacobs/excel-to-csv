@@ -151,7 +151,7 @@ public class SpecialCharacterSanitizer {
     // 'wavy' characters, tildes, vertical dashes, etc.
     // The criteria for what qualifies as a dash here is obviously VERY subjective.
     private static final Character[] DASH_CHARS = {
-            //'\u00AD', // soft hyphen (Note: include or not? usually invisible)
+            //'\u00AD', // soft hyphen (Note: include or not? usually not visible)
             '\u02D7', // modifier letter minus sign
             '\u05A8', // Armenian hyphen
             '\u05BE', // Hebrew punctuation maqaf

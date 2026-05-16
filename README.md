@@ -67,7 +67,7 @@ Common options:
 - `trimStringValues`
 - `skipBlankRows`
 - `skipBlankColumns`
-- `skipInvisibleCells`
+- `skipHiddenCells`
 - `saveUnicodeFileWithBom`
 - `sanitizeSpaces`
 - `sanitizeQuotes`

@@ -54,7 +54,7 @@ class SheetXMLReaderTest {
         SheetConfig cfg = new SheetConfig(
                 false, // skipBlankRows
                 false, // skipBlankColumns
-                false, // skipInvisibleCells
+                false, // skipHiddenCells
                 true,  // trimStringValues
                 Set.of()
         );
@@ -68,7 +68,7 @@ class SheetXMLReaderTest {
     }
 
     @Test
-    void skipInvisibleCells_true_skipsHiddenRowAndHiddenColumn() throws Exception {
+    void skipHiddenCells_true_skipsHiddenRowAndHiddenColumn() throws Exception {
         byte[] workbookBytes = buildWorkbookBytes(wb -> {
             Sheet sheet = wb.createSheet("S1");
 
@@ -92,7 +92,7 @@ class SheetXMLReaderTest {
         SheetConfig cfg = new SheetConfig(
                 false, // skipBlankRows
                 false, // skipBlankColumns
-                true,  // skipInvisibleCells
+                true,  // skipHiddenCells
                 true,  // trimStringValues
                 Set.of()
         );
@@ -105,7 +105,7 @@ class SheetXMLReaderTest {
     }
 
     @Test
-    void skipInvisibleCells_false_includesHiddenRowAndHiddenColumn() throws Exception {
+    void skipHiddenCells_false_includesHiddenRowAndHiddenColumn() throws Exception {
         byte[] workbookBytes = buildWorkbookBytes(wb -> {
             Sheet sheet = wb.createSheet("S1");
 
@@ -124,7 +124,7 @@ class SheetXMLReaderTest {
         SheetConfig cfg = new SheetConfig(
                 false, // skipBlankRows
                 false, // skipBlankColumns
-                false, // skipInvisibleCells
+                false, // skipHiddenCells
                 true,  // trimStringValues
                 Set.of()
         );
@@ -132,7 +132,7 @@ class SheetXMLReaderTest {
         List<List<String>> rows = parseFirstSheet(workbookBytes, cfg);
 
         assertNotNull(rows, "rows must not be null");
-        assertEquals(2, rows.size(), "when not removing invisible cells, hidden row should remain");
+        assertEquals(2, rows.size(), "when not removing hidden cells, hidden row should remain");
         assertEquals(List.of("VISIBLE_A1", "HIDDEN_COL_B1"), rows.get(0), "row 0 mismatch");
         assertEquals(List.of("HIDDEN_ROW_A2", "HIDDEN_ROW_AND_COL_B2"), rows.get(1), "row 1 mismatch");
     }

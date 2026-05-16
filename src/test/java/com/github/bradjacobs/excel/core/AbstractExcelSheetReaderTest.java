@@ -292,7 +292,7 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    class InvisibleCellsTests {
+    class HiddenCellsTests {
         private static final String HIDDEN_CELLS_DATA_FILE = "skipHiddenTestData.xlsx";
         private final Path HIDDEN_CELLS_FILE = TestResourceUtil.getResourceFilePath(HIDDEN_CELLS_DATA_FILE);
         private static final String INPUT_DATA_SHEET_SUFFIX = "_Data";
@@ -310,7 +310,7 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         @ParameterizedTest(name = "HiddenTest {index}: Sheet = {0}")
         @ValueSource(strings = {
                 "BaseCase",
-                "LastInvisible",
+                "LastHidden",
                 "MiddleBlankColumns",
                 "MiddleBlankRows",
                 "SingleHIddenRow",
@@ -320,14 +320,14 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
                 "AllColumnHidden",
                 "FirstLastColumn",
                 "Multi",
-                "LastValueInvisible",
-                "LongestRowInvisible"
+                "LastValueHidden",
+                "LongestRowHidden"
         })
         public void testMissingRowsAndColumns(String sheetNamePrefix) throws IOException {
             String testDataSheetName = sheetNamePrefix + INPUT_DATA_SHEET_SUFFIX;
             String expectedDataSheetName = sheetNamePrefix + EXPECTED_DATA_SHEET_SUFFIX;
 
-            T sheetReader = createBuilder().skipInvisibleCells(true).build();
+            T sheetReader = createBuilder().skipHiddenCells(true).build();
 
             ExcelSheetReadRequest request = createRequest(HIDDEN_CELLS_FILE, testDataSheetName);
             ExcelSheetReadRequest expectedRequest = createRequest(HIDDEN_CELLS_FILE, expectedDataSheetName);
@@ -342,8 +342,8 @@ public abstract class AbstractExcelSheetReaderTest<T extends ExcelSheetReader, B
         }
 
         @Test
-        public void withInvisibleConfigsReadAllSheets() throws IOException {
-            T sheetReader = createBuilder().skipInvisibleCells(true).build();
+        public void withHiddenConfigsReadAllSheets() throws IOException {
+            T sheetReader = createBuilder().skipHiddenCells(true).build();
 
             ExcelSheetReadRequest request = ExcelSheetReadRequest.from(HIDDEN_CELLS_FILE).allSheets().build();
 

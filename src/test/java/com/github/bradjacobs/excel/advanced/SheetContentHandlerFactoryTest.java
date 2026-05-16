@@ -25,11 +25,11 @@ class SheetContentHandlerFactoryTest {
     private static final DataFormatter DATA_FORMATTER = new DataFormatter(true);
 
     @Test
-    void create_whenSkipInvisibleCellsEnabled_returnsVisibleAwareHandler() {
+    void create_whenSkipHiddenCellsEnabled_returnsVisibleAwareHandler() {
         SheetConfig config = new SheetConfig(
                 false,   // skipBlankRows
                 false,   // skipBlankColumns
-                true,    // skipInvisibleCells
+                true,    // skipHiddenCells
                 true,    // trimStringValues
                 Collections.emptySet()
         );
@@ -55,7 +55,7 @@ class SheetContentHandlerFactoryTest {
         SheetConfig config = new SheetConfig(
                 false,   // skipBlankRows
                 false,   // skipBlankColumns
-                false,   // skipInvisibleCells
+                false,   // skipHiddenCells
                 true,    // trimStringValues
                 Collections.emptySet()
         );

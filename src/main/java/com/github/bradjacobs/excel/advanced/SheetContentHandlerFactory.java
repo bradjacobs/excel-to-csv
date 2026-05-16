@@ -26,7 +26,7 @@ final class SheetContentHandlerFactory {
             StylesTable styles,
             DataFormatter dataFormatter
     ) {
-        return sheetConfig.skipInvisibleCells()
+        return sheetConfig.skipHiddenCells()
                 ? createVisibleAwareHandler(sheetConfig, stringRowConsumer, sharedStrings, styles, dataFormatter)
                 : createDefaultHandler(sheetConfig, stringRowConsumer, sharedStrings, styles, dataFormatter);
     }

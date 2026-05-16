@@ -9,19 +9,19 @@ public class SheetConfig {
 
     private final boolean skipBlankRows;
     private final boolean skipBlankColumns;
-    private final boolean skipInvisibleCells;
+    private final boolean skipHiddenCells;
     private final boolean trimStringValues;
     private final Set<SanitizeType> sanitizeTypes;
 
     public SheetConfig(
             boolean skipBlankRows,
             boolean skipBlankColumns,
-            boolean skipInvisibleCells,
+            boolean skipHiddenCells,
             boolean trimStringValues,
             Set<SanitizeType> sanitizeTypes) {
         this.skipBlankRows = skipBlankRows;
         this.skipBlankColumns = skipBlankColumns;
-        this.skipInvisibleCells = skipInvisibleCells;
+        this.skipHiddenCells = skipHiddenCells;
         this.trimStringValues = trimStringValues;
         this.sanitizeTypes = Set.copyOf(sanitizeTypes);
     }
@@ -34,8 +34,8 @@ public class SheetConfig {
         return skipBlankColumns;
     }
 
-    public boolean skipInvisibleCells() {
-        return skipInvisibleCells;
+    public boolean skipHiddenCells() {
+        return skipHiddenCells;
     }
 
     public boolean trimStringValues() {

@@ -100,7 +100,6 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
      * Get the shared strings table.
      * @param reader the XSSFReader
      * @return the shared strings table
-     * TODO: check if underlying SharedStringsTable needs explicit close.
      */
     private SharedStrings getSharedStrings(XSSFReader reader) throws IOException, InvalidFormatException {
         SharedStrings sharedStrings = reader.getSharedStringsTable();
