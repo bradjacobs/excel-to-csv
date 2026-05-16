@@ -47,14 +47,10 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         InputStream excelInputStream = request.getSourceInputStream();
 
         try (excelInputStream; Workbook workbook = WorkbookFactory.create(excelInputStream, password)) {
-            List<WorkbookSheetInfo> selectedSheets = selectWorkbookSheets(workbook, sheetSelector);
+            List<WorkbookSheetInfo> allSheets = getWorkbookSheets(workbook);
+            List<WorkbookSheetInfo> selectedSheets = sheetSelector.filterSheets(allSheets);
             return toSheetContents(selectedSheets);
         }
-    }
-
-    private List<WorkbookSheetInfo> selectWorkbookSheets(Workbook workbook, SheetSelector sheetSelector) {
-        List<WorkbookSheetInfo> workbookSheets = readWorkbookSheets(workbook);
-        return sheetSelector.filterSheets(workbookSheets);
     }
 
     private List<SheetContent> toSheetContents(List<WorkbookSheetInfo> selectedSheets) {
@@ -67,9 +63,9 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      * Gets all sheets in the given workbook
      * returns a list of 'WorkbookSheetInfo', which includes: Sheet, SheetName, SheetIndex.
      * @param workbook workbook
-     * @return list of workbook sheets
+     * @return list of workbook sheet infos (which contain the sheet object)
      */
-    private List<WorkbookSheetInfo> readWorkbookSheets(Workbook workbook) {
+    private List<WorkbookSheetInfo> getWorkbookSheets(Workbook workbook) {
         List<WorkbookSheetInfo> sheetInfos = new ArrayList<>();
         int sheetIndex = 0;
         for (Sheet sheet : workbook) {
@@ -166,13 +162,15 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      *   NOTE: some elements in the result list could be 'null'
      *   (nulls are usually 'default unaltered rows')
      * @param sheet input Excel Sheet
-     * @return list of rows and the max column detected
+     * @return rowInfo containing a list of rows and the max column detected
      */
     private RowInfo getRows(Sheet sheet) {
         // NOTE: need to add 1 to the lastRowNum to make sure don't skip the last row
         //  (however doesn't seem to need for this when using row.getLastCellNum, which seems odd)
         int rowCount = sheet.getLastRowNum() + 1;
 
+        // Note: avoid using 'sheet.iterator()', as it can
+        //   have problems when encountering 'null' rows.
         int maxColumnCount = 0;
         List<Row> rowList = new ArrayList<>(rowCount);
         for (int i = 0; i < rowCount; i++) {
@@ -250,7 +248,6 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
             return new StandardExcelSheetReader(this.buildConfig());
         }
     }
-
 
     private static class WorkbookSheetInfo implements SheetInfo {
         private final String sheetName;
