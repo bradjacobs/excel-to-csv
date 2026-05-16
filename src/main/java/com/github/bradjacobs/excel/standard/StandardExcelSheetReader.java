@@ -215,13 +215,17 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
      * @return int array of column indices to be read
      */
     private int[] getAvailableColumns(Sheet sheet, int maxColumn) {
-        if (!sheetConfig.skipHiddenCells()) {
-            return IntStream.range(0, maxColumn).toArray();
-        }
-
         return IntStream.range(0, maxColumn)
-                .filter(columnIndex -> !sheet.isColumnHidden(columnIndex))
+                .filter(columnIndex -> shouldIncludeColumn(sheet, columnIndex))
                 .toArray();
+    }
+
+    private boolean shouldIncludeColumn(Sheet sheet, int columnIndex) {
+        return !(sheetConfig.skipHiddenCells() && isHiddenColumn(sheet, columnIndex));
+    }
+
+    private static boolean isHiddenColumn(Sheet sheet, int columnIndex) {
+        return sheet.isColumnHidden(columnIndex);
     }
 
     private static class RowInfo {
