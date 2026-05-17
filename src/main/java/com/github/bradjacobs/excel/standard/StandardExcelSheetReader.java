@@ -184,11 +184,8 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
     }
 
     private int getColumnCount(Row row) {
-        if (row == null) {
-            return 0;
-        }
-        short lastCellIndexExclusive = row.getLastCellNum();
-        return Math.max(lastCellIndexExclusive, 0);
+        int rowLastCellNumber = row != null ? row.getLastCellNum() : 0;
+        return Math.max(rowLastCellNumber, 0);
     }
 
     /**
