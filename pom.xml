@@ -160,7 +160,7 @@
 
 			<!-- use spotless to enforce some formatting
 			     NOTE1: want this to run after compile + tests
-			       because want to make sure the could works
+			       because want to first make sure the code works
 			       before worry about format problems
 			     NOTE2: will include additional checks iteratively
 			-->
