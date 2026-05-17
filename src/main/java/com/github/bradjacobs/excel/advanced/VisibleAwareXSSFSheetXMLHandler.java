@@ -44,7 +44,7 @@ class VisibleAwareXSSFSheetXMLHandler extends XSSFSheetXMLHandler {
             handleRowStart(attributes);
         }
         else if (ELEMENT_COL.equals(name)) {
-            handleColStart(attributes);
+            handleColumnStart(attributes);
         }
         super.startElement(uri, localName, name, attributes);
     }
@@ -59,7 +59,7 @@ class VisibleAwareXSSFSheetXMLHandler extends XSSFSheetXMLHandler {
         sheetContext.addHiddenRow(rowNumber1Based - 1);
     }
 
-    private void handleColStart(Attributes attributes) {
+    private void handleColumnStart(Attributes attributes) {
         boolean isHiddenColumn = isHidden(attributes);
         if (!isHiddenColumn) {
             return;
