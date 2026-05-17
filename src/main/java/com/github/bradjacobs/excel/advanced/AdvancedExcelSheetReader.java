@@ -203,7 +203,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         return new Builder();
     }
 
-    public static class Builder extends AbstractExcelSheetReader.AbstractSheetConfigBuilder<AdvancedExcelSheetReader, Builder> {
+    public static class Builder extends AbstractSheetConfigBuilder<AdvancedExcelSheetReader, Builder> {
         @Override
         protected Builder self() {
             return this;
