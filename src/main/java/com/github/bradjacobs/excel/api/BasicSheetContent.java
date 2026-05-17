@@ -29,7 +29,7 @@ public class BasicSheetContent implements SheetContent {
     public BasicSheetContent(String sheetName, List<List<String>> rows) {
         this.sheetName = normalizeSheetName(sheetName);
         this.rows = toUnmodifiableRows(rows);
-        this.rowCount = rows.size();
+        this.rowCount = this.rows.size();
         this.columnCount = rowCount > 0 ? this.rows.get(0).size() : 0;
     }
 

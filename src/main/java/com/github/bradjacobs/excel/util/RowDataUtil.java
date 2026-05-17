@@ -20,7 +20,10 @@ public class RowDataUtil {
     }
 
     public static List<List<String>> toUnmodifiableRows(List<List<String>> rows) {
-        if (rows instanceof UnmodifiableList) {
+        if (rows == null) {
+            return List.of();
+        }
+        else if (rows instanceof UnmodifiableList) {
             return rows;
         }
         List<List<String>> readOnlyRows = new ArrayList<>(rows.size());
@@ -31,14 +34,23 @@ public class RowDataUtil {
     }
 
     public static List<String> toUnmodifiableRow(String[] row) {
+        if (row == null) {
+            return List.of();
+        }
         return toUnmodifiableRow(Arrays.asList(row));
     }
 
     public static List<String> toUnmodifiableRow(List<String> row) {
+        if (row == null) {
+            return List.of();
+        }
         return new UnmodifiableList<>(row);
     }
 
     public static String[][] toArray(List<List<String>> rows) {
+        if (rows == null) {
+            return new String[0][0];
+        }
         int rowCount = rows.size();
         String[][] result = new String[rowCount][];
         for (int i = 0; i <rowCount; i++) {
@@ -47,5 +59,4 @@ public class RowDataUtil {
         }
         return result;
     }
-
 }

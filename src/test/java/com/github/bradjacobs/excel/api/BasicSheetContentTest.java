@@ -27,8 +27,17 @@ class BasicSheetContentTest extends SheetContentTest {
     }
 
     @Test
-    public void testWithNullDataInput() {
+    public void testWithNullDataMatrixInput() {
         SheetContent sheetContent = new BasicSheetContent("mySheet", (String[][])null);
+        assertEquals(0, sheetContent.getRowCount());
+        assertEquals(0, sheetContent.getColumnCount());
+        assertNotNull(sheetContent.getRows());
+        assertEquals(0, sheetContent.getRows().size());
+    }
+
+    @Test
+    public void testWithNullDataRowsInput() {
+        SheetContent sheetContent = new BasicSheetContent("mySheet", (List<List<String>>)null);
         assertEquals(0, sheetContent.getRowCount());
         assertEquals(0, sheetContent.getColumnCount());
         assertNotNull(sheetContent.getRows());
@@ -59,17 +68,5 @@ class BasicSheetContentTest extends SheetContentTest {
         });
     }
 
-    // TODO - come back to decide the future of this.
-//    @Test
-//    public void invalidInputMatrixShape() {
-//        // matrix must be rectangular
-//        String[][] invalidMatrix = new String[][]{
-//                {"A1", "B1"},
-//                {"A2", "B2", "C2"}
-//        };
-//        assertThrows(IllegalArgumentException.class, () -> {
-//            new BasicSheetContent("sheet", invalidMatrix);
-//        });
-//    }
 }
 
