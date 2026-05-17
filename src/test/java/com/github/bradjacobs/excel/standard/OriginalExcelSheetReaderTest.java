@@ -13,7 +13,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.FieldSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -24,10 +23,8 @@ import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
 import static com.github.bradjacobs.excel.config.SanitizeType.DASHES;
 import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
 import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 

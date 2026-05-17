@@ -69,4 +69,3 @@ class BasicSheetContentTest extends SheetContentTest {
     }
 
 }
-
