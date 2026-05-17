@@ -103,10 +103,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
      */
     private SharedStrings getSharedStrings(XSSFReader reader) throws IOException, InvalidFormatException {
         SharedStrings sharedStrings = reader.getSharedStringsTable();
-        if (sharedStrings == null) {
-            sharedStrings = new SharedStringsTable();
-        }
-        return sharedStrings;
+        return sharedStrings != null ? sharedStrings : new SharedStringsTable();
     }
 
     /**
@@ -116,10 +113,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
      */
     private StylesTable getStylesTable(XSSFReader reader) throws IOException, InvalidFormatException {
         StylesTable stylesTable = reader.getStylesTable();
-        if (stylesTable == null) {
-            stylesTable = new StylesTable();
-        }
-        return stylesTable;
+        return stylesTable != null ? stylesTable : new StylesTable();
     }
 
     private SheetContent extractSheetContent(SheetInfoRecord sheetInfoRecord, SheetXMLReader sheetXmlReader) throws IOException, SAXException {
