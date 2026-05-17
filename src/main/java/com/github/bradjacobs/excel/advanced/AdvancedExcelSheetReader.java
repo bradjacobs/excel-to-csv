@@ -198,18 +198,6 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         public int getIndex() {
             return sheetIndex;
         }
-
-        @Override
-        public boolean equals(Object object) {
-            if (object == null || getClass() != object.getClass()) return false;
-            SheetInfoRecord that = (SheetInfoRecord) object;
-            return sheetIndex == that.sheetIndex;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(sheetIndex);
-        }
     }
 
     public static Builder builder() {
