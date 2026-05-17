@@ -56,6 +56,7 @@ abstract class SheetContentTest {
     }
 
     abstract protected SheetContent createDefaultSheetContent();
+
     abstract protected SheetContent createEmptySheetContent();
 
     @Nested
@@ -233,6 +234,15 @@ abstract class SheetContentTest {
         assertThrows(UnsupportedOperationException.class, () -> {
             List<List<String>> rows = sheetContent.getRows();
             rows.add(List.of("extra value"));
+        });
+    }
+
+    @Test
+    public void attemptGetRowsUpdate() {
+        SheetContent sheetContent = createDefaultSheetContent();
+        assertThrows(UnsupportedOperationException.class, () -> {
+            List<List<String>> rows = sheetContent.getRows();
+            rows.add(0, List.of("extra value"));
         });
     }
 }

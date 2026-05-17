@@ -347,7 +347,7 @@ public class MutableSheetContent implements SheetContent {
      * @return normalized value
      */
     private static String normalizeStringValue(String input) {
-        // note: currently does not 'trim'.  TBD if this is desired.
+        // NOTE: currently does not 'trim'.  TBD if this is desired.
         return input != null ? input : EMPTY_VALUE;
     }
 }
