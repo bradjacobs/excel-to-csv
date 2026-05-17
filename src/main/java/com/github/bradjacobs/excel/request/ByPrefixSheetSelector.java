@@ -19,7 +19,7 @@ public class ByPrefixSheetSelector extends ByNameSheetSelector {
     }
 
     @Override
-    public <S extends SheetInfo> List<S> filterSheets(Map<String, S> sheetMap) {
+    protected <S extends SheetInfo> List<S> filterSheets(Map<String, S> sheetMap) {
         List<S> resultList = new ArrayList<>();
         for (String value : valueList) {
             String normalizedValue = normalizeValue(value);

@@ -43,15 +43,14 @@ abstract class ByCollectionSheetSelector<T> implements SheetSelector {
         return filterSheets(sheetMap);
     }
 
-    public <S extends SheetInfo> List<S> filterSheets(Map<T, S> sheetMap) {
+    protected <S extends SheetInfo> List<S> filterSheets(Map<T, S> sheetMap) {
         return valueList.stream()
                 .map(value -> Optional.ofNullable(sheetMap.get(normalizeValue(value)))
                         .orElseThrow(() -> new IllegalArgumentException("Requested Excel sheet not found: '" + value + "'")))
                 .collect(Collectors.toList());
     }
 
-
-        // Each subclass can normalize its key if needed
+    // Each subclass can normalize its key if needed
     protected T normalizeValue(T value) {
         return value; // default = no change
     }
