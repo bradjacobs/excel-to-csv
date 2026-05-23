@@ -9,6 +9,7 @@ import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelReader;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
 import com.github.bradjacobs.excel.request.SheetInfo;
+import com.github.bradjacobs.excel.request.SheetSelector;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
@@ -56,16 +57,9 @@ public class AdvancedExcelReader extends AbstractExcelReader {
             // but tests show ~25% slower performance!
             //reader.setUseReadOnlySharedStringsTable(true);
 
-            List<SheetInfoRecord> allSheetInfos = fetchAllSheets(reader);
+            List<SheetInfoRecord> selectedSheets = fetchSelectedSheets(reader, request.getSheetSelector());
 
             try {
-                List<SheetInfoRecord> selectedSheets =
-                        request.getSheetSelector().filterSheets(allSheetInfos);
-                List<SheetInfoRecord> unselectedSheets = ListUtils.subtract(allSheetInfos, selectedSheets);
-
-                // close any 'extra' inputStreams that will not be processed.
-                closeInputStreams(unselectedSheets);
-
                 XMLSheetStreamReader xmlSheetStreamReader = XMLSheetStreamReader.create(sheetConfig, reader);
 
                 for (SheetInfoRecord selectedSheet : selectedSheets) {
@@ -74,7 +68,7 @@ public class AdvancedExcelReader extends AbstractExcelReader {
                 }
             }
             finally {
-                closeInputStreams(allSheetInfos);
+                closeInputStreams(selectedSheets);
             }
         }
         catch (OpenXML4JException | ParserConfigurationException | SAXException | IOException e) {
@@ -89,6 +83,17 @@ public class AdvancedExcelReader extends AbstractExcelReader {
             IOUtils.closeQuietly(sheetInfoRecord.inputStream);
         }
     }
+
+    private List<SheetInfoRecord> fetchSelectedSheets(XSSFReader reader, SheetSelector sheetSelector) throws IOException, InvalidFormatException {
+        List<SheetInfoRecord> allSheets = fetchAllSheets(reader);
+        List<SheetInfoRecord> selectedSheets = sheetSelector.filterSheets(allSheets);
+        List<SheetInfoRecord> unselectedSheets = ListUtils.subtract(allSheets, selectedSheets);
+
+        // close the inputStreams on the unselected sheets that will not be processed.
+        closeInputStreams(unselectedSheets);
+        return selectedSheets;
+    }
+
 
     private List<SheetInfoRecord> fetchAllSheets(XSSFReader reader) throws IOException, InvalidFormatException {
         List<SheetInfoRecord> records = new ArrayList<>();

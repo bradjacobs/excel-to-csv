@@ -37,7 +37,7 @@ public class XMLSheetStreamReader {
             boolean requires1904DateWindowing =
                     requires1904DateWindowing(reader);
 
-            DateWindowingDataFormatter formatter =
+            DataFormatter formatter =
                     new DateWindowingDataFormatter(
                             requires1904DateWindowing);
 
@@ -46,7 +46,6 @@ public class XMLSheetStreamReader {
                     sharedStrings,
                     styles,
                     formatter);
-
         }
         catch (IOException | SAXException | InvalidFormatException | ParserConfigurationException e) {
             throw new IllegalStateException(
