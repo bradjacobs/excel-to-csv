@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.core;
 
-import com.github.bradjacobs.excel.api.ExcelSheetReader;
+import com.github.bradjacobs.excel.api.ExcelWorkbookReader;
 import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import org.apache.commons.lang3.Validate;
@@ -19,11 +19,11 @@ import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
 
 // TODO - this abstract class might be removed.
 //   its usefulness has now become very limited.
-abstract public class AbstractExcelSheetReader implements ExcelSheetReader {
+abstract public class AbstractExcelReader implements ExcelWorkbookReader {
 
     protected final SheetConfig sheetConfig;
 
-    public AbstractExcelSheetReader(SheetConfig sheetConfig) {
+    public AbstractExcelReader(SheetConfig sheetConfig) {
         Validate.isTrue(sheetConfig != null, "SheetConfig cannot be null.");
         this.sheetConfig = sheetConfig;
 

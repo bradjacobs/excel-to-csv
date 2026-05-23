@@ -6,10 +6,10 @@ package com.github.bradjacobs.excel.standard;
 import com.github.bradjacobs.excel.api.BasicSheetContent;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
+import com.github.bradjacobs.excel.core.AbstractExcelReader;
 import com.github.bradjacobs.excel.core.CellValueReader;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
-import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
+import com.github.bradjacobs.excel.request.ExcelReadRequest;
 import com.github.bradjacobs.excel.request.SheetInfo;
 import com.github.bradjacobs.excel.request.SheetSelector;
 import org.apache.commons.lang3.Validate;
@@ -29,17 +29,17 @@ import java.util.stream.IntStream;
 /**
  * Reads an Excel Sheet and returns a 2-D array of data.
  */
-public class StandardExcelSheetReader extends AbstractExcelSheetReader {
+public class StandardExcelReader extends AbstractExcelReader {
     private final CellValueReader cellValueReader;
 
     // todo: still deciding if this constructor is ok or terrible.
-    public StandardExcelSheetReader(SheetConfig sheetConfig) {
+    public StandardExcelReader(SheetConfig sheetConfig) {
         super(sheetConfig);
         this.cellValueReader = new CellValueReader(sheetConfig.trimStringValues(), sheetConfig.getCharSanitizeFlags());
     }
 
     @Override
-    public List<SheetContent> readSheets(ExcelSheetReadRequest request) throws IOException {
+    public List<SheetContent> readSheets(ExcelReadRequest request) throws IOException {
         Validate.isTrue(request != null, "Request cannot be null");
 
         String password = request.getPassword();
@@ -239,15 +239,15 @@ public class StandardExcelSheetReader extends AbstractExcelSheetReader {
         return new Builder();
     }
 
-    public static class Builder extends AbstractSheetConfigBuilder<StandardExcelSheetReader, Builder> {
+    public static class Builder extends AbstractSheetConfigBuilder<StandardExcelReader, Builder> {
         @Override
         protected Builder self() {
             return this;
         }
 
         @Override
-        public StandardExcelSheetReader build() {
-            return new StandardExcelSheetReader(this.buildConfig());
+        public StandardExcelReader build() {
+            return new StandardExcelReader(this.buildConfig());
         }
     }
 

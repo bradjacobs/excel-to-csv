@@ -14,7 +14,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collection;
 
-public class ExcelSheetReadRequest {
+public class ExcelReadRequest {
     private static final String DEFAULT_PASSWORD = null;
     private static final int DEFAULT_SHEET_INDEX = 0;
     // by default only process the first sheet in Excel file.
@@ -26,7 +26,7 @@ public class ExcelSheetReadRequest {
     private final SheetSelector sheetSelector;
     private final String password;
 
-    private ExcelSheetReadRequest(Builder builder) {
+    private ExcelReadRequest(Builder builder) {
         this.path = builder.path;
         this.url = builder.url;
         this.sheetSelector = builder.sheetSelector;
@@ -98,8 +98,8 @@ public class ExcelSheetReadRequest {
         }
 
         // Build method
-        public ExcelSheetReadRequest build() {
-            return new ExcelSheetReadRequest(this);
+        public ExcelReadRequest build() {
+            return new ExcelReadRequest(this);
         }
     }
 
@@ -120,6 +120,12 @@ public class ExcelSheetReadRequest {
         return password;
     }
 
+    /**
+     * Creates a new InputStream for the source file.
+     * NOTE: caller is responsible for closing the stream.
+     * @return input stream
+     * @throws IOException exception
+     */
     public InputStream getSourceInputStream() throws IOException {
         InputStreamGenerator inputStreamGenerator = new InputStreamGenerator();
         if (path != null) {

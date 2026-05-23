@@ -32,12 +32,12 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 //   this class is now basically duplicated by the
 //   newer abstract class tests.
 //   Need to update (or remove) this test in a future update.
-class OriginalExcelSheetReaderTest {
+class OriginalExcelReaderTest {
 
     private static final String TEST_DATA_FILE = "testSheetData.xlsx";
 
-    private static final StandardExcelSheetReader DEFAULT_SHEET_READER =
-            StandardExcelSheetReader.builder().build();
+    private static final StandardExcelReader DEFAULT_SHEET_READER =
+            StandardExcelReader.builder().build();
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -114,7 +114,7 @@ class OriginalExcelSheetReaderTest {
         public void trimStringValuesEnabled(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Sheet testSheet = createSingleCellExcelSheet(tempDir, testValue);
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
+            StandardExcelReader standardExcelSheetReader1 = StandardExcelReader.builder()
                     .trimStringValues(true)
                     .build();
             String[][] dataMatrix = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
@@ -125,7 +125,7 @@ class OriginalExcelSheetReaderTest {
         public void trimStringValuesDisabled(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Sheet testSheet = createSingleCellExcelSheet(tempDir, testValue);
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
+            StandardExcelReader standardExcelSheetReader1 = StandardExcelReader.builder()
                     .trimStringValues(false)
                     .build();
             String[][] dataMatrix = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
@@ -151,10 +151,10 @@ class OriginalExcelSheetReaderTest {
         @Test
         public void skipBlankRows() {
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithThreeBlankRows");
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
+            StandardExcelReader standardExcelSheetReader1 = StandardExcelReader.builder()
                     .skipBlankRows(false)
                     .build();
-            StandardExcelSheetReader standardExcelSheetReader2 = StandardExcelSheetReader.builder()
+            StandardExcelReader standardExcelSheetReader2 = StandardExcelReader.builder()
                     .skipBlankRows(true)
                     .build();
             String[][] dataMatrixRetainBlankRows = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
@@ -167,7 +167,7 @@ class OriginalExcelSheetReaderTest {
         public void defaultRetainBlankRows() {
             // by default we keep the blank rows.
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithThreeBlankRows");
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
+            StandardExcelReader standardExcelSheetReader1 = StandardExcelReader.builder()
                     .skipBlankRows(false)
                     .build();
             String[][] dataMatrixRetainBlankRows = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
@@ -182,7 +182,7 @@ class OriginalExcelSheetReaderTest {
         @Test
         public void pruneExtraBlankRows() {
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "ExtraBlankRowsAfterData");
-            StandardExcelSheetReader standardExcelSheetReader = StandardExcelSheetReader.builder()
+            StandardExcelReader standardExcelSheetReader = StandardExcelReader.builder()
                     .skipBlankRows(false)
                     .build();
             String[][] dataMatrix = standardExcelSheetReader.toSheetContent(testSheet).getMatrix();
@@ -200,10 +200,10 @@ class OriginalExcelSheetReaderTest {
         @Test
         public void skipBlankColumns() {
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithTwoBlankColumns");
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
+            StandardExcelReader standardExcelSheetReader1 = StandardExcelReader.builder()
                     .skipBlankColumns(false)
                     .build();
-            StandardExcelSheetReader standardExcelSheetReader2 = StandardExcelSheetReader.builder()
+            StandardExcelReader standardExcelSheetReader2 = StandardExcelReader.builder()
                     .skipBlankColumns(true)
                     .build();
             String[][] dataMatrixRetainBlankColumns = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
@@ -216,7 +216,7 @@ class OriginalExcelSheetReaderTest {
         public void defaultRetainBlankCoumns() {
             // by default we keep the blank columns.
             Sheet testSheet = getFileSheet(TEST_DATA_FILE, "WithTwoBlankColumns");
-            StandardExcelSheetReader standardExcelSheetReader1 = StandardExcelSheetReader.builder()
+            StandardExcelReader standardExcelSheetReader1 = StandardExcelReader.builder()
                     .skipBlankColumns(false)
                     .build();
             String[][] dataMatrixRetainBlankColumns = standardExcelSheetReader1.toSheetContent(testSheet).getMatrix();
@@ -249,8 +249,8 @@ class OriginalExcelSheetReaderTest {
             Sheet testSheet = createSingleCellExcelSheet(tempDir, origValue);
 
             // create readers set to both enabled and disabled
-            StandardExcelSheetReader enabledSheetReader = createSanitizeSheetReader(type, true);
-            StandardExcelSheetReader disabledSheetReader = createSanitizeSheetReader(type, false);
+            StandardExcelReader enabledSheetReader = createSanitizeSheetReader(type, true);
+            StandardExcelReader disabledSheetReader = createSanitizeSheetReader(type, false);
 
             // ensure that each reader returns correct expected value.
             String[][] enabledMatrix = enabledSheetReader.toSheetContent(testSheet).getMatrix();
@@ -267,8 +267,8 @@ class OriginalExcelSheetReaderTest {
             }
         }
 
-        private StandardExcelSheetReader createSanitizeSheetReader(SanitizeType type, boolean enabled) {
-            StandardExcelSheetReader.Builder builder = StandardExcelSheetReader.builder();
+        private StandardExcelReader createSanitizeSheetReader(SanitizeType type, boolean enabled) {
+            StandardExcelReader.Builder builder = StandardExcelReader.builder();
             switch (type) {
                 case SPACES:
                     return builder.sanitizeSpaces(enabled).build();

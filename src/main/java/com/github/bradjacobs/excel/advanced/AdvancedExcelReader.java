@@ -3,13 +3,11 @@
  */
 package com.github.bradjacobs.excel.advanced;
 
-import com.github.bradjacobs.excel.advanced.datewindowing.Date1904Util;
-import com.github.bradjacobs.excel.advanced.datewindowing.DateWindowingDataFormatter;
 import com.github.bradjacobs.excel.api.BasicSheetContent;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.core.AbstractExcelSheetReader;
-import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
+import com.github.bradjacobs.excel.core.AbstractExcelReader;
+import com.github.bradjacobs.excel.request.ExcelReadRequest;
 import com.github.bradjacobs.excel.request.SheetInfo;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
@@ -38,18 +36,20 @@ import java.util.List;
 import static org.apache.poi.extractor.ExtractorFactory.OOXML_PACKAGE;
 import static org.apache.poi.poifs.crypt.Decryptor.DEFAULT_POIFS_ENTRY;
 
-public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
+public class AdvancedExcelReader extends AbstractExcelReader {
+
+    private static final DateWindowingDetector DATE_WINDOWING_DETECTOR = new DateWindowingDetector();
 
     /**
      * Constructor
      */
     // TODO: Maybe change constructor to non-public
-    public AdvancedExcelSheetReader(SheetConfig config) {
+    public AdvancedExcelReader(SheetConfig config) {
         super(config);
     }
 
     @Override
-    public List<SheetContent> readSheets(ExcelSheetReadRequest request) throws IOException {
+    public List<SheetContent> readSheets(ExcelReadRequest request) throws IOException {
         Validate.isTrue(request != null, "Request cannot be null");
 
         InputStream sourceInputStream = request.getSourceInputStream();
@@ -76,7 +76,7 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
                 SharedStrings sharedStrings = getSharedStrings(reader);
                 StylesTable styles = getStylesTable(reader);
 
-                boolean uses1904DateWindowing = Date1904Util.is1904DateWindowing(reader);
+                boolean uses1904DateWindowing = requires1904DateWindowing(reader);
                 DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
 
                 for (SheetInfoRecord selectedSheet : selectedSheets) {
@@ -93,6 +93,10 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         }
 
         return sheetContentList;
+    }
+
+    protected boolean requires1904DateWindowing(XSSFReader reader) throws IOException, ParserConfigurationException, InvalidFormatException, SAXException {
+        return DATE_WINDOWING_DETECTOR.is1904DateWindowing(reader);
     }
 
     /**
@@ -203,15 +207,15 @@ public class AdvancedExcelSheetReader extends AbstractExcelSheetReader {
         return new Builder();
     }
 
-    public static class Builder extends AbstractSheetConfigBuilder<AdvancedExcelSheetReader, Builder> {
+    public static class Builder extends AbstractSheetConfigBuilder<AdvancedExcelReader, Builder> {
         @Override
         protected Builder self() {
             return this;
         }
 
         @Override
-        public AdvancedExcelSheetReader build() {
-            return new AdvancedExcelSheetReader(this.buildConfig());
+        public AdvancedExcelReader build() {
+            return new AdvancedExcelReader(this.buildConfig());
         }
     }
 }

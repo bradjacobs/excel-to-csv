@@ -427,8 +427,12 @@ class MutableSheetContentTest extends SheetContentTest {
 
         @Test
         public void removeAllColumnsByIndex() {
+            // removing all columns will result in removing all data.
+            //   thus the row data will be empty.
             MutableSheetContent mutableSheetContent = new MutableSheetContent("", REMOVE_COLUMNS_INPUT_ROWS);
             mutableSheetContent.removeColumn(0,1,2,3);
+            assertEquals(0, mutableSheetContent.getColumnCount());
+            assertEquals(0, mutableSheetContent.getRowCount());
             assertEquals(List.of(), mutableSheetContent.getRows());
         }
 

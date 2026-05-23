@@ -4,7 +4,7 @@ import com.github.bradjacobs.excel.ExcelProcessor;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.csv.CsvWriter;
 import com.github.bradjacobs.excel.csv.QuoteMode;
-import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
+import com.github.bradjacobs.excel.request.ExcelReadRequest;
 import com.github.bradjacobs.excel.util.TestResourceUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -32,14 +32,14 @@ public class ExamplesTest {
     }
 
     private static void convertExcelToCsvFile(Path inputFile, Path outputFile) throws IOException {
-        ExcelSheetReadRequest request = ExcelSheetReadRequest.from(inputFile).build();
+        ExcelReadRequest request = ExcelReadRequest.from(inputFile).build();
         SheetContent sheetContent = ExcelProcessor.builder().build().readSheet(request);
         CsvWriter.writeToFile(outputFile, sheetContent);
     }
 
     private static void convertExcelToCsvFile2(Path inputFile, Path outputFile) throws IOException {
         // create request to read 2 sheets from inputFile
-        ExcelSheetReadRequest request = ExcelSheetReadRequest
+        ExcelReadRequest request = ExcelReadRequest
                 .from(inputFile)
                 .bySheetName("MySheet1", "MySheet2")
                 .build();

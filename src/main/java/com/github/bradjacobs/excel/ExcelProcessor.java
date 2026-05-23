@@ -3,13 +3,13 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.advanced.AdvancedExcelSheetReader;
-import com.github.bradjacobs.excel.api.ExcelSheetReader;
+import com.github.bradjacobs.excel.advanced.AdvancedExcelReader;
+import com.github.bradjacobs.excel.api.ExcelWorkbookReader;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.core.AbstractExcelSheetReader.AbstractSheetConfigBuilder;
-import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
-import com.github.bradjacobs.excel.standard.StandardExcelSheetReader;
+import com.github.bradjacobs.excel.core.AbstractExcelReader.AbstractSheetConfigBuilder;
+import com.github.bradjacobs.excel.request.ExcelReadRequest;
+import com.github.bradjacobs.excel.standard.StandardExcelReader;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -21,42 +21,42 @@ import java.util.List;
 /**
  * ExcelProcessor
  */
-public class ExcelProcessor implements ExcelSheetReader {
+public class ExcelProcessor implements ExcelWorkbookReader {
     private static final String XLSX_EXTENSION = "xlsx";
 
     private final boolean useAdvancedReader;
-    private final ExcelSheetReader standardExcelSheetReader;
-    private final ExcelSheetReader advancedExcelSheetReader;
+    private final ExcelWorkbookReader standardExcelWorkbookReader;
+    private final ExcelWorkbookReader advancedExcelWorkbookReader;
 
     private ExcelProcessor(Builder builder) {
         this.useAdvancedReader = builder.useAdvancedReader;
         SheetConfig sheetConfig = builder.buildConfig();
-        this.standardExcelSheetReader = new StandardExcelSheetReader(sheetConfig);
-        this.advancedExcelSheetReader = new AdvancedExcelSheetReader(sheetConfig);
+        this.standardExcelWorkbookReader = new StandardExcelReader(sheetConfig);
+        this.advancedExcelWorkbookReader = new AdvancedExcelReader(sheetConfig);
     }
 
     @Override
-    public List<SheetContent> readSheets(ExcelSheetReadRequest request) throws IOException {
+    public List<SheetContent> readSheets(ExcelReadRequest request) throws IOException {
         Validate.isTrue(request != null, "Request cannot be null");
         return getSheetReaderForRequest(request).readSheets(request);
     }
 
-    private ExcelSheetReader getSheetReaderForRequest(ExcelSheetReadRequest request) {
+    private ExcelWorkbookReader getSheetReaderForRequest(ExcelReadRequest request) {
         return shouldUseAdvancedReader(request)
-                ? this.advancedExcelSheetReader
-                : this.standardExcelSheetReader;
+                ? this.advancedExcelWorkbookReader
+                : this.standardExcelWorkbookReader;
     }
 
-    private boolean shouldUseAdvancedReader(ExcelSheetReadRequest request) {
+    private boolean shouldUseAdvancedReader(ExcelReadRequest request) {
         return this.useAdvancedReader && hasXlsxExtension(request);
     }
 
-    private boolean hasXlsxExtension(ExcelSheetReadRequest request) {
+    private boolean hasXlsxExtension(ExcelReadRequest request) {
         String sourceLocation = resolveSourceLocation(request);
         return XLSX_EXTENSION.equalsIgnoreCase(FilenameUtils.getExtension(sourceLocation));
     }
 
-    private String resolveSourceLocation(ExcelSheetReadRequest request) {
+    private String resolveSourceLocation(ExcelReadRequest request) {
         Path path = request.getPath();
         if (path != null) {
             return path.toString();

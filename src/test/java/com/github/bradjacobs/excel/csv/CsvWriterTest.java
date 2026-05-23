@@ -5,8 +5,8 @@ package com.github.bradjacobs.excel.csv;
 
 import com.github.bradjacobs.excel.api.BasicSheetContent;
 import com.github.bradjacobs.excel.api.SheetContent;
-import com.github.bradjacobs.excel.request.ExcelSheetReadRequest;
-import com.github.bradjacobs.excel.standard.StandardExcelSheetReader;
+import com.github.bradjacobs.excel.request.ExcelReadRequest;
+import com.github.bradjacobs.excel.standard.StandardExcelReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -451,9 +451,9 @@ class CsvWriterTest {
     void testExpectedQuoteTextFileParam(QuoteMode quoteMode, String expectedResultFileName) throws Exception {
         String expectedCsvText = readResourceFileText(expectedResultFileName);
         File inputFile = getResourceFileObject("test_data.xlsx");
-        ExcelSheetReadRequest request = ExcelSheetReadRequest.from(inputFile).build();
+        ExcelReadRequest request = ExcelReadRequest.from(inputFile).build();
 
-        StandardExcelSheetReader sheetReader = StandardExcelSheetReader.builder().build();
+        StandardExcelReader sheetReader = StandardExcelReader.builder().build();
         SheetContent sheetContent = sheetReader.readSheet(request);
 
         CsvWriter csvWriter = CsvWriter.builder().quoteMode(quoteMode).build();

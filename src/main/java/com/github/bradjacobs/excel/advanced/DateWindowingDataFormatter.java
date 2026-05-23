@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.advanced.datewindowing;
+package com.github.bradjacobs.excel.advanced;
 
 import org.apache.poi.ss.usermodel.DataFormatter;
 
