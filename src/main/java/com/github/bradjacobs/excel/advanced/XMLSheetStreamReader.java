@@ -6,9 +6,11 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.XMLHelper;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
+import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.SharedStrings;
 import org.apache.poi.xssf.model.SharedStringsTable;
 import org.apache.poi.xssf.model.StylesTable;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -21,6 +23,7 @@ import java.util.List;
 public class XMLSheetStreamReader {
 
     private static final DateWindowingDetector DATE_WINDOWING_DETECTOR = new DateWindowingDetector();
+    private static final boolean FORMULAS_NOT_RESULTS = false;
 
     private final SheetConfig sheetConfig;
     private final SharedStrings sharedStrings;
@@ -30,7 +33,6 @@ public class XMLSheetStreamReader {
     public static XMLSheetStreamReader create(
             SheetConfig config,
             XSSFReader reader) {
-
         try {
             SharedStrings sharedStrings = getSharedStrings(reader);
             StylesTable styles = getStylesTable(reader);
@@ -49,7 +51,7 @@ public class XMLSheetStreamReader {
         }
         catch (IOException | SAXException | InvalidFormatException | ParserConfigurationException e) {
             throw new IllegalStateException(
-                    "Failed to initialize XMLSheetStreamParser; " + e.getMessage(), e);
+                    "Failed to initialize XMLSheetStreamParser: " + e.getMessage(), e);
         }
     }
 
@@ -82,16 +84,45 @@ public class XMLSheetStreamReader {
             StringRowConsumer stringRowConsumer
     ) throws SAXException, ParserConfigurationException {
         XMLReader parser = XMLHelper.newXMLReader();
-        parser.setContentHandler(
-                SheetContentHandlerFactory.create(
+        parser.setContentHandler(createSheetContentHandler(stringRowConsumer));
+        return parser;
+    }
+
+    private ContentHandler createSheetContentHandler(StringRowConsumer stringRowConsumer) {
+        return sheetConfig.skipHiddenCells()
+                ? createVisibleAwareHandler(stringRowConsumer)
+                : createDefaultHandler(stringRowConsumer);
+    }
+
+    private ContentHandler createVisibleAwareHandler(
+            StringRowConsumer stringRowConsumer) {
+        SheetContext sheetContext = new SheetContext();
+        return new VisibleAwareXSSFSheetXMLHandler(
+                styles,
+                sharedStrings,
+                new VisibleCellsSheetContentHandler(
                         sheetConfig,
                         stringRowConsumer,
-                        sharedStrings,
-                        styles,
-                        dataFormatter
-                )
+                        sheetContext
+                ),
+                dataFormatter,
+                FORMULAS_NOT_RESULTS,
+                sheetContext
         );
-        return parser;
+    }
+
+    private ContentHandler createDefaultHandler(
+            StringRowConsumer stringRowConsumer) {
+        return new XSSFSheetXMLHandler(
+                styles,
+                sharedStrings,
+                new SheetContentHandler(
+                        sheetConfig,
+                        stringRowConsumer
+                ),
+                dataFormatter,
+                FORMULAS_NOT_RESULTS
+        );
     }
 
     private static SharedStrings getSharedStrings(XSSFReader reader) throws IOException, InvalidFormatException {

@@ -94,7 +94,6 @@ public class AdvancedExcelReader extends AbstractExcelReader {
         return selectedSheets;
     }
 
-
     private List<SheetInfoRecord> fetchAllSheets(XSSFReader reader) throws IOException, InvalidFormatException {
         List<SheetInfoRecord> records = new ArrayList<>();
         XSSFReader.SheetIterator sheetIterator = reader.getSheetIterator();
