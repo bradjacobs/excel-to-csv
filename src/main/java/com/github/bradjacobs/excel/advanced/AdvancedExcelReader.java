@@ -19,12 +19,7 @@ import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
-import org.apache.poi.xssf.model.SharedStrings;
-import org.apache.poi.xssf.model.SharedStringsTable;
-import org.apache.poi.xssf.model.StylesTable;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,8 +32,6 @@ import static org.apache.poi.extractor.ExtractorFactory.OOXML_PACKAGE;
 import static org.apache.poi.poifs.crypt.Decryptor.DEFAULT_POIFS_ENTRY;
 
 public class AdvancedExcelReader extends AbstractExcelReader {
-
-    private static final DateWindowingDetector DATE_WINDOWING_DETECTOR = new DateWindowingDetector();
 
     /**
      * Constructor
@@ -73,15 +66,11 @@ public class AdvancedExcelReader extends AbstractExcelReader {
                 // close any 'extra' inputStreams that will not be processed.
                 closeInputStreams(unselectedSheets);
 
-                SharedStrings sharedStrings = getSharedStrings(reader);
-                StylesTable styles = getStylesTable(reader);
-
-                boolean uses1904DateWindowing = requires1904DateWindowing(reader);
-                DataFormatter dataFormatter = new DateWindowingDataFormatter(uses1904DateWindowing);
+                XMLSheetStreamReader xmlSheetStreamReader = XMLSheetStreamReader.create(sheetConfig, reader);
 
                 for (SheetInfoRecord selectedSheet : selectedSheets) {
-                    SheetXMLReader sheetXmlReader = SheetXMLReader.create(this.sheetConfig, sharedStrings, styles, dataFormatter);
-                    sheetContentList.add(extractSheetContent(selectedSheet, sheetXmlReader));
+                    List<List<String>> sheetDataRows = xmlSheetStreamReader.read(selectedSheet.inputStream);
+                    sheetContentList.add(new BasicSheetContent(selectedSheet.sheetName, sheetDataRows));
                 }
             }
             finally {
@@ -93,40 +82,6 @@ public class AdvancedExcelReader extends AbstractExcelReader {
         }
 
         return sheetContentList;
-    }
-
-    protected boolean requires1904DateWindowing(XSSFReader reader) throws IOException, ParserConfigurationException, InvalidFormatException, SAXException {
-        return DATE_WINDOWING_DETECTOR.is1904DateWindowing(reader);
-    }
-
-    /**
-     * Get the shared strings table.
-     * @param reader the XSSFReader
-     * @return the shared strings table
-     */
-    private SharedStrings getSharedStrings(XSSFReader reader) throws IOException, InvalidFormatException {
-        SharedStrings sharedStrings = reader.getSharedStringsTable();
-        return sharedStrings != null ? sharedStrings : new SharedStringsTable();
-    }
-
-    /**
-     * Get the styles table.
-     * @param reader the XSSFReader
-     * @return the styles table
-     */
-    private StylesTable getStylesTable(XSSFReader reader) throws IOException, InvalidFormatException {
-        StylesTable stylesTable = reader.getStylesTable();
-        return stylesTable != null ? stylesTable : new StylesTable();
-    }
-
-    private SheetContent extractSheetContent(SheetInfoRecord sheetInfoRecord, SheetXMLReader sheetXmlReader) throws IOException, SAXException {
-        try (InputStream sheetInputStream = sheetInfoRecord.inputStream) {
-            // actually parse the sheetInputStream for the data
-            InputSource sheetSource = new InputSource(sheetInputStream);
-            sheetXmlReader.parse(sheetSource);
-            List<List<String>> sheetDataRows = sheetXmlReader.getSheetDataRows();
-            return new BasicSheetContent(sheetInfoRecord.sheetName, sheetDataRows);
-        }
     }
 
     private void closeInputStreams(List<SheetInfoRecord> sheetInfoRecords) {
