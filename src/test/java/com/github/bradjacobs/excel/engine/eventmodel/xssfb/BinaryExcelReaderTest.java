@@ -24,11 +24,6 @@ public class BinaryExcelReaderTest {
     private final AdvancedExcelReader defaultSheetReader = AdvancedExcelReader.builder().build();
 
 
-    @Test
-    public void visibleTests() {
-
-    }
-
     @ParameterizedTest(name = "HiddenTest {index}: Sheet = {0}")
     @ValueSource(strings = {
             "BaseCase",
