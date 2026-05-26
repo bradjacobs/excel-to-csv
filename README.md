@@ -14,7 +14,7 @@ Simple tool to convert an Excel worksheet into CSV format.
 Implemented using the [Apache POI](https://poi.apache.org/) libraries
 
 > ⚠️ **Warning**
-> > Curreently giving the code an 'overhaul'.
+> > Currently giving the code an 'overhaul'.
 
 ## API Overview
 
@@ -206,7 +206,7 @@ Possible work items that I _MIGHT_ get around to "eventually" (perhaps)
   <summary>Todo Item List... (Click To Expand)</summary>
 
 Features:
-* Add in addtional 'row and column filtering' (low priority)
+* Add in additional 'row and column filtering' (low priority)
   * this would expand on skipping blanks rows/columns.  (i.e. select only certain columns want returned)
   * for column, would select either column index or name
 
@@ -235,18 +235,16 @@ Certain items that I _WILL NOT_ get around to.
 <details>
   <summary>Won't Fix... (Click To Expand)</summary>
 
-* XLSB support (Excel 2016+)
-  * looks like a pain to implement, especially for a format i've rarely come across.
-* Date/Time formatting 
+* Custome Date/Time Formatting or Handling
   * too many considerations of format, timezone shifting, etc
-* Numeric formatting 
+* Custom Numeric Formatting or Handling
   * Do not want to deal with things like: 
     * 2 vs 2.0
     * if 98% should be 0.98 or 98
     * international formats
     * super large, super small numbers
     * etc
-  * Harder to deal with in the advaenced event implementation.
+  * Harder to deal with in the advanced event implementation.
 * Multiple sheets to SINGLE CSV file.
   * too many concerns if sheets have a different structure.
   * Easy for someone to do programmatically (just merge the SheetContent List<List<String>> values).

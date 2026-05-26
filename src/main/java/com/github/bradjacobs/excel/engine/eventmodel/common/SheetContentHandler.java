@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.advanced;
+package com.github.bradjacobs.excel.engine.eventmodel.common;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.CellValueSanitizer;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // TODO: more javaDocs and unitTests
-class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
+public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     private static final String EMPTY_CELL_VALUE = "";
     private static final String EXCEL_ERROR_PREFIX = "ERROR:";
     private static final String MISSING_CELL_REFERENCE_MESSAGE = "Unable to parse Excel Sheet. " +

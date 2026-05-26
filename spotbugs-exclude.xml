@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+
+    <!-- TODO - check refactor options for feasibility of removing this first exemption -->
+    <Match>
+        <Class name="com.github.bradjacobs.excel.engine.eventmodel.common.SheetContentHandler"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.github.bradjacobs.excel.engine.eventmodel.common.VisibleAwareSheetContentHandler"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+</FindBugsFilter>

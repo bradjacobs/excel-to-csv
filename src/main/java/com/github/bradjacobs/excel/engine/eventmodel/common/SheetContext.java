@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.advanced;
+package com.github.bradjacobs.excel.engine.eventmodel.common;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Tracks hidden row/column indices while parsing a sheet.
  */
-final class SheetContext {
+public final class SheetContext {
     private final Set<Integer> hiddenRows = new HashSet<>();
     private final Set<Integer> hiddenColumns = new HashSet<>();
 

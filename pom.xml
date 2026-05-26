@@ -152,6 +152,7 @@
 				</executions>
 
 				<configuration>
+					<excludeFilterFile>${project.basedir}/spotbugs-exclude.xml</excludeFilterFile>
 					<failOnError>true</failOnError>
 					<threshold>Low</threshold>
 					<effort>Max</effort>

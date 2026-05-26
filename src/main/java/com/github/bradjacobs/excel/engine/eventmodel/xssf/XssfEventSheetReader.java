@@ -1,8 +1,20 @@
-package com.github.bradjacobs.excel.advanced;
+/*
+ * This file is subject to the terms and conditions defined in the 'LICENSE' file.
+ */
+package com.github.bradjacobs.excel.engine.eventmodel.xssf;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
+import com.github.bradjacobs.excel.engine.eventmodel.common.DateWindowingDataFormatter;
+import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheet;
+import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheetReader;
+import com.github.bradjacobs.excel.engine.eventmodel.common.PoiSheetStreamProvider;
+import com.github.bradjacobs.excel.engine.eventmodel.common.SheetContentHandler;
+import com.github.bradjacobs.excel.engine.eventmodel.common.SheetContext;
+import com.github.bradjacobs.excel.engine.eventmodel.common.VisibleAwareSheetContentHandler;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.XMLHelper;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
@@ -20,20 +32,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-public class XMLSheetStreamReader {
+public class XssfEventSheetReader implements EventSheetReader {
 
-    private static final DateWindowingDetector DATE_WINDOWING_DETECTOR = new DateWindowingDetector();
+    private static final XssfDateWindowingDetector DATE_WINDOWING_DETECTOR = new XssfDateWindowingDetector();
     private static final boolean FORMULAS_NOT_RESULTS = false;
+    private static final PoiSheetStreamProvider sheetStreamProvider = new PoiSheetStreamProvider();
 
+    private final XSSFReader reader;
     private final SheetConfig sheetConfig;
+    //private final PoiSheetStreamProvider sheetStreamProvider;
     private final SharedStrings sharedStrings;
     private final StylesTable styles;
     private final DataFormatter dataFormatter;
 
-    public static XMLSheetStreamReader create(
-            SheetConfig config,
-            XSSFReader reader) {
+    public static XssfEventSheetReader create(
+            OPCPackage pkg,
+            SheetConfig config) {
         try {
+            XSSFReader reader = new XSSFReader(pkg);
+//            PoiSheetStreamProvider sheetStreamProvider = new PoiSheetStreamProvider(reader);
             SharedStrings sharedStrings = getSharedStrings(reader);
             StylesTable styles = getStylesTable(reader);
             boolean requires1904DateWindowing =
@@ -43,29 +60,39 @@ public class XMLSheetStreamReader {
                     new DateWindowingDataFormatter(
                             requires1904DateWindowing);
 
-            return new XMLSheetStreamReader(
+            return new XssfEventSheetReader(
+                    reader,
                     config,
                     sharedStrings,
                     styles,
                     formatter);
         }
-        catch (IOException | SAXException | InvalidFormatException | ParserConfigurationException e) {
+        catch (IOException | SAXException | OpenXML4JException | ParserConfigurationException e) {
             throw new IllegalStateException(
                     "Failed to initialize XMLSheetStreamParser: " + e.getMessage(), e);
         }
     }
 
-    private XMLSheetStreamReader(
+    private XssfEventSheetReader(
+            XSSFReader reader,
             SheetConfig config,
             SharedStrings sharedStrings,
             StylesTable styles,
             DataFormatter dataFormatter) {
+        this.reader = reader;
+        //this.sheetStreamProvider = sheetStreamProvider;
         this.sheetConfig = config;
         this.sharedStrings = sharedStrings;
         this.styles = styles;
         this.dataFormatter = dataFormatter;
     }
 
+    @Override
+    public List<EventSheet> getSheets() throws IOException, InvalidFormatException {
+        return sheetStreamProvider.getSheets(this.reader);
+    }
+
+    @Override
     public List<List<String>> read(InputStream inputStream) throws ParserConfigurationException, SAXException, IOException {
         StringRowConsumer stringRowConsumer = createStringRowConsumer();
         XMLReader xmlReader = createXmlReader(stringRowConsumer);
@@ -97,10 +124,10 @@ public class XMLSheetStreamReader {
     private ContentHandler createVisibleAwareHandler(
             StringRowConsumer stringRowConsumer) {
         SheetContext sheetContext = new SheetContext();
-        return new VisibleAwareXSSFSheetXMLHandler(
+        return new XssfVisibleAwareSheetXmlHandler(
                 styles,
                 sharedStrings,
-                new VisibleCellsSheetContentHandler(
+                new VisibleAwareSheetContentHandler(
                         sheetConfig,
                         stringRowConsumer,
                         sheetContext

@@ -1,26 +1,33 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.advanced;
+package com.github.bradjacobs.excel.engine.eventmodel;
 
 import com.github.bradjacobs.excel.api.BasicSheetContent;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelReader;
+import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheet;
+import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheetReader;
+import com.github.bradjacobs.excel.engine.eventmodel.xssf.XssfEventSheetReader;
+import com.github.bradjacobs.excel.engine.eventmodel.xssfb.XssfbEventSheetReader;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
-import com.github.bradjacobs.excel.request.SheetInfo;
 import com.github.bradjacobs.excel.request.SheetSelector;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackagePart;
+import org.apache.poi.openxml4j.opc.PackageRelationship;
+import org.apache.poi.openxml4j.opc.PackageRelationshipTypes;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.xssf.eventusermodel.XSSFReader;
+import org.apache.poi.xssf.usermodel.XSSFRelation;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -51,20 +58,20 @@ public class AdvancedExcelReader extends AbstractExcelReader {
 
         try (InputStream inputStream = preprocessFileInputStream(sourceInputStream, request.getPassword());
             OPCPackage pkg = OPCPackage.open(inputStream)) {
-            XSSFReader reader = new XSSFReader(pkg);
 
             // NOTE: Docs say readOnlySharedStringsTable saves memory on large files,
             // but tests show ~25% slower performance!
             //reader.setUseReadOnlySharedStringsTable(true);
 
-            List<SheetInfoRecord> selectedSheets = fetchSelectedSheets(reader, request.getSheetSelector());
+            EventSheetReader eventSheetReader =
+                    createEventSheetReader(pkg, sheetConfig);
+
+            List<EventSheet> selectedSheets = fetchSelectedSheets(eventSheetReader, request.getSheetSelector());
 
             try {
-                XMLSheetStreamReader xmlSheetStreamReader = XMLSheetStreamReader.create(sheetConfig, reader);
-
-                for (SheetInfoRecord selectedSheet : selectedSheets) {
-                    List<List<String>> sheetDataRows = xmlSheetStreamReader.read(selectedSheet.inputStream);
-                    sheetContentList.add(new BasicSheetContent(selectedSheet.sheetName, sheetDataRows));
+                for (EventSheet selectedSheet : selectedSheets) {
+                    List<List<String>> sheetDataRows = eventSheetReader.read(selectedSheet.getInputStream());
+                    sheetContentList.add(new BasicSheetContent(selectedSheet.getName(), sheetDataRows));
                 }
             }
             finally {
@@ -78,34 +85,44 @@ public class AdvancedExcelReader extends AbstractExcelReader {
         return sheetContentList;
     }
 
-    private void closeInputStreams(List<SheetInfoRecord> sheetInfoRecords) {
-        for (SheetInfoRecord sheetInfoRecord : sheetInfoRecords) {
-            IOUtils.closeQuietly(sheetInfoRecord.inputStream);
+    private void closeInputStreams(List<EventSheet> eventSheets) {
+        for (EventSheet eventSheet : eventSheets) {
+            IOUtils.closeQuietly(eventSheet.getInputStream());
         }
     }
 
-    private List<SheetInfoRecord> fetchSelectedSheets(XSSFReader reader, SheetSelector sheetSelector) throws IOException, InvalidFormatException {
-        List<SheetInfoRecord> allSheets = fetchAllSheets(reader);
-        List<SheetInfoRecord> selectedSheets = sheetSelector.filterSheets(allSheets);
-        List<SheetInfoRecord> unselectedSheets = ListUtils.subtract(allSheets, selectedSheets);
+    private List<EventSheet> fetchSelectedSheets(EventSheetReader eventSheetReader, SheetSelector sheetSelector) throws IOException, InvalidFormatException {
+        List<EventSheet> allSheets = eventSheetReader.getSheets();
+        List<EventSheet> selectedSheets = sheetSelector.filterSheets(allSheets);
+        List<EventSheet> unselectedSheets = ListUtils.subtract(allSheets, selectedSheets);
 
         // close the inputStreams on the unselected sheets that will not be processed.
         closeInputStreams(unselectedSheets);
         return selectedSheets;
     }
 
-    private List<SheetInfoRecord> fetchAllSheets(XSSFReader reader) throws IOException, InvalidFormatException {
-        List<SheetInfoRecord> records = new ArrayList<>();
-        XSSFReader.SheetIterator sheetIterator = reader.getSheetIterator();
-        int sheetIndex = 0;
+    protected EventSheetReader createEventSheetReader(
+            OPCPackage pkg,
+            SheetConfig sheetConfig) {
 
-        while (sheetIterator.hasNext()) {
-            InputStream sheetStream = sheetIterator.next();
-            String sheetName = sheetIterator.getSheetName();
-            records.add(new SheetInfoRecord(sheetIndex, sheetName, sheetStream));
-            sheetIndex++;
+        if (isBinary(pkg)) {
+            return XssfbEventSheetReader.create(pkg, sheetConfig);
         }
-        return records;
+        return XssfEventSheetReader.create(pkg, sheetConfig);
+    }
+
+    private boolean isBinary(OPCPackage pkg) {
+        PackageRelationship coreDocRelationship = pkg.getRelationshipsByType(
+                PackageRelationshipTypes.CORE_DOCUMENT).getRelationship(0);
+
+        PackagePart pp = pkg.getPart(coreDocRelationship);
+        if (pp == null) {
+            pkg.revert();
+            throw new POIXMLException("OOXML file structure broken/invalid - core document '" + coreDocRelationship.getTargetURI() + "' not found.");
+        }
+
+        return XSSFRelation.XLSB_BINARY_WORKBOOK.getContentType()
+                .equals(pp.getContentType());
     }
 
     /**
@@ -137,29 +154,6 @@ public class AdvancedExcelReader extends AbstractExcelReader {
             //throw new NotOfficeXmlFileException("Cannot open Excel file - unsupported file type: " + fm);
         }
         return resultStream;
-    }
-
-    // simple pojo to hold information for a specific sheet.
-    private static class SheetInfoRecord implements SheetInfo {
-        private final int sheetIndex;
-        private final String sheetName;
-        private final InputStream inputStream;
-
-        public SheetInfoRecord(int sheetIndex, String sheetName, InputStream inputStream) {
-            this.sheetIndex = sheetIndex;
-            this.sheetName = sheetName;
-            this.inputStream = inputStream;
-        }
-
-        @Override
-        public String getName() {
-            return sheetName;
-        }
-
-        @Override
-        public int getIndex() {
-            return sheetIndex;
-        }
     }
 
     public static Builder builder() {

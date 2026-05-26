@@ -1,8 +1,9 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.advanced;
+package com.github.bradjacobs.excel.engine.eventmodel.xssf;
 
+import com.github.bradjacobs.excel.engine.eventmodel.common.SheetContext;
 import org.apache.commons.lang3.Validate;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
@@ -14,7 +15,7 @@ import org.xml.sax.SAXException;
 /**
  * Extends the XSSFSheetXMLHandler to track hidden rows and columns.
  */
-class VisibleAwareXSSFSheetXMLHandler extends XSSFSheetXMLHandler {
+class XssfVisibleAwareSheetXmlHandler extends XSSFSheetXMLHandler {
 
     private static final String ELEMENT_ROW = "row";
     private static final String ELEMENT_COL = "col";
@@ -27,7 +28,7 @@ class VisibleAwareXSSFSheetXMLHandler extends XSSFSheetXMLHandler {
 
     private final SheetContext sheetContext;
 
-    public VisibleAwareXSSFSheetXMLHandler(
+    public XssfVisibleAwareSheetXmlHandler(
             Styles styles,
             SharedStrings sharedStrings,
             SheetContentsHandler sheetContentsHandler,

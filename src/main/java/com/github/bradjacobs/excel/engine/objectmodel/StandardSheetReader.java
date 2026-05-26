@@ -1,4 +1,7 @@
-package com.github.bradjacobs.excel.standard;
+/*
+ * This file is subject to the terms and conditions defined in the 'LICENSE' file.
+ */
+package com.github.bradjacobs.excel.engine.objectmodel;
 
 import com.github.bradjacobs.excel.api.BasicSheetContent;
 import com.github.bradjacobs.excel.api.SheetContent;
@@ -168,6 +171,9 @@ public class StandardSheetReader {
         return sheet.isColumnHidden(columnIndex);
     }
 
+    /**
+     * Simple POJO to hold Excel sheet rows and size of largest row.
+     */
     private static class RowInfo {
         protected final List<Row> rowList;
         protected final int maxColumn;

@@ -3,13 +3,13 @@
  */
 package com.github.bradjacobs.excel;
 
-import com.github.bradjacobs.excel.advanced.AdvancedExcelReader;
 import com.github.bradjacobs.excel.api.ExcelWorkbookReader;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelReader.AbstractSheetConfigBuilder;
+import com.github.bradjacobs.excel.engine.eventmodel.AdvancedExcelReader;
+import com.github.bradjacobs.excel.engine.objectmodel.StandardExcelReader;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
-import com.github.bradjacobs.excel.standard.StandardExcelReader;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 

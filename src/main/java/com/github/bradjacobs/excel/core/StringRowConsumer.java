@@ -60,6 +60,7 @@ public class StringRowConsumer implements Consumer<List<String>> {
      * Tracks which columns contain at least one non-blank value.
      * Only used when {@link #skipBlankColumns} is enabled.
      */
+    // note: could use a bitset instead of a list, but this seems simpler.
     private final List<Boolean> keepColumnsFlags = new ArrayList<>();
     private int keepColumnsCount = 0;
 

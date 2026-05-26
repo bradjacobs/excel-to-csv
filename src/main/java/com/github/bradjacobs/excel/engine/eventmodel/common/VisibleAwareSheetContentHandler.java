@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.advanced;
+package com.github.bradjacobs.excel.engine.eventmodel.common;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.StringRowConsumer;
@@ -10,7 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 /**
  * Special SheetContentHandler that only processes 'visible' rows and columns.
  */
-class VisibleCellsSheetContentHandler extends SheetContentHandler {
+public class VisibleAwareSheetContentHandler extends SheetContentHandler {
 
     private static final int NO_PREVIOUS_ROW = -1;
 
@@ -21,7 +21,7 @@ class VisibleCellsSheetContentHandler extends SheetContentHandler {
 
     private final SheetContext sheetContext;
 
-    public VisibleCellsSheetContentHandler(
+    public VisibleAwareSheetContentHandler(
             SheetConfig sheetConfig,
             StringRowConsumer stringRowConsumer,
             SheetContext sheetContext) {

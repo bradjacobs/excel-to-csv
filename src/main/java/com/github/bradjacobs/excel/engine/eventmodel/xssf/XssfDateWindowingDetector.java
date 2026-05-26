@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.advanced;
+package com.github.bradjacobs.excel.engine.eventmodel.xssf;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
@@ -14,7 +14,7 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
 
-class DateWindowingDetector {
+class XssfDateWindowingDetector {
 
     public boolean is1904DateWindowing(XSSFReader reader) throws IOException, InvalidFormatException, ParserConfigurationException, SAXException {
         WorkbookPropsHandler workbookPropsHandler =
