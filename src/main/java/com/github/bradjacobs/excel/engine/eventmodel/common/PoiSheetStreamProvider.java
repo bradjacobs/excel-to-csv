@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel.common;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 
@@ -14,6 +15,8 @@ import java.util.List;
 public class PoiSheetStreamProvider {
 
     public List<EventSheet> getSheets(XSSFReader reader) throws IOException, InvalidFormatException {
+        Validate.isTrue(reader != null, "Must provide an XSSFReader reader");
+
         List<EventSheet> sheets = new ArrayList<>();
         XSSFReader.SheetIterator sheetIterator = reader.getSheetIterator();
         int sheetIndex = 0;
