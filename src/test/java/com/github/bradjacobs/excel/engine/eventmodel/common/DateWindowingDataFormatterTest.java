@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DateWindowingDataFormatterTest {
+class DateWindowingDataFormatterTest {
 
     /**
      * Confirm the underlying `isEmulateCSV` is always set to 'true'

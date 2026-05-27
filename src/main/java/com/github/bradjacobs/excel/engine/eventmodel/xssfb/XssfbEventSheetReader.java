@@ -34,6 +34,8 @@ TODO: NOTE this class references POI classes that are marked as "internal"
  */
 public class XssfbEventSheetReader implements EventSheetReader {
 
+    private static final XssfbDateWindowingDetector DATE_WINDOWING_DETECTOR
+            = new XssfbDateWindowingDetector();
     private static final XSSFBCommentsTable EMPTY_COMMENTS = null;
     private static final boolean FORMULAS_NOT_RESULTS = false;
     private static final PoiSheetStreamProvider sheetStreamProvider = new PoiSheetStreamProvider();
@@ -51,11 +53,9 @@ public class XssfbEventSheetReader implements EventSheetReader {
             XSSFBReader reader = new XSSFBReader(pkg);
             XSSFBSharedStringsTable sharedStrings = new XSSFBSharedStringsTable(pkg);
             XSSFBStylesTable styles = reader.getXSSFBStylesTable();
-            XssfbDateWindowingDetector dateWindowingDetector =
-                    new XssfbDateWindowingDetector();
 
             boolean requires1904DateWindowing =
-                    dateWindowingDetector.is1904DateWindowing(reader);
+                    DATE_WINDOWING_DETECTOR.is1904DateWindowing(reader);
 
             DataFormatter formatter =
                     new DateWindowingDataFormatter(
@@ -72,7 +72,6 @@ public class XssfbEventSheetReader implements EventSheetReader {
             throw new IllegalStateException(
                     "Failed to initialize XMLSheetStreamParser: " + e.getMessage(), e);
        }
-
     }
 
     private XssfbEventSheetReader(

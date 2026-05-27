@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Reads an Excel Sheet and returns a 2-D array of data.
+ * Reads an Excel File sheets
  */
 public class StandardExcelReader extends AbstractExcelReader {
 

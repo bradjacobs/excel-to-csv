@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BinaryExcelReaderTest {
+class BinaryExcelReaderTest {
 
     private static final String HIDDEN_CELLS_DATA_FILE = "skipHiddenTestData.xlsb";
     private final Path HIDDEN_CELLS_FILE = TestResourceUtil.getResourceFilePath(HIDDEN_CELLS_DATA_FILE);

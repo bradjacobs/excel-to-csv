@@ -40,7 +40,6 @@ public class XssfEventSheetReader implements EventSheetReader {
 
     private final XSSFReader reader;
     private final SheetConfig sheetConfig;
-    //private final PoiSheetStreamProvider sheetStreamProvider;
     private final SharedStrings sharedStrings;
     private final StylesTable styles;
     private final DataFormatter dataFormatter;
@@ -50,7 +49,6 @@ public class XssfEventSheetReader implements EventSheetReader {
             SheetConfig config) {
         try {
             XSSFReader reader = new XSSFReader(pkg);
-//            PoiSheetStreamProvider sheetStreamProvider = new PoiSheetStreamProvider(reader);
             SharedStrings sharedStrings = getSharedStrings(reader);
             StylesTable styles = getStylesTable(reader);
             boolean requires1904DateWindowing =
@@ -80,7 +78,6 @@ public class XssfEventSheetReader implements EventSheetReader {
             StylesTable styles,
             DataFormatter dataFormatter) {
         this.reader = reader;
-        //this.sheetStreamProvider = sheetStreamProvider;
         this.sheetConfig = config;
         this.sharedStrings = sharedStrings;
         this.styles = styles;
