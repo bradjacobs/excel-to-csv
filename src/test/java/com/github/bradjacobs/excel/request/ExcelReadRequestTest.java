@@ -86,7 +86,7 @@ class ExcelReadRequestTest {
 
         @Test
         void forUrlCreatesRequestWithUrlSource() throws Exception {
-            URL url = new URL("https://example.com/test.xlsx");
+            URL url = new URL("https://fakehost123.com/test.xlsx");
             ExcelReadRequest request = ExcelReadRequest.from(url).build();
             assertNull(request.getPath());
             assertEquals(url, request.getUrl());
