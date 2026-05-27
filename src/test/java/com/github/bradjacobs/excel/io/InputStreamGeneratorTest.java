@@ -77,7 +77,7 @@ class InputStreamGeneratorTest {
                     createUrlMockedInputStreamGenerator(testText, false);
 
             InputStream resultInputStream = streamGenerator
-                    .getInputStream(new URL("https://myexample.com/file.txt"));
+                    .getInputStream(new URL("https://fakehost123.com/file.txt"));
             assertEquals(testText, readStream(resultInputStream));
         }
 
@@ -89,7 +89,7 @@ class InputStreamGeneratorTest {
                     createUrlMockedInputStreamGenerator(testText, true);
 
             InputStream resultInputStream = streamGenerator
-                    .getInputStream(new URL("https://myexample.com/file.txt"));
+                    .getInputStream(new URL("https://fakehost123.com/file.txt"));
             assertEquals(testText, readStream(resultInputStream));
         }
 
