@@ -85,17 +85,14 @@ public class CsvWriter {
     }
 
     public void saveToDirectory(Path outputDirectory, List<SheetContent> sheetContentList) throws IOException {
-        Validate.isTrue(outputDirectory != null, "Must supply outputDirectory location to save CSV files.");
-        Validate.isTrue(Files.isDirectory(outputDirectory), "Must supply a valid directory to write CSV data.");
+        validateOutputDirectoryParameter(outputDirectory);
         Validate.isTrue(!CollectionUtils.isEmpty(sheetContentList), "Must supply at least one sheetContent to write.");
         Validate.isTrue(!containsMissingSheetName(sheetContentList), "Must supply a non-empty sheetName for each sheetContent to write.");
 
         Map<Path, SheetContent> fileToSheetContentMap = new LinkedHashMap<>();
         // first create all the output file paths and validate.
         for (SheetContent sheetContent : sheetContentList) {
-            String fileName = sheetContent.getSheetName().trim() + ".csv";
-            Path outputPath = outputDirectory.resolve(fileName);
-            validateOutputFileParameter(outputPath);
+            Path outputPath = buildOutputFilePath(outputDirectory, sheetContent);
             fileToSheetContentMap.put(outputPath, sheetContent);
         }
 
@@ -151,7 +148,7 @@ public class CsvWriter {
         return sb.toString();
     }
 
-    private String escapeDoubleQuotes(String value) {
+    private static String escapeDoubleQuotes(String value) {
         if (value.contains("\"")) {
             return value.replace("\"", "\"\"");
         }
@@ -172,7 +169,14 @@ public class CsvWriter {
         return csvContent;
     }
 
-    private boolean containsUnicode(String input) {
+    private Path buildOutputFilePath(Path outputDirectory, SheetContent sheetContent) {
+        String fileName = sheetContent.getSheetName().trim() + ".csv";
+        Path outputPath = outputDirectory.resolve(fileName);
+        validateOutputFileParameter(outputPath);
+        return outputPath;
+    }
+
+    private static boolean containsUnicode(String input) {
         return input.chars().anyMatch(ch -> ch > 127);
     }
 
@@ -200,7 +204,12 @@ public class CsvWriter {
                 "Attempted to overwrite an existing file: " + fileName);
     }
 
-    private boolean containsMissingSheetName(List<SheetContent> sheetContentList) {
+    private void validateOutputDirectoryParameter(Path outputDirectory) throws IllegalArgumentException {
+        Validate.isTrue(outputDirectory != null, "Must supply outputDirectory location to save CSV files.");
+        Validate.isTrue(Files.isDirectory(outputDirectory), "Must supply a valid directory to write CSV data.");
+    }
+
+    private static boolean containsMissingSheetName(List<SheetContent> sheetContentList) {
         return sheetContentList.stream()
                 .anyMatch(obj -> obj == null ||
                         obj.getSheetName() == null ||
