@@ -69,8 +69,8 @@ public class XssfbEventSheetReader implements EventSheetReader {
                     formatter);
        }
        catch (IOException | SAXException | OpenXML4JException  e) {
-            throw new IllegalStateException(
-                    "Failed to initialize XMLSheetStreamParser: " + e.getMessage(), e);
+           throw new IllegalStateException(
+                   "Failed to initialize XssfbEventSheetReader: " + e.getMessage(), e);
        }
     }
 
