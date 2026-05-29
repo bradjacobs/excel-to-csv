@@ -17,12 +17,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * ExcelProcessor
  */
 public class ExcelProcessor implements ExcelWorkbookReader {
-    private static final String XLSX_EXTENSION = "xlsx";
+    private static final List<String> ADVANCED_SUPPORTED_EXTENSIONS
+            = List.of("xlsx", "xlsb", "xlsm", "xltx", "xltm");
 
     private final boolean useAdvancedReader;
     private final ExcelWorkbookReader standardExcelWorkbookReader;
@@ -48,12 +50,17 @@ public class ExcelProcessor implements ExcelWorkbookReader {
     }
 
     private boolean shouldUseAdvancedReader(ExcelReadRequest request) {
-        return this.useAdvancedReader && hasXlsxExtension(request);
+        return this.useAdvancedReader && hasAdvancedSupportedExtension(request);
     }
 
-    private boolean hasXlsxExtension(ExcelReadRequest request) {
+    private boolean hasAdvancedSupportedExtension(ExcelReadRequest request) {
         String sourceLocation = resolveSourceLocation(request);
-        return XLSX_EXTENSION.equalsIgnoreCase(FilenameUtils.getExtension(sourceLocation));
+        String fileExtension = FilenameUtils.getExtension(sourceLocation);
+        if (fileExtension == null) {
+            return false;
+        }
+        fileExtension = fileExtension.toLowerCase(Locale.ROOT);
+        return ADVANCED_SUPPORTED_EXTENSIONS.contains(fileExtension);
     }
 
     private String resolveSourceLocation(ExcelReadRequest request) {
