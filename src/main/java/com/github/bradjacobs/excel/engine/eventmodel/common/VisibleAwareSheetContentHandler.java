@@ -95,3 +95,8 @@ public class VisibleAwareSheetContentHandler extends SheetContentHandler {
         return sheetContext.isColumnVisible(columnIndex);
     }
 }
+
+// Dev Note: some alternate implementations without inheritance may be possible
+//   but all attempts have turned out to be "more ugly".
+//   Also, could inject a type of "default policy" or "visible only policy" object
+//   into SheetContentHandler, but that makes that class more convoluted.

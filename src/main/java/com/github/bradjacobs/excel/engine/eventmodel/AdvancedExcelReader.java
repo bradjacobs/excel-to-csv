@@ -101,7 +101,7 @@ public class AdvancedExcelReader extends AbstractExcelReader {
         return selectedSheets;
     }
 
-    protected EventSheetReader createEventSheetReader(
+    private EventSheetReader createEventSheetReader(
             OPCPackage pkg,
             SheetConfig sheetConfig) {
 

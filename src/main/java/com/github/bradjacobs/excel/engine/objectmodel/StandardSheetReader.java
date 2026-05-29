@@ -175,8 +175,8 @@ public class StandardSheetReader {
      * Simple POJO to hold Excel sheet rows and size of largest row.
      */
     private static class RowInfo {
-        protected final List<Row> rowList;
-        protected final int maxColumn;
+        private final List<Row> rowList;
+        private final int maxColumn;
 
         public RowInfo(List<Row> rowList, int maxColumn) {
             this.rowList = rowList;

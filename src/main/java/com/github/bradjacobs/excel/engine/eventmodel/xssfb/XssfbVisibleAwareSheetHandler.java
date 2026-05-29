@@ -42,9 +42,7 @@ class XssfbVisibleAwareSheetHandler extends XSSFBSheetHandler {
     }
 
     private void handleRow(byte[] data) {
-        // TODO - this criteria may be 'incomplete'
-        //   'hidden' and 'zero height' could be different?
-        int rowFlags = data[11] & 0xFF;
+        int rowFlags = Byte.toUnsignedInt(data[11]);
 
         boolean isHiddenRow = (rowFlags & 0x10) != 0;
         if (isHiddenRow) {
@@ -55,7 +53,7 @@ class XssfbVisibleAwareSheetHandler extends XSSFBSheetHandler {
 
     private void handleColumn(byte[] data) {
         // TODO - suspect data can be different lengths TBD
-        int flags = data[16] & 0xFF;
+        int flags = Byte.toUnsignedInt(data[16]);
         // Bit 0 = hidden
         boolean hidden = (flags & 0x0001) != 0;
 
