@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+// todo: this class needs more cleanup
 class ExcelReadRequestTest {
 
     @TempDir
@@ -35,6 +36,17 @@ class ExcelReadRequestTest {
             TestSheetInfoUtil.sheet("AAA", 0),
             TestSheetInfoUtil.sheet("BBB", 1),
             TestSheetInfoUtil.sheet("CCC", 2)
+    );
+
+    private static final List<SheetInfo> TEST_PREFIX_SHEETS = List.of(
+            TestSheetInfoUtil.sheet("Aaa", 0),
+            TestSheetInfoUtil.sheet("abc", 1),
+            TestSheetInfoUtil.sheet("ba1", 2),
+            TestSheetInfoUtil.sheet("bb2", 3),
+            TestSheetInfoUtil.sheet("bb3", 4),
+            TestSheetInfoUtil.sheet("cat1", 5),
+            TestSheetInfoUtil.sheet("cat2", 6),
+            TestSheetInfoUtil.sheet("dog", 7)
     );
 
     private Path getSampleFilePath() {
@@ -207,6 +219,50 @@ class ExcelReadRequestTest {
             assertEquals(2, filteredSheetList.size());
             assertEquals("CCC", filteredSheetList.get(0).getName());
             assertEquals("AAA", filteredSheetList.get(1).getName());
+        }
+
+        @Test
+        void byPrefixSheetSelection() {
+            Path filePath = getSampleFilePath();
+            ExcelReadRequest request = ExcelReadRequest.from(filePath)
+                    .bySheetPrefix("BB")
+                    .build();
+
+            // confirm our custom sheet selector was applied.
+            List<SheetInfo> filteredSheetList = request.getSheetSelector().filterSheets(TEST_PREFIX_SHEETS);
+            assertEquals(2, filteredSheetList.size());
+            assertEquals("bb2", filteredSheetList.get(0).getName());
+            assertEquals("bb3", filteredSheetList.get(1).getName());
+        }
+
+        @Test
+        void byPrefixVarArgsSheetSelection() {
+            Path filePath = getSampleFilePath();
+            ExcelReadRequest request = ExcelReadRequest.from(filePath)
+                    .bySheetPrefix("cat", "a")
+                    .build();
+
+            // confirm our custom sheet selector was applied.
+            List<SheetInfo> filteredSheetList = request.getSheetSelector().filterSheets(TEST_PREFIX_SHEETS);
+            assertEquals(4, filteredSheetList.size());
+            assertEquals("cat1", filteredSheetList.get(0).getName());
+            assertEquals("cat2", filteredSheetList.get(1).getName());
+            assertEquals("Aaa", filteredSheetList.get(2).getName());
+            assertEquals("abc", filteredSheetList.get(3).getName());
+        }
+
+        @Test
+        void byPrefixCollectionSheetSelection() {
+            Path filePath = getSampleFilePath();
+            ExcelReadRequest request = ExcelReadRequest.from(filePath)
+                    .bySheetPrefixes(List.of("ab", "dog"))
+                    .build();
+
+            // confirm our custom sheet selector was applied.
+            List<SheetInfo> filteredSheetList = request.getSheetSelector().filterSheets(TEST_PREFIX_SHEETS);
+            assertEquals(2, filteredSheetList.size());
+            assertEquals("abc", filteredSheetList.get(0).getName());
+            assertEquals("dog", filteredSheetList.get(1).getName());
         }
 
         @Test
