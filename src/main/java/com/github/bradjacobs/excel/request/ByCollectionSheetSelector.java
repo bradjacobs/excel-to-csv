@@ -6,7 +6,6 @@ package com.github.bradjacobs.excel.request;
 import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -66,10 +65,5 @@ abstract class ByCollectionSheetSelector<T> implements SheetSelector {
         //   rather than automatically remove.
         Validate.isTrue(values.size() == valueSet.size(),
                 label + " cannot contain duplicate values");
-    }
-
-    @SafeVarargs
-    protected static <T> Collection<T> toCollection(T... values) {
-        return values == null ? null : Arrays.asList(values);
     }
 }
