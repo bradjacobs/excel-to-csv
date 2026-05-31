@@ -1,6 +1,6 @@
 package com.github.bradjacobs.excel.engine.eventmodel.xssfb;
 
-import com.github.bradjacobs.excel.util.TestResourceUtil;
+import com.github.bradjacobs.excel.testutils.TestResourceUtil;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.XSSFBReader;
 import org.junit.jupiter.api.Test;

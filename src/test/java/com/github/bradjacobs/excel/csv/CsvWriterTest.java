@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.github.bradjacobs.excel.util.TestResourceUtil.getResourceFileObject;
-import static com.github.bradjacobs.excel.util.TestResourceUtil.readResourceFileText;
+import static com.github.bradjacobs.excel.testutils.TestResourceUtil.getResourceFileObject;
+import static com.github.bradjacobs.excel.testutils.TestResourceUtil.readResourceFileText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;

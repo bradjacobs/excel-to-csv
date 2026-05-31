@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.request;
 
-import com.github.bradjacobs.excel.util.TestSheetInfoUtil;
+import com.github.bradjacobs.excel.testutils.TestSheetInfoUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel.common;
 
-import com.github.bradjacobs.excel.util.TestResourceUtil;
+import com.github.bradjacobs.excel.testutils.TestResourceUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;

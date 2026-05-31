@@ -6,7 +6,7 @@ package com.github.bradjacobs.excel.engine.eventmodel.xssfb;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.engine.eventmodel.AdvancedExcelReader;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
-import com.github.bradjacobs.excel.util.TestResourceUtil;
+import com.github.bradjacobs.excel.testutils.TestResourceUtil;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 

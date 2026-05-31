@@ -7,7 +7,7 @@ import com.github.bradjacobs.excel.core.AbstractExcelReaderTest;
 
 import java.nio.file.Path;
 
-import static com.github.bradjacobs.excel.util.TestResourceUtil.getResourceFilePath;
+import static com.github.bradjacobs.excel.testutils.TestResourceUtil.getResourceFilePath;
 
 class StandardExcelReaderTest extends AbstractExcelReaderTest<StandardExcelReader, StandardExcelReader.Builder> {
 

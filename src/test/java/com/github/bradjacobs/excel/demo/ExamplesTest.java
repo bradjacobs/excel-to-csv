@@ -5,7 +5,7 @@ import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.csv.CsvWriter;
 import com.github.bradjacobs.excel.csv.QuoteMode;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
-import com.github.bradjacobs.excel.util.TestResourceUtil;
+import com.github.bradjacobs.excel.testutils.TestResourceUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
