@@ -25,19 +25,35 @@ The API follows a simple pipeline:
 4. Output it using `CsvWriter` (writes CSV files)
 
 ## Quick Start
+
 ```java
+// Bare Bones Example...
+ExcelReadRequest request = ExcelReadRequest.from("input.xlsx").build();
+SheetContent sheetContent = ExcelProcessor.builder().build().readSheet(request);
+CsvWriter.writeToFile(Paths.get("output.csv"), content);
+```
+
+```java
+// With Custom Options Example...
 ExcelSheetReadRequest request = ExcelSheetReadRequest
     .from(Paths.get("input.xlsx"))
-    .byName("Sheet1")
+    .byName("MyDataSheet") // specific sheet to parse
     .build();
 
 ExcelProcessor processor = ExcelProcessor.builder()
-    .skipBlankRows(true)
+    .skipBlankRows(true) // skip/ignore blank rows
+    .skipBlankColumns(true) // skip/ignore blank columns
+    .sanitizeDiacritics(true) // sanitize diacritics (accents). e.g. "résumé" -> "resume"
     .build();
 
-SheetContent content = processor.readSheets(request).get(0);
+// read the sheet data
+SheetContent content = processor.readSheet(request);
+// write the sheet data to a CSV file, and only quote values required for CSV compliance.
 CsvWriter.writeToFile(Paths.get("output.csv"), content, QuoteMode.MINIMAL);
 ```
+
+TODO – document a full list of API options with descriptions.
+
 <details>
   <summary><strong>ExcelSheetReadRequest</strong></summary>
 
@@ -128,7 +144,7 @@ Opening the Excel file and then 'resaving' can sometimes resolve issues.
 Most cases below appear to be pretty rare (subjectively)
 
 * Sometimes 'zero' and 'blank' can get mixed up.
-    * i.e. expected "" but got "0.0"
+    * i.e., expected "" but got "0.0"
 * Advanced parser can throw an exception if encounters a cell without a CellReference
     * a poi-examples class [XLSX2CSV.java](https://github.com/apache/poi/blob/trunk/poi-examples/src/main/java/org/apache/poi/examples/xssf/eventusermodel/XLSX2CSV.java) shows a proposed solution, but it only works in a handful of cases.
 * Certain Linked or Embedded Objects typically render as "#VALUE!" (Pictures, Stock, Geography, etc.)
@@ -235,19 +251,19 @@ Certain items that I _WILL NOT_ get around to.
 <details>
   <summary>Won't Fix... (Click To Expand)</summary>
 
-* Custome Date/Time Formatting or Handling
-  * too many considerations of format, timezone shifting, etc
+* Custom Date/Time Formatting or Handling
+  * too many considerations of format, timezone shifting, etc.
 * Custom Numeric Formatting or Handling
   * Do not want to deal with things like: 
     * 2 vs 2.0
     * if 98% should be 0.98 or 98
     * international formats
-    * super large, super small numbers
+    * super large or super small numbers
     * etc
   * Harder to deal with in the advanced event implementation.
 * Multiple sheets to SINGLE CSV file.
   * too many concerns if sheets have a different structure.
-  * Easy for someone to do programmatically (just merge the SheetContent List<List<String>> values).
+  * can be done programmatically if desired (just merge the SheetContent List<List<String>> values).
 * Read all Excel files in a directory.
   * Not hard to write for those who would want that functionality.
 * Formula handling Option.
