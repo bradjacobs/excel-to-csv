@@ -273,7 +273,7 @@ class StringRowConsumerTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class PruneEmptyRowConsumerTests {
         @Test
-        public void ekipBlankRowsWhenConfigured() {
+        public void skipBlankRowsWhenConfigured() {
             String[][] input = {
                     {"aa", "bb"},
                     {"", ""},
