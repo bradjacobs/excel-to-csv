@@ -65,6 +65,27 @@ class ByPrefixSheetSelectorTest {
             assertEquals("dog", result.get(2).getName());
         }
 
+        @Test
+        void multiplePrefixMatchSameSheet() {
+            // ensure don't 'double match' the same sheet
+            ByPrefixSheetSelector selector
+                    = new ByPrefixSheetSelector(List.of("a", "aa"));
+
+            List<SheetInfo> result = selector.filterSheets(sheets(
+                    sheet("aaa1", 0),
+                    sheet("aaa2", 1),
+                    sheet("a3", 2),
+                    sheet("a4", 3),
+                    sheet("b1", 4)
+            ));
+
+            assertEquals(4, result.size());
+            assertEquals("aaa1", result.get(0).getName());
+            assertEquals("aaa2", result.get(1).getName());
+            assertEquals("a3", result.get(2).getName());
+            assertEquals("a4", result.get(3).getName());
+        }
+
         @Nested
         @DisplayName("exception behavior")
         class ExceptionTests {
