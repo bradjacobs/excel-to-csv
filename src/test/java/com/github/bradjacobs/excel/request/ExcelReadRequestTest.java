@@ -295,7 +295,7 @@ class ExcelReadRequestTest {
             ExcelReadRequest request = ExcelReadRequest.from(filePath)
                     .password("")
                     .build();
-            assertEquals(null, request.getPassword());
+            assertNull(request.getPassword());
         }
     }
 
