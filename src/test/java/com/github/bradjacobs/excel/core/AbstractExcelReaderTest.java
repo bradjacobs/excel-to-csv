@@ -442,7 +442,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
     private static final String INPUT_FILE_NOT_FOUND_PATH = "/bogus/path/here/file.xlsx";
     private static final String INPUT_FILE_NOT_FOUND_URL = "https://www.zxfake12.com/foo/bar.html";
 
-    protected static List<Arguments> invalidInputPaths() {
+    private static List<Arguments> invalidInputPaths() {
         return Arrays.asList(
                 arguments(named("File Not Found", INPUT_FILE_NOT_FOUND_PATH), FileNotFoundException.class, "Invalid Excel file path: /bogus/path/here/file.xlsx"),
                 arguments(named("Null Input", null), IllegalArgumentException.class, "Either file path or url must be provided"),
@@ -451,7 +451,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         );
     }
 
-    protected static List<Arguments> invalidInputUrls() {
+    private static List<Arguments> invalidInputUrls() {
         return Arrays.asList(
                 arguments(named("Url Not Found", INPUT_FILE_NOT_FOUND_URL), UnknownHostException.class, null),
                 arguments(named("Null Input", null), IllegalArgumentException.class, "Either file path or url must be provided"),
