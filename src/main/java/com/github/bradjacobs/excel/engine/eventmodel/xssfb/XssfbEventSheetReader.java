@@ -21,6 +21,7 @@ import org.apache.poi.xssf.binary.XSSFBSharedStringsTable;
 import org.apache.poi.xssf.binary.XSSFBSheetHandler;
 import org.apache.poi.xssf.binary.XSSFBStylesTable;
 import org.apache.poi.xssf.eventusermodel.XSSFBReader;
+import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.SharedStrings;
 import org.xml.sax.SAXException;
 
@@ -34,11 +35,14 @@ TODO: NOTE this class references POI classes that are marked as "internal"
  */
 public class XssfbEventSheetReader implements EventSheetReader {
 
-    private static final XssfbDateWindowingDetector DATE_WINDOWING_DETECTOR
-            = new XssfbDateWindowingDetector();
+    private static final XssfbDateWindowingDetector DATE_WINDOWING_DETECTOR =
+            new XssfbDateWindowingDetector();
     private static final XSSFBCommentsTable EMPTY_COMMENTS = null;
     private static final boolean FORMULAS_NOT_RESULTS = false;
-    private static final PoiSheetStreamProvider sheetStreamProvider = new PoiSheetStreamProvider();
+    private static final PoiSheetStreamProvider SHEET_STREAM_PROVIDER =
+            new PoiSheetStreamProvider();
+    private static final String INITIALIZATION_FAILURE_MESSAGE = "Failed to initialize XssfbEventSheetReader";
+
 
     private final XSSFBReader reader;
     private final SheetConfig sheetConfig;
@@ -49,29 +53,20 @@ public class XssfbEventSheetReader implements EventSheetReader {
     public static XssfbEventSheetReader create(
             OPCPackage pkg,
             SheetConfig config) {
-       try {
+        try {
             XSSFBReader reader = new XSSFBReader(pkg);
-            XSSFBSharedStringsTable sharedStrings = new XSSFBSharedStringsTable(pkg);
-            XSSFBStylesTable styles = reader.getXSSFBStylesTable();
-
-            boolean requires1904DateWindowing =
-                    DATE_WINDOWING_DETECTOR.is1904DateWindowing(reader);
-
-            DataFormatter formatter =
-                    new DateWindowingDataFormatter(
-                            requires1904DateWindowing);
 
             return new XssfbEventSheetReader(
                     reader,
                     config,
-                    sharedStrings,
-                    styles,
-                    formatter);
-       }
-       catch (IOException | SAXException | OpenXML4JException  e) {
-           throw new IllegalStateException(
-                   "Failed to initialize XssfbEventSheetReader: " + e.getMessage(), e);
-       }
+                    new XSSFBSharedStringsTable(pkg),
+                    reader.getXSSFBStylesTable(),
+                    createDataFormatter(reader));
+        }
+        catch (IOException | SAXException | OpenXML4JException e) {
+            throw new IllegalStateException(
+                    INITIALIZATION_FAILURE_MESSAGE + e.getMessage(), e);
+        }
     }
 
     private XssfbEventSheetReader(
@@ -89,11 +84,12 @@ public class XssfbEventSheetReader implements EventSheetReader {
 
     @Override
     public List<EventSheet> getSheets() throws IOException, InvalidFormatException {
-        return sheetStreamProvider.getSheets(this.reader);
+        return SHEET_STREAM_PROVIDER.getSheets(reader);
     }
 
     @Override
-    public List<List<String>> read(InputStream inputStream) throws ParserConfigurationException, SAXException, IOException {
+    public List<List<String>> read(InputStream inputStream)
+            throws ParserConfigurationException, SAXException, IOException {
         StringRowConsumer stringRowConsumer = createStringRowConsumer();
         XSSFBSheetHandler sheetHandler = createSheetHandler(inputStream, stringRowConsumer);
         sheetHandler.parse();
@@ -109,23 +105,20 @@ public class XssfbEventSheetReader implements EventSheetReader {
 
     private XSSFBSheetHandler createSheetHandler(
             InputStream inputStream,
-            StringRowConsumer stringRowConsumer) {
+            StringRowConsumer rowConsumer) {
         return sheetConfig.skipHiddenCells()
-                ? createVisibleAwareHandler(inputStream, stringRowConsumer)
-                : createDefaultHandler(inputStream, stringRowConsumer);
+                ? createVisibleAwareHandler(inputStream, rowConsumer)
+                : createDefaultHandler(inputStream, rowConsumer);
     }
 
     private XSSFBSheetHandler createDefaultHandler(
             InputStream inputStream,
-            StringRowConsumer stringRowConsumer) {
-
+            StringRowConsumer rowConsumer) {
         SheetContentHandler handler = new SheetContentHandler(
                 sheetConfig,
-                stringRowConsumer
+                rowConsumer
         );
-
-        XssfbCustomSheetContentsHandlerWrapper handlerWrapper =
-                new XssfbCustomSheetContentsHandlerWrapper(handler, dataFormatter);
+        XssfbCustomSheetContentsHandlerWrapper handlerWrapper = createHandlerWrapper(handler);
 
         return new XSSFBSheetHandler(
                 inputStream,
@@ -140,16 +133,14 @@ public class XssfbEventSheetReader implements EventSheetReader {
     private XSSFBSheetHandler createVisibleAwareHandler(
             InputStream inputStream,
             StringRowConsumer stringRowConsumer) {
-
         SheetContext sheetContext = new SheetContext();
+
         SheetContentHandler handler = new VisibleAwareSheetContentHandler(
                 sheetConfig,
                 stringRowConsumer,
                 sheetContext
         );
-
-        XssfbCustomSheetContentsHandlerWrapper handlerWrapper =
-                new XssfbCustomSheetContentsHandlerWrapper(handler, dataFormatter);
+        XssfbCustomSheetContentsHandlerWrapper handlerWrapper = createHandlerWrapper(handler);
 
         return new XssfbVisibleAwareSheetHandler(
                 inputStream,
@@ -160,5 +151,17 @@ public class XssfbEventSheetReader implements EventSheetReader {
                 FORMULAS_NOT_RESULTS,
                 sheetContext
         );
+    }
+
+    private XssfbCustomSheetContentsHandlerWrapper createHandlerWrapper(
+            XSSFSheetXMLHandler.SheetContentsHandler handler) {
+        return new XssfbCustomSheetContentsHandlerWrapper(handler, dataFormatter);
+    }
+
+    private static DataFormatter createDataFormatter(XSSFBReader reader)
+            throws IOException, OpenXML4JException, SAXException {
+        boolean requires1904DateWindowing =
+                DATE_WINDOWING_DETECTOR.is1904DateWindowing(reader);
+        return new DateWindowingDataFormatter(requires1904DateWindowing);
     }
 }
