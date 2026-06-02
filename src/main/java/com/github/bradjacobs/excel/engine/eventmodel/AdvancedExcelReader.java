@@ -16,13 +16,11 @@ import com.github.bradjacobs.excel.request.SheetSelector;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.poi.ooxml.POIXMLException;
+import org.apache.poi.ooxml.POIXMLDocumentPart;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.openxml4j.opc.PackageRelationshipTypes;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.FileMagic;
@@ -112,17 +110,10 @@ public class AdvancedExcelReader extends AbstractExcelReader {
     }
 
     private boolean isBinary(OPCPackage pkg) {
-        PackageRelationship coreDocRelationship = pkg.getRelationshipsByType(
-                PackageRelationshipTypes.CORE_DOCUMENT).getRelationship(0);
-
-        PackagePart pp = pkg.getPart(coreDocRelationship);
-        if (pp == null) {
-            pkg.revert();
-            throw new POIXMLException("OOXML file structure broken/invalid - core document '" + coreDocRelationship.getTargetURI() + "' not found.");
-        }
-
+        POIXMLDocumentPart documentPart = new POIXMLDocumentPart(pkg);
+        PackagePart packagePart = documentPart.getPackagePart();
         return XSSFRelation.XLSB_BINARY_WORKBOOK.getContentType()
-                .equals(pp.getContentType());
+                .equals(packagePart.getContentType());
     }
 
     /**
