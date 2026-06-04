@@ -66,6 +66,9 @@ public class StandardExcelReader extends AbstractExcelReader {
         for (Sheet sheet : workbook) {
             sheetInfos.add(new WorkbookSheetInfo(sheet.getSheetName(), sheetIndex++, sheet));
         }
+        if (sheetInfos.isEmpty()) {
+            throw new IllegalStateException("Unable to read workbook sheets. File might be corrupted.");
+        }
         return sheetInfos;
     }
 
