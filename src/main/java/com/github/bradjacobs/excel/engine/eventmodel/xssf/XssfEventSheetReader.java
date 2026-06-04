@@ -10,7 +10,7 @@ import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheet;
 import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheetReader;
 import com.github.bradjacobs.excel.engine.eventmodel.common.PoiSheetStreamProvider;
 import com.github.bradjacobs.excel.engine.eventmodel.common.SheetContentHandler;
-import com.github.bradjacobs.excel.engine.eventmodel.common.SheetContext;
+import com.github.bradjacobs.excel.engine.eventmodel.common.SheetVisibilityTracker;
 import com.github.bradjacobs.excel.engine.eventmodel.common.VisibleAwareSheetContentHandler;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -50,6 +50,10 @@ public class XssfEventSheetReader implements EventSheetReader {
             SheetConfig config) {
         try {
             XSSFReader xssfReader = new XSSFReader(pkg);
+
+            // SIDE NOTE: Docs say readOnlySharedStringsTable saves memory
+            // on large files, but experiments show ~25% slower performance!
+            //xssfReader.setUseReadOnlySharedStringsTable(true);
 
             return new XssfEventSheetReader(
                     xssfReader,
@@ -130,7 +134,7 @@ public class XssfEventSheetReader implements EventSheetReader {
     }
 
     private ContentHandler createVisibleAwareHandler(StringRowConsumer rowConsumer) {
-        SheetContext sheetContext = new SheetContext();
+        SheetVisibilityTracker sheetVisibilityTracker = new SheetVisibilityTracker();
 
         return new XssfVisibleAwareSheetXmlHandler(
                 styles,
@@ -138,14 +142,13 @@ public class XssfEventSheetReader implements EventSheetReader {
                 new VisibleAwareSheetContentHandler(
                         sheetConfig,
                         rowConsumer,
-                        sheetContext
+                        sheetVisibilityTracker
                 ),
                 dataFormatter,
                 FORMULAS_NOT_RESULTS,
-                sheetContext
+                sheetVisibilityTracker
         );
     }
-
 
     private static DataFormatter createDataFormatter(XSSFReader reader)
             throws IOException, ParserConfigurationException, InvalidFormatException, SAXException {

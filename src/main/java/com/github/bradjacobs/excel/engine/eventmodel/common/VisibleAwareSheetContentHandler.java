@@ -19,14 +19,14 @@ public class VisibleAwareSheetContentHandler extends SheetContentHandler {
      */
     private int lastProcessedRowIndex = NO_PREVIOUS_ROW;
 
-    private final SheetContext sheetContext;
+    private final SheetVisibilityTracker sheetVisibilityTracker;
 
     public VisibleAwareSheetContentHandler(
             SheetConfig sheetConfig,
             StringRowConsumer stringRowConsumer,
-            SheetContext sheetContext) {
+            SheetVisibilityTracker sheetVisibilityTracker) {
         super(sheetConfig, stringRowConsumer);
-        this.sheetContext = sheetContext;
+        this.sheetVisibilityTracker = sheetVisibilityTracker;
     }
 
     @Override
@@ -88,11 +88,11 @@ public class VisibleAwareSheetContentHandler extends SheetContentHandler {
     }
 
     private boolean isRowVisible(int rowIndex) {
-        return sheetContext.isRowVisible(rowIndex);
+        return sheetVisibilityTracker.isRowVisible(rowIndex);
     }
 
     private boolean isColumnVisible(int columnIndex) {
-        return sheetContext.isColumnVisible(columnIndex);
+        return sheetVisibilityTracker.isColumnVisible(columnIndex);
     }
 }
 

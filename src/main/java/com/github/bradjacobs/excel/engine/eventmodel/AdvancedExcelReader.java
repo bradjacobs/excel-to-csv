@@ -57,10 +57,6 @@ public class AdvancedExcelReader extends AbstractExcelReader {
         try (InputStream inputStream = preprocessFileInputStream(sourceInputStream, request.getPassword());
             OPCPackage pkg = OPCPackage.open(inputStream)) {
 
-            // NOTE: Docs say readOnlySharedStringsTable saves memory on large files,
-            // but tests show ~25% slower performance!
-            //reader.setUseReadOnlySharedStringsTable(true);
-
             EventSheetReader eventSheetReader =
                     createEventSheetReader(pkg, sheetConfig);
 
@@ -140,9 +136,9 @@ public class AdvancedExcelReader extends AbstractExcelReader {
         }
 
         if (FileMagic.OOXML != fm) {
-            // todo - currently throw IOException to be consistent with the other impl.
-            throw new IOException("Cannot open excel file - unsupported file type: " + fm);
-            //throw new NotOfficeXmlFileException("Cannot open Excel file - unsupported file type: " + fm);
+            // NOTE: - currently throw IOException to be consistent with the
+            // other standard implementations that throws from WorkbookFactory.create
+            throw new IOException("Cannot open workbook - unsupported file type: " + fm);
         }
         return resultStream;
     }

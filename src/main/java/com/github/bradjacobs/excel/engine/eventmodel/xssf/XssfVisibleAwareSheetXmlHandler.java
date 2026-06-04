@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel.xssf;
 
-import com.github.bradjacobs.excel.engine.eventmodel.common.SheetContext;
+import com.github.bradjacobs.excel.engine.eventmodel.common.SheetVisibilityTracker;
 import org.apache.commons.lang3.Validate;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
@@ -26,7 +26,7 @@ class XssfVisibleAwareSheetXmlHandler extends XSSFSheetXMLHandler {
     private static final String ATTR_MIN = "min";
     private static final String ATTR_MAX = "max";
 
-    private final SheetContext sheetContext;
+    private final SheetVisibilityTracker sheetVisibilityTracker;
 
     public XssfVisibleAwareSheetXmlHandler(
             Styles styles,
@@ -34,9 +34,9 @@ class XssfVisibleAwareSheetXmlHandler extends XSSFSheetXMLHandler {
             SheetContentsHandler sheetContentsHandler,
             DataFormatter dataFormatter,
             boolean formulasNotResults,
-            SheetContext sheetContext) {
+            SheetVisibilityTracker sheetVisibilityTracker) {
         super(styles, sharedStrings, sheetContentsHandler, dataFormatter, formulasNotResults);
-        this.sheetContext = sheetContext;
+        this.sheetVisibilityTracker = sheetVisibilityTracker;
     }
 
     @Override
@@ -57,7 +57,7 @@ class XssfVisibleAwareSheetXmlHandler extends XSSFSheetXMLHandler {
         }
 
         int rowNumber1Based = getIntAttribute(attributes, ATTR_ROW_NUMBER);
-        sheetContext.addHiddenRow(rowNumber1Based - 1);
+        sheetVisibilityTracker.addHiddenRow(rowNumber1Based - 1);
     }
 
     private void handleColumnStart(Attributes attributes) {
@@ -71,7 +71,7 @@ class XssfVisibleAwareSheetXmlHandler extends XSSFSheetXMLHandler {
 
         // Columns are 1-based in XML, convert to 0-based index
         for (int col1Based = min1Based; col1Based <= max1Based; col1Based++) {
-            sheetContext.addHiddenColumn(col1Based - 1);
+            sheetVisibilityTracker.addHiddenColumn(col1Based - 1);
         }
     }
 

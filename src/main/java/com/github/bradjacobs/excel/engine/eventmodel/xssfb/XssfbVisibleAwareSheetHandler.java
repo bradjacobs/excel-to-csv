@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel.xssfb;
 
-import com.github.bradjacobs.excel.engine.eventmodel.common.SheetContext;
+import com.github.bradjacobs.excel.engine.eventmodel.common.SheetVisibilityTracker;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.xssf.binary.XSSFBCommentsTable;
 import org.apache.poi.xssf.binary.XSSFBParseException;
@@ -16,7 +16,7 @@ import java.io.InputStream;
 
 class XssfbVisibleAwareSheetHandler extends XSSFBSheetHandler {
 
-    private final SheetContext sheetContext;
+    private final SheetVisibilityTracker sheetVisibilityTracker;
 
     public XssfbVisibleAwareSheetHandler(
             InputStream is,
@@ -25,9 +25,9 @@ class XssfbVisibleAwareSheetHandler extends XSSFBSheetHandler {
             SharedStrings strings,
             XSSFBSheetContentsHandler sheetContentsHandler,
             boolean formulasNotResults,
-            SheetContext sheetContext) {
+            SheetVisibilityTracker sheetVisibilityTracker) {
         super(is, styles, comments, strings, sheetContentsHandler, formulasNotResults);
-        this.sheetContext = sheetContext;
+        this.sheetVisibilityTracker = sheetVisibilityTracker;
     }
 
     @Override
@@ -47,7 +47,7 @@ class XssfbVisibleAwareSheetHandler extends XSSFBSheetHandler {
         boolean isHiddenRow = (rowFlags & 0x10) != 0;
         if (isHiddenRow) {
             int rowNumber = LittleEndian.getInt(data, 0);
-            sheetContext.addHiddenRow(rowNumber);
+            sheetVisibilityTracker.addHiddenRow(rowNumber);
         }
     }
 
@@ -63,7 +63,7 @@ class XssfbVisibleAwareSheetHandler extends XSSFBSheetHandler {
             int colLast  = LittleEndian.getInt(data, 4);
 
             for (int columnIndex = colFirst; columnIndex <= colLast; columnIndex++) {
-                sheetContext.addHiddenColumn(columnIndex);
+                sheetVisibilityTracker.addHiddenColumn(columnIndex);
             }
         }
     }

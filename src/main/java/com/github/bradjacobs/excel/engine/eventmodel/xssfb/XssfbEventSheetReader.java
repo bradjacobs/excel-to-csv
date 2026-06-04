@@ -10,7 +10,7 @@ import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheet;
 import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheetReader;
 import com.github.bradjacobs.excel.engine.eventmodel.common.PoiSheetStreamProvider;
 import com.github.bradjacobs.excel.engine.eventmodel.common.SheetContentHandler;
-import com.github.bradjacobs.excel.engine.eventmodel.common.SheetContext;
+import com.github.bradjacobs.excel.engine.eventmodel.common.SheetVisibilityTracker;
 import com.github.bradjacobs.excel.engine.eventmodel.common.VisibleAwareSheetContentHandler;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -42,7 +42,6 @@ public class XssfbEventSheetReader implements EventSheetReader {
     private static final PoiSheetStreamProvider SHEET_STREAM_PROVIDER =
             new PoiSheetStreamProvider();
     private static final String INITIALIZATION_FAILURE_MESSAGE = "Failed to initialize XssfbEventSheetReader";
-
 
     private final XSSFBReader reader;
     private final SheetConfig sheetConfig;
@@ -133,12 +132,12 @@ public class XssfbEventSheetReader implements EventSheetReader {
     private XSSFBSheetHandler createVisibleAwareHandler(
             InputStream inputStream,
             StringRowConsumer stringRowConsumer) {
-        SheetContext sheetContext = new SheetContext();
+        SheetVisibilityTracker sheetVisibilityTracker = new SheetVisibilityTracker();
 
         SheetContentHandler handler = new VisibleAwareSheetContentHandler(
                 sheetConfig,
                 stringRowConsumer,
-                sheetContext
+                sheetVisibilityTracker
         );
         XssfbCustomSheetContentsHandlerWrapper handlerWrapper = createHandlerWrapper(handler);
 
@@ -149,7 +148,7 @@ public class XssfbEventSheetReader implements EventSheetReader {
                 sharedStrings,
                 handlerWrapper,
                 FORMULAS_NOT_RESULTS,
-                sheetContext
+                sheetVisibilityTracker
         );
     }
 

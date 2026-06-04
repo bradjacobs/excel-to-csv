@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Tracks hidden row/column indices while parsing a sheet.
  */
-public final class SheetContext {
+public final class SheetVisibilityTracker {
     private final Set<Integer> hiddenRows = new HashSet<>();
     private final Set<Integer> hiddenColumns = new HashSet<>();
 

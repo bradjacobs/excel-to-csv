@@ -5,7 +5,7 @@ package com.github.bradjacobs.excel.api;
 
 
 // TODO - after previous refactors this class is no longer relevant
-//   need to detect is need this logic check for row content
+//   need to confirm if need this logic check for row content
 //   and then update (or delete) this class as needed.
 final class SheetContentValidation {
 
