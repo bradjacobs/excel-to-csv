@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel.xssfb;
 
-import com.github.bradjacobs.excel.engine.eventmodel.common.SheetVisibilityTracker;
+import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetVisibilityTracker;
 import org.apache.poi.util.LittleEndian;
 import org.apache.poi.xssf.binary.XSSFBCommentsTable;
 import org.apache.poi.xssf.binary.XSSFBParseException;

@@ -3,11 +3,11 @@
 
     <!-- TODO - check refactor options for feasibility of removing this first exemption -->
     <Match>
-        <Class name="com.github.bradjacobs.excel.engine.eventmodel.common.SheetContentHandler"/>
+        <Class name="com.github.bradjacobs.excel.engine.eventmodel.shared.SheetContentHandler"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.github.bradjacobs.excel.engine.eventmodel.common.VisibleAwareSheetContentHandler"/>
+        <Class name="com.github.bradjacobs.excel.engine.eventmodel.shared.VisibleAwareSheetContentHandler"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 

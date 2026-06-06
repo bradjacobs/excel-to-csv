@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.engine.eventmodel.common;
+package com.github.bradjacobs.excel.engine.eventmodel.shared;
 
 import com.github.bradjacobs.excel.testutils.TestResourceUtil;
 import org.apache.commons.io.IOUtils;

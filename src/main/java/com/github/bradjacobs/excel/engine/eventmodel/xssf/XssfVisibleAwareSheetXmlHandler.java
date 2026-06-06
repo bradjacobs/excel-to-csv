@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel.xssf;
 
-import com.github.bradjacobs.excel.engine.eventmodel.common.SheetVisibilityTracker;
+import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetVisibilityTracker;
 import org.apache.commons.lang3.Validate;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;

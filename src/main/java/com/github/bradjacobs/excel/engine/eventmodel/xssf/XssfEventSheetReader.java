@@ -4,13 +4,13 @@
 package com.github.bradjacobs.excel.engine.eventmodel.xssf;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.engine.eventmodel.common.DateWindowingDataFormatter;
-import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheet;
-import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheetReader;
-import com.github.bradjacobs.excel.engine.eventmodel.common.PoiSheetStreamProvider;
-import com.github.bradjacobs.excel.engine.eventmodel.common.SheetContentHandler;
-import com.github.bradjacobs.excel.engine.eventmodel.common.SheetVisibilityTracker;
-import com.github.bradjacobs.excel.engine.eventmodel.common.VisibleAwareSheetContentHandler;
+import com.github.bradjacobs.excel.engine.eventmodel.shared.DateWindowingDataFormatter;
+import com.github.bradjacobs.excel.engine.eventmodel.shared.EventSheet;
+import com.github.bradjacobs.excel.engine.eventmodel.shared.EventSheetReader;
+import com.github.bradjacobs.excel.engine.eventmodel.shared.PoiSheetStreamProvider;
+import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetContentHandler;
+import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetVisibilityTracker;
+import com.github.bradjacobs.excel.engine.eventmodel.shared.VisibleAwareSheetContentHandler;
 import com.github.bradjacobs.excel.row.StringRowConsumer;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
