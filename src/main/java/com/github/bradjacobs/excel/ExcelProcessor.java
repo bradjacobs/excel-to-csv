@@ -7,7 +7,7 @@ import com.github.bradjacobs.excel.api.ExcelWorkbookReader;
 import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.core.AbstractExcelReader.AbstractSheetConfigBuilder;
-import com.github.bradjacobs.excel.engine.eventmodel.AdvancedExcelReader;
+import com.github.bradjacobs.excel.engine.eventmodel.EventModelExcelReader;
 import com.github.bradjacobs.excel.engine.objectmodel.StandardExcelReader;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
 import org.apache.commons.io.FilenameUtils;
@@ -34,7 +34,7 @@ public class ExcelProcessor implements ExcelWorkbookReader {
         this.useAdvancedReader = builder.useAdvancedReader;
         SheetConfig sheetConfig = builder.buildConfig();
         this.standardExcelWorkbookReader = new StandardExcelReader(sheetConfig);
-        this.advancedExcelWorkbookReader = new AdvancedExcelReader(sheetConfig);
+        this.advancedExcelWorkbookReader = new EventModelExcelReader(sheetConfig);
     }
 
     @Override

@@ -5,11 +5,11 @@ package com.github.bradjacobs.excel.engine.eventmodel;
 
 import com.github.bradjacobs.excel.core.AbstractExcelReaderTest;
 
-class AdvancedExcelReaderTest extends AbstractExcelReaderTest<AdvancedExcelReader, AdvancedExcelReader.Builder> {
+class EventModelExcelReaderTest extends AbstractExcelReaderTest<EventModelExcelReader, EventModelExcelReader.Builder> {
 
     @Override
-    protected AdvancedExcelReader.Builder createBuilder() {
-        return AdvancedExcelReader.builder();
+    protected EventModelExcelReader.Builder createBuilder() {
+        return EventModelExcelReader.builder();
     }
 
     // TODO

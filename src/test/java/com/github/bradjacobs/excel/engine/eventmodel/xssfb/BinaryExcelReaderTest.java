@@ -4,7 +4,7 @@
 package com.github.bradjacobs.excel.engine.eventmodel.xssfb;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.engine.eventmodel.AdvancedExcelReader;
+import com.github.bradjacobs.excel.engine.eventmodel.EventModelExcelReader;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
 import com.github.bradjacobs.excel.testutils.TestResourceUtil;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,7 +23,7 @@ class BinaryExcelReaderTest {
     private static final String INPUT_DATA_SHEET_SUFFIX = "_Data";
     private static final String EXPECTED_DATA_SHEET_SUFFIX = "_Expected";
 
-    private final AdvancedExcelReader defaultSheetReader = AdvancedExcelReader.builder().build();
+    private final EventModelExcelReader defaultSheetReader = EventModelExcelReader.builder().build();
 
 
     @ParameterizedTest(name = "HiddenTest {index}: Sheet = {0}")
@@ -46,11 +46,11 @@ class BinaryExcelReaderTest {
         String testDataSheetName = sheetNamePrefix + INPUT_DATA_SHEET_SUFFIX;
         String expectedDataSheetName = sheetNamePrefix + EXPECTED_DATA_SHEET_SUFFIX;
 
-        SheetConfig config = AdvancedExcelReader.builder()
+        SheetConfig config = EventModelExcelReader.builder()
                 .skipHiddenCells(true)
                 .buildConfig();
 
-        AdvancedExcelReader sheetReader = new AdvancedExcelReader(config);
+        EventModelExcelReader sheetReader = new EventModelExcelReader(config);
 
         ExcelReadRequest request = createRequest(HIDDEN_CELLS_FILE, testDataSheetName);
         ExcelReadRequest expectedRequest = createRequest(HIDDEN_CELLS_FILE, expectedDataSheetName);
@@ -72,7 +72,7 @@ class BinaryExcelReaderTest {
         return ExcelReadRequest.from(path).bySheetIndex(sheetIndex).build();
     }
 
-    private String[][] readMatrix(AdvancedExcelReader sheetReader, ExcelReadRequest request) throws IOException {
+    private String[][] readMatrix(EventModelExcelReader sheetReader, ExcelReadRequest request) throws IOException {
         return sheetReader.readSheet(request).getMatrix();
     }
 

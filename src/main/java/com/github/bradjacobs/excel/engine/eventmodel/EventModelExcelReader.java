@@ -37,13 +37,13 @@ import java.util.List;
 import static org.apache.poi.extractor.ExtractorFactory.OOXML_PACKAGE;
 import static org.apache.poi.poifs.crypt.Decryptor.DEFAULT_POIFS_ENTRY;
 
-public class AdvancedExcelReader extends AbstractExcelReader {
+public class EventModelExcelReader extends AbstractExcelReader {
 
     /**
      * Constructor
      */
     // TODO: Maybe change constructor to non-public
-    public AdvancedExcelReader(SheetConfig config) {
+    public EventModelExcelReader(SheetConfig config) {
         super(config);
     }
 
@@ -147,15 +147,15 @@ public class AdvancedExcelReader extends AbstractExcelReader {
         return new Builder();
     }
 
-    public static class Builder extends AbstractSheetConfigBuilder<AdvancedExcelReader, Builder> {
+    public static class Builder extends AbstractSheetConfigBuilder<EventModelExcelReader, Builder> {
         @Override
         protected Builder self() {
             return this;
         }
 
         @Override
-        public AdvancedExcelReader build() {
-            return new AdvancedExcelReader(this.buildConfig());
+        public EventModelExcelReader build() {
+            return new EventModelExcelReader(this.buildConfig());
         }
     }
 }
