@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.api;
+package com.github.bradjacobs.excel.model;
 
 import org.apache.commons.collections4.list.FixedSizeList;
 import org.apache.commons.lang3.Validate;

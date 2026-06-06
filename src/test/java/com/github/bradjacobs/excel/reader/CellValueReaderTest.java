@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.core;
+package com.github.bradjacobs.excel.reader;
 
 import com.github.bradjacobs.excel.sanitize.SanitizeType;
 import org.apache.poi.ss.usermodel.Cell;

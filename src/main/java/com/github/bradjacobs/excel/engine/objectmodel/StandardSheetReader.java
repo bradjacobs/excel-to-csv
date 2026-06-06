@@ -3,10 +3,10 @@
  */
 package com.github.bradjacobs.excel.engine.objectmodel;
 
-import com.github.bradjacobs.excel.api.BasicSheetContent;
-import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.core.CellValueReader;
+import com.github.bradjacobs.excel.model.BasicSheetContent;
+import com.github.bradjacobs.excel.model.SheetContent;
+import com.github.bradjacobs.excel.reader.CellValueReader;
 import com.github.bradjacobs.excel.row.StringRowConsumer;
 import org.apache.commons.lang3.Validate;
 import org.apache.poi.ss.usermodel.Cell;

@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.api;
+package com.github.bradjacobs.excel.model;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -123,7 +123,7 @@ class MutableSheetContentTest extends SheetContentTest {
     class AddRowTests {
 
         @ParameterizedTest(name = "Add Row: {0}")
-        @MethodSource("com.github.bradjacobs.excel.api.MutableSheetContentTest#listProvider")
+        @MethodSource("com.github.bradjacobs.excel.model.MutableSheetContentTest#listProvider")
         void addRowOperations(String name, List<String> inputList, List<String> expectedList) {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.addRow(inputList);
@@ -142,7 +142,7 @@ class MutableSheetContentTest extends SheetContentTest {
     class InsertRowTests {
 
         @ParameterizedTest(name = "Insert Row: {0}")
-        @MethodSource("com.github.bradjacobs.excel.api.MutableSheetContentTest#listProvider")
+        @MethodSource("com.github.bradjacobs.excel.model.MutableSheetContentTest#listProvider")
         void insertRowOperations(String name, List<String> inputList, List<String> expectedList) {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.insertRow(1, inputList);
@@ -193,7 +193,7 @@ class MutableSheetContentTest extends SheetContentTest {
     class ReplaceRowTests {
 
         @ParameterizedTest(name = "Replace Row: {0}")
-        @MethodSource("com.github.bradjacobs.excel.api.MutableSheetContentTest#listProvider")
+        @MethodSource("com.github.bradjacobs.excel.model.MutableSheetContentTest#listProvider")
         void replaceRowOperations(String name, List<String> inputList, List<String> expectedList) {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.replaceRow(1, inputList);

@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel;
 
-import com.github.bradjacobs.excel.core.AbstractExcelReaderTest;
+import com.github.bradjacobs.excel.reader.AbstractExcelReaderTest;
 
 class EventModelExcelReaderTest extends AbstractExcelReaderTest<EventModelExcelReader, EventModelExcelReader.Builder> {
 

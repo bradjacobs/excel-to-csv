@@ -3,14 +3,14 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel;
 
-import com.github.bradjacobs.excel.api.BasicSheetContent;
-import com.github.bradjacobs.excel.api.SheetContent;
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.core.AbstractExcelReader;
 import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheet;
 import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheetReader;
 import com.github.bradjacobs.excel.engine.eventmodel.xssf.XssfEventSheetReader;
 import com.github.bradjacobs.excel.engine.eventmodel.xssfb.XssfbEventSheetReader;
+import com.github.bradjacobs.excel.model.BasicSheetContent;
+import com.github.bradjacobs.excel.model.SheetContent;
+import com.github.bradjacobs.excel.reader.AbstractExcelReader;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
 import com.github.bradjacobs.excel.request.SheetSelector;
 import org.apache.commons.collections4.ListUtils;

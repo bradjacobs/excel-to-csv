@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.csv;
 
-import com.github.bradjacobs.excel.api.SheetContent;
+import com.github.bradjacobs.excel.model.SheetContent;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;

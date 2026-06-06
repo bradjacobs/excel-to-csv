@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.engine.objectmodel;
 
-import com.github.bradjacobs.excel.core.AbstractExcelReaderTest;
+import com.github.bradjacobs.excel.reader.AbstractExcelReaderTest;
 
 import java.nio.file.Path;
 
