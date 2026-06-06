@@ -1,9 +1,8 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.core;
+package com.github.bradjacobs.excel.sanitize;
 
-import com.github.bradjacobs.excel.config.SanitizeType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -16,10 +15,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.config.SanitizeType.DASHES;
-import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
-import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.SPACES;
 import static java.util.stream.Collectors.toMap;
 
 /**

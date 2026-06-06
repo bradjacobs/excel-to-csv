@@ -3,7 +3,8 @@
  */
 package com.github.bradjacobs.excel.core;
 
-import com.github.bradjacobs.excel.config.SanitizeType;
+import com.github.bradjacobs.excel.sanitize.CellValueSanitizer;
+import com.github.bradjacobs.excel.sanitize.SanitizeType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 

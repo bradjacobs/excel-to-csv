@@ -5,8 +5,8 @@ package com.github.bradjacobs.excel.core;
 
 import com.github.bradjacobs.excel.api.ExcelWorkbookReader;
 import com.github.bradjacobs.excel.api.SheetContent;
-import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
+import com.github.bradjacobs.excel.sanitize.SanitizeType;
 import com.github.bradjacobs.excel.testutils.TestExcelFileSheetUtils;
 import com.github.bradjacobs.excel.testutils.TestResourceUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -33,10 +33,10 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.config.SanitizeType.DASHES;
-import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
-import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.SPACES;
 import static com.github.bradjacobs.excel.testutils.TestResourceUtil.getResourceFilePath;
 import static com.github.bradjacobs.excel.testutils.TestResourceUtil.getResourceFileUrl;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

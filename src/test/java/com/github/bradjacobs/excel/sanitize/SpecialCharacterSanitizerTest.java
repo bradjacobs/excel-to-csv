@@ -1,9 +1,8 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.core;
+package com.github.bradjacobs.excel.sanitize;
 
-import com.github.bradjacobs.excel.config.SanitizeType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,10 +17,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.config.SanitizeType.DASHES;
-import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
-import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.SPACES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;

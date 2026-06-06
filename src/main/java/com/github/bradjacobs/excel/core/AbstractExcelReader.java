@@ -4,17 +4,18 @@
 package com.github.bradjacobs.excel.core;
 
 import com.github.bradjacobs.excel.api.ExcelWorkbookReader;
-import com.github.bradjacobs.excel.config.SanitizeType;
 import com.github.bradjacobs.excel.config.SheetConfig;
+import com.github.bradjacobs.excel.sanitize.SanitizeType;
+import com.github.bradjacobs.excel.sanitize.SpecialCharacterSanitizer;
 import org.apache.commons.lang3.Validate;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.config.SanitizeType.DASHES;
-import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
-import static com.github.bradjacobs.excel.config.SanitizeType.SPACES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.DASHES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.SPACES;
 
 
 // TODO - this abstract class might be removed.

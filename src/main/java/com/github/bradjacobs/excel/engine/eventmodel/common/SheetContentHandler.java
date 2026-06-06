@@ -4,8 +4,8 @@
 package com.github.bradjacobs.excel.engine.eventmodel.common;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.core.CellValueSanitizer;
 import com.github.bradjacobs.excel.row.StringRowConsumer;
+import com.github.bradjacobs.excel.sanitize.CellValueSanitizer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.poi.ss.util.CellAddress;

@@ -1,14 +1,14 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.core;
+package com.github.bradjacobs.excel.sanitize;
 
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.QUOTES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CellValueSanitizerTest {

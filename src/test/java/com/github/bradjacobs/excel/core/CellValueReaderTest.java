@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.core;
 
-import com.github.bradjacobs.excel.config.SanitizeType;
+import com.github.bradjacobs.excel.sanitize.SanitizeType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static com.github.bradjacobs.excel.config.SanitizeType.BASIC_DIACRITICS;
-import static com.github.bradjacobs.excel.config.SanitizeType.QUOTES;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.BASIC_DIACRITICS;
+import static com.github.bradjacobs.excel.sanitize.SanitizeType.QUOTES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;

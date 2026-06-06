@@ -3,6 +3,8 @@
  */
 package com.github.bradjacobs.excel.config;
 
+import com.github.bradjacobs.excel.sanitize.SanitizeType;
+
 import java.util.Set;
 
 public class SheetConfig {
