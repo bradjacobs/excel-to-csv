@@ -110,11 +110,11 @@ public class XssfEventSheetReader implements EventSheetReader {
     private XMLReader createXmlReader(StringRowConsumer rowConsumer)
             throws SAXException, ParserConfigurationException {
         XMLReader xmlReader = XMLHelper.newXMLReader();
-        xmlReader.setContentHandler(createSheetContentHandler(rowConsumer));
+        xmlReader.setContentHandler(createContentHandler(rowConsumer));
         return xmlReader;
     }
 
-    private ContentHandler createSheetContentHandler(StringRowConsumer rowConsumer) {
+    private ContentHandler createContentHandler(StringRowConsumer rowConsumer) {
         return sheetConfig.skipHiddenCells()
                 ? createVisibleAwareHandler(rowConsumer)
                 : createDefaultHandler(rowConsumer);
