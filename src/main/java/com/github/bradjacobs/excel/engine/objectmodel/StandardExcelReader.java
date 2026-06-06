@@ -4,8 +4,8 @@
 package com.github.bradjacobs.excel.engine.objectmodel;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
+import com.github.bradjacobs.excel.engine.AbstractExcelReader;
 import com.github.bradjacobs.excel.model.SheetContent;
-import com.github.bradjacobs.excel.reader.AbstractExcelReader;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
 import com.github.bradjacobs.excel.request.SheetInfo;
 import com.github.bradjacobs.excel.request.SheetSelector;

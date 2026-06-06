@@ -5,9 +5,9 @@ package com.github.bradjacobs.excel.model;
 
 import java.util.List;
 
-import static com.github.bradjacobs.excel.row.RowDataUtil.toArray;
-import static com.github.bradjacobs.excel.row.RowDataUtil.toUnmodifiableRow;
-import static com.github.bradjacobs.excel.row.RowDataUtil.toUnmodifiableRows;
+import static com.github.bradjacobs.excel.engine.row.RowDataUtil.toArray;
+import static com.github.bradjacobs.excel.engine.row.RowDataUtil.toUnmodifiableRow;
+import static com.github.bradjacobs.excel.engine.row.RowDataUtil.toUnmodifiableRows;
 
 
 public class BasicSheetContent implements SheetContent {

@@ -4,7 +4,7 @@
 package com.github.bradjacobs.excel.engine.eventmodel.shared;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.row.StringRowConsumer;
+import com.github.bradjacobs.excel.engine.row.StringRowConsumer;
 import com.github.bradjacobs.excel.sanitize.CellValueSanitizer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;

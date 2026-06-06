@@ -1,8 +1,9 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.reader;
+package com.github.bradjacobs.excel.engine;
 
+import com.github.bradjacobs.excel.api.ExcelWorkbookReader;
 import com.github.bradjacobs.excel.model.SheetContent;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
 import com.github.bradjacobs.excel.sanitize.SanitizeType;

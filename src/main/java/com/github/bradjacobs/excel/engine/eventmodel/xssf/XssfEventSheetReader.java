@@ -11,7 +11,7 @@ import com.github.bradjacobs.excel.engine.eventmodel.shared.PoiSheetStreamProvid
 import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetContentHandler;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetVisibilityTracker;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.VisibleAwareSheetContentHandler;
-import com.github.bradjacobs.excel.row.StringRowConsumer;
+import com.github.bradjacobs.excel.engine.row.StringRowConsumer;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
