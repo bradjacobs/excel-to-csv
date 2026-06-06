@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Utility methods for converting row-oriented spreadsheet data between arrays and lists.
+ * <p>
+ * This class also provides helpers for wrapping rows and collections of rows in
+ * unmodifiable list views, while treating {@code null} inputs as empty results.
+ */
 public class RowDataUtil {
 
     public static List<List<String>> toUnmodifiableRows(String[][] array) {
