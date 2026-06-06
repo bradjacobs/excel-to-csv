@@ -19,7 +19,6 @@ class NoPackageCyclesTest {
      * note: this may turn out to be 'too aggressive', and
      * and be tuned later if/when needed.
      */
-
     @Test
     public void everyPackageMustBeCycleFree() {
         JavaClasses classes = new ClassFileImporter()
@@ -29,9 +28,7 @@ class NoPackageCyclesTest {
         SliceAssignment byExactPackage = new SliceAssignment() {
             @Override
             public SliceIdentifier getIdentifierOf(JavaClass javaClass) {
-                return SliceIdentifier.of(
-                        javaClass.getPackageName()
-                );
+                return SliceIdentifier.of(javaClass.getPackageName());
             }
 
             @Override

@@ -33,6 +33,39 @@ public class ExcelReadRequest {
         this.password = builder.password;
     }
 
+    // ===== Getters =====
+    public Path getPath() {
+        return path;
+    }
+
+    public URL getUrl() {
+        return url;
+    }
+
+    public SheetSelector getSheetSelector() {
+        return sheetSelector;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Creates a new InputStream for the source file.
+     * NOTE: caller is responsible for closing the stream.
+     * @return input stream
+     * @throws IOException exception
+     */
+    public InputStream getSourceInputStream() throws IOException {
+        InputStreamGenerator inputStreamGenerator = new InputStreamGenerator();
+        if (path != null) {
+            return inputStreamGenerator.getInputStream(path);
+        }
+        else {
+            return inputStreamGenerator.getInputStream(url);
+        }
+    }
+
     // Factory methods for readability
     public static Builder from(Path path) {
         return new Builder(path, null);
@@ -100,39 +133,6 @@ public class ExcelReadRequest {
         // Build method
         public ExcelReadRequest build() {
             return new ExcelReadRequest(this);
-        }
-    }
-
-    // ===== Getters =====
-    public Path getPath() {
-        return path;
-    }
-
-    public URL getUrl() {
-        return url;
-    }
-
-    public SheetSelector getSheetSelector() {
-        return sheetSelector;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * Creates a new InputStream for the source file.
-     * NOTE: caller is responsible for closing the stream.
-     * @return input stream
-     * @throws IOException exception
-     */
-    public InputStream getSourceInputStream() throws IOException {
-        InputStreamGenerator inputStreamGenerator = new InputStreamGenerator();
-        if (path != null) {
-            return inputStreamGenerator.getInputStream(path);
-        }
-        else {
-            return inputStreamGenerator.getInputStream(url);
         }
     }
 }

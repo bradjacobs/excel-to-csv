@@ -73,7 +73,7 @@ class ByPrefixSheetSelectorTest {
 
             List<SheetInfo> result = selector.filterSheets(sheets(
                     sheet("aaa1", 0),
-                    sheet("aaa2", 1),
+                    sheet("Aaa2", 1),
                     sheet("a3", 2),
                     sheet("a4", 3),
                     sheet("b1", 4)
@@ -81,7 +81,7 @@ class ByPrefixSheetSelectorTest {
 
             assertEquals(4, result.size());
             assertEquals("aaa1", result.get(0).getName());
-            assertEquals("aaa2", result.get(1).getName());
+            assertEquals("Aaa2", result.get(1).getName());
             assertEquals("a3", result.get(2).getName());
             assertEquals("a4", result.get(3).getName());
         }
