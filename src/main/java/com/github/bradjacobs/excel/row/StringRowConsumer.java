@@ -1,7 +1,7 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.core;
+package com.github.bradjacobs.excel.row;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static com.github.bradjacobs.excel.util.RowDataUtil.toArray;
-import static com.github.bradjacobs.excel.util.RowDataUtil.toUnmodifiableRows;
+import static com.github.bradjacobs.excel.row.RowDataUtil.toArray;
+import static com.github.bradjacobs.excel.row.RowDataUtil.toUnmodifiableRows;
 
 /**
  * StringRowConsumer handles processing of String rows from Excel files.

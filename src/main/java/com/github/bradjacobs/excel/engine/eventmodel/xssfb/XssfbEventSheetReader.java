@@ -4,7 +4,6 @@
 package com.github.bradjacobs.excel.engine.eventmodel.xssfb;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.core.StringRowConsumer;
 import com.github.bradjacobs.excel.engine.eventmodel.common.DateWindowingDataFormatter;
 import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheet;
 import com.github.bradjacobs.excel.engine.eventmodel.common.EventSheetReader;
@@ -12,6 +11,7 @@ import com.github.bradjacobs.excel.engine.eventmodel.common.PoiSheetStreamProvid
 import com.github.bradjacobs.excel.engine.eventmodel.common.SheetContentHandler;
 import com.github.bradjacobs.excel.engine.eventmodel.common.SheetVisibilityTracker;
 import com.github.bradjacobs.excel.engine.eventmodel.common.VisibleAwareSheetContentHandler;
+import com.github.bradjacobs.excel.row.StringRowConsumer;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;

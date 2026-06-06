@@ -1,4 +1,4 @@
-package com.github.bradjacobs.excel.util;
+package com.github.bradjacobs.excel.row;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
 

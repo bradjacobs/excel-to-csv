@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.github.bradjacobs.excel.util.RowDataUtil.toArray;
+import static com.github.bradjacobs.excel.row.RowDataUtil.toArray;
 
 /**
  * Represents a mutable implementation of the {@link SheetContent} interface,

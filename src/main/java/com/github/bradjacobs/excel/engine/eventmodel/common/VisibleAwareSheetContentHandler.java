@@ -4,7 +4,7 @@
 package com.github.bradjacobs.excel.engine.eventmodel.common;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.core.StringRowConsumer;
+import com.github.bradjacobs.excel.row.StringRowConsumer;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 
 /**
