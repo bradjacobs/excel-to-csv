@@ -97,15 +97,6 @@ public class StringRowConsumer implements Consumer<List<String>> {
         rows.add(normalizeRow(row));
     }
 
-    private void performFinalRowCleanUpIfNeeded() {
-        removeTrailingBlankRows();
-        // Ensure all rows have are uniform width before potentially filtering columns.
-        for (List<String> row : rows) {
-            padRowRightToWidth(row, maxColumnCount);
-        }
-        filterBlankColumnsIfNeeded();
-    }
-
     public List<List<String>> generateRowDataList() {
         performFinalRowCleanUpIfNeeded();
         return toUnmodifiableRows(rows);
@@ -194,6 +185,24 @@ public class StringRowConsumer implements Consumer<List<String>> {
         }
     }
 
+    private void performFinalRowCleanUpIfNeeded() {
+        removeTrailingBlankRows();
+        // Ensure all rows have are uniform width before potentially filtering columns.
+        for (List<String> row : rows) {
+            padRowRightToWidth(row, maxColumnCount);
+        }
+        filterBlankColumnsIfNeeded();
+    }
+
+    /**
+     * Trim off any trailing blank rows (so the last row always has data)
+     */
+    private void removeTrailingBlankRows() {
+        while (!rows.isEmpty() && isEmptyRow(rows.get(rows.size() - 1))) {
+            rows.remove(rows.size() - 1);
+        }
+    }
+
     private void filterBlankColumnsIfNeeded() {
         if (!shouldFilterBlankColumns()) {
             return;
@@ -218,15 +227,6 @@ public class StringRowConsumer implements Consumer<List<String>> {
         return skipBlankColumns
                 && !rows.isEmpty()
                 && keepColumnsCount < keepColumnsFlags.size();
-    }
-
-    /**
-     * Trim off any trailing blank rows (so the last row always has data)
-     */
-    private void removeTrailingBlankRows() {
-        while (!rows.isEmpty() && isEmptyRow(rows.get(rows.size() - 1))) {
-            rows.remove(rows.size() - 1);
-        }
     }
 
     /**
