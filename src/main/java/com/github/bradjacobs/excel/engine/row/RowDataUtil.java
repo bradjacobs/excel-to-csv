@@ -1,3 +1,6 @@
+/*
+ * This file is subject to the terms and conditions defined in the 'LICENSE' file.
+ */
 package com.github.bradjacobs.excel.engine.row;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
@@ -14,9 +17,12 @@ import java.util.List;
  */
 public class RowDataUtil {
 
+    private static final List<String> EMPTY_ROW = new UnmodifiableList<>(List.of());
+    private static final List<List<String>> EMPTY_ROWS = new UnmodifiableList<>(List.of());
+
     public static List<List<String>> toUnmodifiableRows(String[][] array) {
         if (array == null) {
-            return List.of();
+            return EMPTY_ROWS;
         }
         List<List<String>> readOnlyRows = new ArrayList<>(array.length);
         for (String[] row : array) {
@@ -27,7 +33,7 @@ public class RowDataUtil {
 
     public static List<List<String>> toUnmodifiableRows(List<List<String>> rows) {
         if (rows == null) {
-            return List.of();
+            return EMPTY_ROWS;
         }
         else if (rows instanceof UnmodifiableList) {
             return rows;
@@ -41,14 +47,17 @@ public class RowDataUtil {
 
     public static List<String> toUnmodifiableRow(String[] row) {
         if (row == null) {
-            return List.of();
+            return EMPTY_ROW;
         }
         return toUnmodifiableRow(Arrays.asList(row));
     }
 
     public static List<String> toUnmodifiableRow(List<String> row) {
         if (row == null) {
-            return List.of();
+            return EMPTY_ROW;
+        }
+        else if (row instanceof UnmodifiableList) {
+            return row;
         }
         return new UnmodifiableList<>(row);
     }
