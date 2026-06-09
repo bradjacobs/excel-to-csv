@@ -26,6 +26,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 class MutableSheetContentTest extends SheetContentTest {
 
     private static final SheetContent INPUT_SHEET = new BasicSheetContent(INPUT_SHEET_NAME, INPUT_MATRIX);
+    private static final SheetContent INPUT_SHEET_W_NULL = new BasicSheetContent("", INPUT_LIST_W_NULL);
 
     @Override
     protected SheetContent createDefaultSheetContent() {
@@ -40,6 +41,11 @@ class MutableSheetContentTest extends SheetContentTest {
     protected SheetContent createEmptySheetContent() {
         SheetContent emptySheet = new BasicSheetContent("", new String[][]{});
         return MutableSheetContent.copyOf(emptySheet);
+    }
+
+    @Override
+    protected SheetContent createSheetWithNullContent() {
+        return MutableSheetContent.copyOf(INPUT_SHEET_W_NULL);
     }
 
     static Stream<Arguments> listProvider() {

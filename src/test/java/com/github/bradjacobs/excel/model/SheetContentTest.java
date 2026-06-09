@@ -31,6 +31,8 @@ abstract class SheetContentTest {
     protected static final List<List<String>> INPUT_LIST = matrixToList(INPUT_MATRIX);
     protected static final String INPUT_SHEET_NAME = "mySheet";
 
+    protected static final List<List<String>> INPUT_LIST_W_NULL = List.of(Arrays.asList("A", null, "C"));
+
     protected static List<List<String>> copyOfInput() {
         return copyOfInput(null);
     }
@@ -58,6 +60,8 @@ abstract class SheetContentTest {
     abstract protected SheetContent createDefaultSheetContent();
 
     abstract protected SheetContent createEmptySheetContent();
+
+    abstract protected SheetContent createSheetWithNullContent();
 
     @Nested
     @DisplayName("Default Get Behavior")
@@ -244,5 +248,15 @@ abstract class SheetContentTest {
             List<List<String>> rows = sheetContent.getRows();
             rows.add(0, List.of("extra value"));
         });
+    }
+
+    @Test
+    public void createSheetWithNullValue() {
+        SheetContent sheetContent = createSheetWithNullContent();
+        List<String> rowValueList = sheetContent.getRow(0);
+
+        assertEquals("A", rowValueList.get(0));
+        assertEquals("", rowValueList.get(1));
+        assertEquals("C", rowValueList.get(2));
     }
 }

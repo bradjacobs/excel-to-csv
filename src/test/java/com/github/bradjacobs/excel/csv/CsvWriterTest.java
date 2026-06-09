@@ -99,11 +99,9 @@ class CsvWriterTest {
 
         @Test
         public void convertWithNullValue() {
-            // under 'normal circumstances' the matrix should never
-            // contain a null, but this is a sanity check to ensure we
-            // don't blow up on it.
+            // NOTE: the 'null' will become an empty string (expected)
             String[][] matrix = {{"cow bell", null, "hot dog"}};
-            String expected = "\"cow bell\",null,\"hot dog\"";
+            String expected = "\"cow bell\",,\"hot dog\"";
 
             String csvResult = DEFAULT_CSV_WRITER.toCsv(sheetContent(matrix));
             assertEquals(expected, csvResult, "Mismatch expected CSV output");

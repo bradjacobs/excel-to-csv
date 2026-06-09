@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -64,9 +63,7 @@ class RowDataUtilTest {
 
         @Test
         void arrayContainsRowWithNullElementsToRows() {
-            // NOTE: this specific util is not responsible
-            //   for converting null to empty string for
-            //   individual values in the list.
+            // NOTE: the null value will become empty string (expected).
             String[][] input = {
                     {"A", null, "C"}
             };
@@ -76,10 +73,7 @@ class RowDataUtilTest {
 
             assertUnmodifiableRows(result);
             assertEquals(1, result.size());
-            assertEquals(3, result.get(0).size());
-            assertEquals("A", result.get(0).get(0));
-            assertNull(result.get(0).get(1));
-            assertEquals("C", result.get(0).get(2));
+            assertEquals(List.of("A", "", "C"), result.get(0));
         }
 
         @Test
@@ -172,19 +166,14 @@ class RowDataUtilTest {
 
         @Test
         void arrayWithNullValueToRow() {
-            // NOTE: this specific util is not responsible
-            //   for converting null to empty string for
-            //   individual values in the list.
+            // NOTE: the null value will become empty string (expected).
             String[] input = {"A", null, "C"};
 
             List<String> result =
                     RowDataUtil.toUnmodifiableRow(input);
 
             assertUnmodifiableRow(result);
-            assertEquals(3, result.size());
-            assertEquals("A", result.get(0));
-            assertNull(result.get(1));
-            assertEquals("C", result.get(2));
+            assertEquals(List.of("A", "", "C"), result);
         }
 
         @Test
@@ -210,9 +199,7 @@ class RowDataUtilTest {
 
         @Test
         void listWithNullValueToRow() {
-            // NOTE: this specific util is not responsible
-            //   for converting null to empty string for
-            //   individual values in the list.
+            // NOTE: the null value will become empty string (expected).
             List<String> input =
                     Arrays.asList("A", null, "C");
 
@@ -220,10 +207,7 @@ class RowDataUtilTest {
                     RowDataUtil.toUnmodifiableRow(input);
 
             assertUnmodifiableRow(result);
-            assertEquals(3, result.size());
-            assertEquals("A", result.get(0));
-            assertNull(result.get(1));
-            assertEquals("C", result.get(2));
+            assertEquals(List.of("A", "", "C"), result);
         }
     }
 
@@ -292,7 +276,7 @@ class RowDataUtilTest {
 
             assertNotNull(result);
             assertArrayEquals(
-                    new String[]{"A", null, "C"},
+                    new String[]{"A", "", "C"},
                     result[0]);
         }
     }

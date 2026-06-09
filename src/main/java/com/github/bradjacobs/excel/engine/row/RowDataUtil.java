@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Utility methods for converting row-oriented spreadsheet data between arrays and lists.
+ * Utility methods for converting row-oriented spreadsheet data to lists or arrays.
  * <p>
  * This class also provides helpers for wrapping rows and collections of rows in
  * unmodifiable list views, while treating {@code null} inputs as empty results.
@@ -53,13 +53,10 @@ public class RowDataUtil {
     }
 
     public static List<String> toUnmodifiableRow(List<String> row) {
-        if (row == null) {
-            return EMPTY_ROW;
-        }
-        else if (row instanceof UnmodifiableList) {
+        if (row instanceof UnmodifiableList) {
             return row;
         }
-        return new UnmodifiableList<>(row);
+        return new UnmodifiableList<>(normalizeRow(row));
     }
 
     public static String[][] toArray(List<List<String>> rows) {
@@ -69,9 +66,32 @@ public class RowDataUtil {
         int rowCount = rows.size();
         String[][] result = new String[rowCount][];
         for (int i = 0; i <rowCount; i++) {
-            List<String> row = rows.get(i);
+            List<String> row = normalizeRow(rows.get(i));
             result[i] = row.toArray(new String[0]);
         }
         return result;
+    }
+
+    private static List<String> normalizeRow(List<String> inputRow) {
+        if (inputRow == null) {
+            return EMPTY_ROW;
+        }
+        if (containsNull(inputRow)) {
+            List<String> resultRow = new ArrayList<>(inputRow);
+            resultRow.replaceAll(input -> input != null ? input : "");
+            return resultRow;
+        }
+        else {
+            return inputRow;
+        }
+    }
+
+    private static boolean containsNull(List<String> row) {
+        for (String element : row) {
+            if (element == null) {
+                return true;
+            }
+        }
+        return false;
     }
 }

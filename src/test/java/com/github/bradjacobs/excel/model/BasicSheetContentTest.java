@@ -15,6 +15,7 @@ class BasicSheetContentTest extends SheetContentTest {
 
     private static final SheetContent DEFAULT_INPUT_SHEET = new BasicSheetContent(INPUT_SHEET_NAME, INPUT_MATRIX);
     private static final SheetContent EMPTY_INPUT_SHEET = new BasicSheetContent("", new String[][]{});
+    private static final SheetContent WITH_DULL_INPUT_SHEET = new BasicSheetContent("", INPUT_LIST_W_NULL);
 
     @Override
     protected SheetContent createDefaultSheetContent() {
@@ -24,6 +25,11 @@ class BasicSheetContentTest extends SheetContentTest {
     @Override
     protected SheetContent createEmptySheetContent() {
         return EMPTY_INPUT_SHEET;
+    }
+
+    @Override
+    protected SheetContent createSheetWithNullContent() {
+        return WITH_DULL_INPUT_SHEET;
     }
 
     @Test
