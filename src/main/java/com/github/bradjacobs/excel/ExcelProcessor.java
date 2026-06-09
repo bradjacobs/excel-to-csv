@@ -23,18 +23,18 @@ import java.util.Locale;
  * ExcelProcessor
  */
 public class ExcelProcessor implements ExcelWorkbookReader {
-    private static final List<String> ADVANCED_SUPPORTED_EXTENSIONS
+    private static final List<String> EVENT_SUPPORTED_EXTENSIONS
             = List.of("xlsx", "xlsb", "xlsm", "xltx", "xltm");
 
-    private final boolean useAdvancedReader;
+    private final boolean useEventReader;
     private final ExcelWorkbookReader standardExcelWorkbookReader;
-    private final ExcelWorkbookReader advancedExcelWorkbookReader;
+    private final ExcelWorkbookReader eventExcelWorkbookReader;
 
     private ExcelProcessor(Builder builder) {
-        this.useAdvancedReader = builder.useAdvancedReader;
+        this.useEventReader = builder.useEventReader;
         SheetConfig sheetConfig = builder.buildConfig();
         this.standardExcelWorkbookReader = new StandardExcelReader(sheetConfig);
-        this.advancedExcelWorkbookReader = new EventModelExcelReader(sheetConfig);
+        this.eventExcelWorkbookReader = new EventModelExcelReader(sheetConfig);
     }
 
     @Override
@@ -44,23 +44,23 @@ public class ExcelProcessor implements ExcelWorkbookReader {
     }
 
     private ExcelWorkbookReader getSheetReaderForRequest(ExcelReadRequest request) {
-        return shouldUseAdvancedReader(request)
-                ? this.advancedExcelWorkbookReader
+        return shouldUseEventReader(request)
+                ? this.eventExcelWorkbookReader
                 : this.standardExcelWorkbookReader;
     }
 
-    private boolean shouldUseAdvancedReader(ExcelReadRequest request) {
-        return this.useAdvancedReader && hasAdvancedSupportedExtension(request);
+    private boolean shouldUseEventReader(ExcelReadRequest request) {
+        return this.useEventReader && hasEventSupportedExtension(request);
     }
 
-    private boolean hasAdvancedSupportedExtension(ExcelReadRequest request) {
+    private boolean hasEventSupportedExtension(ExcelReadRequest request) {
         String sourceLocation = resolveSourceLocation(request);
         String fileExtension = FilenameUtils.getExtension(sourceLocation);
         if (fileExtension == null) {
             return false;
         }
         fileExtension = fileExtension.toLowerCase(Locale.ROOT);
-        return ADVANCED_SUPPORTED_EXTENSIONS.contains(fileExtension);
+        return EVENT_SUPPORTED_EXTENSIONS.contains(fileExtension);
     }
 
     private String resolveSourceLocation(ExcelReadRequest request) {
@@ -82,7 +82,7 @@ public class ExcelProcessor implements ExcelWorkbookReader {
     // this builder extends the abstract class to allow any of the
     //   AbstractSheetConfigBuilder values to be set on this Builder as well.
     public static class Builder extends AbstractSheetConfigBuilder<ExcelProcessor, Builder> {
-        private boolean useAdvancedReader = true;
+        private boolean useEventReader = true;
 
         @Override
         protected Builder self() {
@@ -90,11 +90,11 @@ public class ExcelProcessor implements ExcelWorkbookReader {
         }
 
         /**
-         * Toggle using the advanced reader
+         * Toggle using the event reader
          * (typically only used for testing convenience)
          */
-        public Builder useAdvancedReader(boolean useAdvancedReader) {
-            this.useAdvancedReader = useAdvancedReader;
+        public Builder useEventReader(boolean useEventReader) {
+            this.useEventReader = useEventReader;
             return this;
         }
 
