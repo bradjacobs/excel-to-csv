@@ -28,7 +28,6 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.xssf.usermodel.XSSFRelation;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -72,7 +71,7 @@ public class EventModelExcelReader extends AbstractExcelReader {
                 closeInputStreams(selectedSheets);
             }
         }
-        catch (OpenXML4JException | ParserConfigurationException | SAXException | IOException e) {
+        catch (OpenXML4JException | SAXException | IOException e) {
             throw new IOException("Failed to read Excel sheet data: " + e.getMessage(), e);
         }
 

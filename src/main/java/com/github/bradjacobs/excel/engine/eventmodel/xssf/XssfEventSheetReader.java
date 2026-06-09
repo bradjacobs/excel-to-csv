@@ -88,14 +88,14 @@ public class XssfEventSheetReader implements EventSheetReader {
 
     @Override
     public List<List<String>> read(InputStream inputStream)
-            throws ParserConfigurationException, SAXException, IOException {
+            throws SAXException, IOException {
         StringRowConsumer rowConsumer = createStringRowConsumer();
         parseSheet(inputStream, rowConsumer);
         return rowConsumer.generateRowDataList();
     }
 
     private void parseSheet(InputStream inputStream, StringRowConsumer rowConsumer)
-            throws ParserConfigurationException, SAXException, IOException {
+            throws SAXException, IOException {
         XMLReader xmlReader = createXmlReader(rowConsumer);
         xmlReader.parse(new InputSource(inputStream));
     }
@@ -108,8 +108,14 @@ public class XssfEventSheetReader implements EventSheetReader {
     }
 
     private XMLReader createXmlReader(StringRowConsumer rowConsumer)
-            throws SAXException, ParserConfigurationException {
-        XMLReader xmlReader = XMLHelper.newXMLReader();
+            throws SAXException {
+        XMLReader xmlReader;
+        try {
+            xmlReader = XMLHelper.newXMLReader();
+        }
+        catch (ParserConfigurationException e) {
+            throw new SAXException("SAX parser configuration error: " + e.getMessage(), e);
+        }
         xmlReader.setContentHandler(createContentHandler(rowConsumer));
         return xmlReader;
     }

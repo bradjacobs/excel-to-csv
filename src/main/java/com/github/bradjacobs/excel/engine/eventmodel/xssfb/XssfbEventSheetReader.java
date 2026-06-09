@@ -25,7 +25,6 @@ import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.SharedStrings;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -88,7 +87,7 @@ public class XssfbEventSheetReader implements EventSheetReader {
 
     @Override
     public List<List<String>> read(InputStream inputStream)
-            throws ParserConfigurationException, SAXException, IOException {
+            throws SAXException, IOException {
         StringRowConsumer stringRowConsumer = createStringRowConsumer();
         XSSFBSheetHandler sheetHandler = createSheetHandler(inputStream, stringRowConsumer);
         sheetHandler.parse();
@@ -158,7 +157,7 @@ public class XssfbEventSheetReader implements EventSheetReader {
     }
 
     private static DataFormatter createDataFormatter(XSSFBReader reader)
-            throws IOException, OpenXML4JException, SAXException {
+            throws IOException, OpenXML4JException {
         boolean requires1904DateWindowing =
                 DATE_WINDOWING_DETECTOR.is1904DateWindowing(reader);
         return new DateWindowingDataFormatter(requires1904DateWindowing);
