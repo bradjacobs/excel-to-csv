@@ -25,7 +25,7 @@ public class SheetConfig {
         this.skipBlankColumns = skipBlankColumns;
         this.skipHiddenCells = skipHiddenCells;
         this.trimStringValues = trimStringValues;
-        this.sanitizeTypes = Set.copyOf(sanitizeTypes);
+        this.sanitizeTypes = sanitizeTypes != null ? Set.copyOf(sanitizeTypes) : Set.of();
     }
 
     public boolean skipBlankRows() {
