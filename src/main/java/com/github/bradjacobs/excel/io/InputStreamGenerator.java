@@ -26,27 +26,18 @@ public class InputStreamGenerator {
     private static final String USER_AGENT_VALUE = "javaClient/" + System.getProperty("java.version");
 
     public InputStream getInputStream(File inputFile) throws IOException {
-        Validate.isTrue(inputFile != null, "Must provide an input file.");
+        validateFile(inputFile);
         return getInputStream(inputFile.toPath());
     }
 
     public InputStream getInputStream(Path inputFile) throws IOException {
-        Validate.isTrue(inputFile != null, "Must provide an input file.");
-        Validate.isTrue(!Files.isDirectory(inputFile), "The input file cannot be a directory.");
-        if (!Files.exists(inputFile)) {
-            // throw a different exception for FileNotFound
-            throw new FileNotFoundException(String.format("Invalid Excel file path: %s", inputFile.toAbsolutePath()));
-        }
+        validatePath(inputFile);
         return new BufferedInputStream( Files.newInputStream(inputFile) );
     }
 
     public InputStream getInputStream(URL url) throws IOException {
-        Validate.isTrue(url != null, "Must provide an input url.");
-
-        String urlProtocol = url.getProtocol();
-        Validate.isTrue(VALID_URL_SCHEMES.contains(urlProtocol), "URL has an unsupported protocol: %s", urlProtocol);
-
-        if (urlProtocol.equalsIgnoreCase("file")) {
+        validateUrl(url);
+        if ("file".equalsIgnoreCase(url.getProtocol())) {
             return getInputStream( Paths.get(url.getPath()) );
         }
 
@@ -62,6 +53,26 @@ public class InputStreamGenerator {
             urlInputStream = new GZIPInputStream(urlInputStream);
         }
         return new BufferedInputStream(urlInputStream);
+    }
+
+    private static void validatePath(Path inputFile) throws FileNotFoundException {
+        Validate.isTrue(inputFile != null, "Must provide an input file.");
+        Validate.isTrue(!Files.isDirectory(inputFile), "The input file cannot be a directory.");
+        if (!Files.exists(inputFile)) {
+            // throw a different exception for FileNotFound
+            throw new FileNotFoundException(String.format("Invalid Excel file path: %s", inputFile.toAbsolutePath()));
+        }
+    }
+
+    private static void validateFile(File inputFile) throws FileNotFoundException {
+        Validate.isTrue(inputFile != null, "Must provide an input file.");
+        validatePath(inputFile.toPath());
+    }
+
+    private static void validateUrl(URL url) {
+        Validate.isTrue(url != null, "Must provide an input url.");
+        String urlProtocol = url.getProtocol();
+        Validate.isTrue(VALID_URL_SCHEMES.contains(urlProtocol), "URL has an unsupported protocol: %s", urlProtocol);
     }
 
     // scoped to allow for mock testing
