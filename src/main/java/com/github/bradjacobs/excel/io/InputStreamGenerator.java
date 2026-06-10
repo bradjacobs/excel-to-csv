@@ -72,7 +72,8 @@ public class InputStreamGenerator {
     private static void validateUrl(URL url) {
         Validate.isTrue(url != null, "Must provide an input url.");
         String urlProtocol = url.getProtocol();
-        Validate.isTrue(VALID_URL_SCHEMES.contains(urlProtocol), "URL has an unsupported protocol: %s", urlProtocol);
+        Validate.isTrue(VALID_URL_SCHEMES.contains(urlProtocol),
+                "URL has an unsupported protocol: %s", urlProtocol);
     }
 
     // scoped to allow for mock testing
