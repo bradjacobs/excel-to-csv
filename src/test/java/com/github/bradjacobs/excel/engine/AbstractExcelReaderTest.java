@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
@@ -440,7 +441,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
     private static final String DIR_PATH = Paths.get("").toAbsolutePath().toString();
 
     private static final String INPUT_FILE_NOT_FOUND_PATH = "/bogus/path/here/file.xlsx";
-    private static final String INPUT_FILE_NOT_FOUND_URL = "https://www.zxfake12.com/foo/bar.html";
+    private static final String INPUT_FILE_NOT_FOUND_URL = "http://127.0.0.1:1/foo/bar.html";
 
     private static List<Arguments> invalidInputPaths() {
         return Arrays.asList(
@@ -453,7 +454,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
 
     private static List<Arguments> invalidInputUrls() {
         return Arrays.asList(
-                arguments(named("Url Not Found", INPUT_FILE_NOT_FOUND_URL), UnknownHostException.class, null),
+                arguments(named("Url Not Found", INPUT_FILE_NOT_FOUND_URL), ConnectException.class, null),
                 arguments(named("Null Input", null), IllegalArgumentException.class, "Either file path or url must be provided"),
                 arguments(named("Directory Input", "file:///"), IllegalArgumentException.class, "The input file cannot be a directory."),
                 arguments(named("Invalid Url Protocol", "jar:file:/C:/foo/jar/parser.jar!/test.xlsx"), IllegalArgumentException.class, "URL has an unsupported protocol: jar")
