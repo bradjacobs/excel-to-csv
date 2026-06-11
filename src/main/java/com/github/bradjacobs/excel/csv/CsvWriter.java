@@ -197,19 +197,16 @@ public class CsvWriter {
         Validate.isTrue(ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase(Locale.ROOT)),
                 "Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext);
 
-        Path parentDirectory = absOutputFile.getParent();
-        if (parentDirectory == null) {
-            throw new IllegalArgumentException(
-                    "Attempted to save CSV output file in a non-existent directory: " + absOutputFile
-            );
-        }
+        Validate.isTrue(allowOverwriteFile || !Files.exists(absOutputFile),
+                "Attempted to overwrite an existing file: " + fileName);
 
+        Path parentDirectory = absOutputFile.getParent();
+        Validate.isTrue(parentDirectory != null,
+                "Attempted to save CSV output file in a non-existent directory: " + absOutputFile);
         Validate.isTrue(Files.isDirectory(parentDirectory),
                 "Attempted to save CSV output file in a non-existent directory: " + absOutputFile);
         Validate.isTrue( Files.isWritable(parentDirectory),
                 "Attempted to save CSV output file in a non-writable directory: " + absOutputFile);
-        Validate.isTrue(allowOverwriteFile || !Files.exists(absOutputFile),
-                "Attempted to overwrite an existing file: " + fileName);
     }
 
     private void validateOutputDirectoryParameter(Path outputDirectory) throws IllegalArgumentException {
