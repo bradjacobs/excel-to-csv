@@ -187,26 +187,35 @@ public class CsvWriter {
      */
     private void validateOutputFileParameter(Path outputFile) throws IllegalArgumentException {
         Validate.isTrue(outputFile != null, "Must supply outputFile location to save CSV data.");
-        Validate.isTrue(!Files.isDirectory(outputFile), "The outputFile cannot be an existing directory.");
+        Path absOutputFile = outputFile.toAbsolutePath().normalize();
+        Validate.isTrue(!Files.isDirectory(absOutputFile), "The outputFile cannot be an existing directory.");
 
-        Path fileNamePath = outputFile.getFileName();
+        Path fileNamePath = absOutputFile.getFileName();
         String fileName = fileNamePath != null ? fileNamePath.toString() : "";
         // confirm the output file has an allowed file extension
         String ext = FilenameUtils.getExtension(fileName);
         Validate.isTrue(ALLOWED_OUTPUT_FILE_EXTENSIONS.contains(ext.toLowerCase(Locale.ROOT)),
                 "Illegal outputFile extension '%s'.  Must be either 'csv', 'txt' or blank", ext);
 
-        Path parentDirectory = outputFile.toAbsolutePath().normalize().getParent();
-        Validate.isTrue(parentDirectory != null && Files.isDirectory(parentDirectory),
-                "Attempted to save CSV output file in a non-existent directory: " + outputFile);
+        Path parentDirectory = absOutputFile.getParent();
+        if (parentDirectory == null) {
+            throw new IllegalArgumentException(
+                    "Attempted to save CSV output file in a non-existent directory: " + absOutputFile
+            );
+        }
 
-        Validate.isTrue(allowOverwriteFile || !Files.exists(outputFile),
+        Validate.isTrue(Files.isDirectory(parentDirectory),
+                "Attempted to save CSV output file in a non-existent directory: " + absOutputFile);
+        Validate.isTrue( Files.isWritable(parentDirectory),
+                "Attempted to save CSV output file in a non-writable directory: " + absOutputFile);
+        Validate.isTrue(allowOverwriteFile || !Files.exists(absOutputFile),
                 "Attempted to overwrite an existing file: " + fileName);
     }
 
     private void validateOutputDirectoryParameter(Path outputDirectory) throws IllegalArgumentException {
         Validate.isTrue(outputDirectory != null, "Must supply outputDirectory location to save CSV files.");
         Validate.isTrue(Files.isDirectory(outputDirectory), "Must supply a valid directory to write CSV data.");
+        Validate.isTrue(Files.isWritable(outputDirectory), "The output directory is not writable: " + outputDirectory);
     }
 
     private static boolean containsMissingSheetName(List<SheetContent> sheetContentList) {

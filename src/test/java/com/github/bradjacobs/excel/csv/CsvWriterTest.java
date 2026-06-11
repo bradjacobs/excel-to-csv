@@ -276,6 +276,7 @@ class CsvWriterTest {
     private static final String DIR_PATH = Paths.get("").toAbsolutePath().toString();
     protected static List<Arguments> invalidOutputPaths() {
         return Arrays.asList(
+                // note: trying to avoid 'os-specific' scenarios
                 arguments(named("Invalid Output file extension", "outfile.exe"), IllegalArgumentException.class, "Illegal outputFile extension 'exe'.  Must be either 'csv', 'txt' or blank"),
                 arguments(named("Invalid Output directory", "/fakeDirectory/myOutputFile.csv"), IllegalArgumentException.class, "Attempted to save CSV output file in a non-existent directory: /fakeDirectory/myOutputFile.csv"),
                 arguments(named("Null Csv Output Param", null), IllegalArgumentException.class, "Must supply outputFile location to save CSV data."),
@@ -432,7 +433,6 @@ class CsvWriterTest {
             assertEquals(expectedMessage, exception.getMessage());
         }
     }
-
 
     private static Stream<Arguments> quoteVariations() {
         return Stream.of(
