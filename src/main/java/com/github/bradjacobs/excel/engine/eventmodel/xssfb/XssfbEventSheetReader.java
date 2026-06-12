@@ -10,8 +10,8 @@ import com.github.bradjacobs.excel.engine.eventmodel.shared.EventSheetReader;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.PoiSheetStreamProvider;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetContentHandler;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetVisibilityTracker;
-import com.github.bradjacobs.excel.engine.eventmodel.shared.VisibleAwareSheetContentHandler;
 import com.github.bradjacobs.excel.engine.row.StringRowConsumer;
+import com.github.bradjacobs.excel.sanitize.CellValueSanitizer;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -112,9 +112,10 @@ public class XssfbEventSheetReader implements EventSheetReader {
     private XSSFBSheetHandler createDefaultHandler(
             InputStream inputStream,
             StringRowConsumer rowConsumer) {
+
         SheetContentHandler handler = new SheetContentHandler(
-                sheetConfig,
-                rowConsumer
+                rowConsumer,
+                createCellValueSanitizer(sheetConfig)
         );
         XssfbCustomSheetContentsHandlerWrapper handlerWrapper = createHandlerWrapper(handler);
 
@@ -130,12 +131,12 @@ public class XssfbEventSheetReader implements EventSheetReader {
 
     private XSSFBSheetHandler createVisibleAwareHandler(
             InputStream inputStream,
-            StringRowConsumer stringRowConsumer) {
+            StringRowConsumer rowConsumer) {
         SheetVisibilityTracker sheetVisibilityTracker = new SheetVisibilityTracker();
 
-        SheetContentHandler handler = new VisibleAwareSheetContentHandler(
-                sheetConfig,
-                stringRowConsumer,
+        SheetContentHandler handler = new SheetContentHandler(
+                rowConsumer,
+                createCellValueSanitizer(sheetConfig),
                 sheetVisibilityTracker
         );
         XssfbCustomSheetContentsHandlerWrapper handlerWrapper = createHandlerWrapper(handler);
@@ -162,4 +163,9 @@ public class XssfbEventSheetReader implements EventSheetReader {
                 DATE_WINDOWING_DETECTOR.is1904DateWindowing(reader);
         return new DateWindowingDataFormatter(requires1904DateWindowing);
     }
+
+    private static CellValueSanitizer createCellValueSanitizer(SheetConfig sheetConfig) {
+        return new CellValueSanitizer(sheetConfig.trimStringValues(), sheetConfig.getCharSanitizeFlags());
+    }
+
 }

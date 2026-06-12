@@ -3,7 +3,6 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel.shared;
 
-import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.engine.row.StringRowConsumer;
 import com.github.bradjacobs.excel.sanitize.CellValueSanitizer;
 import org.apache.commons.lang3.StringUtils;
@@ -22,24 +21,50 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
     private static final String MISSING_CELL_REFERENCE_MESSAGE = "Unable to parse Excel Sheet. " +
             "A cell value was encountered without a cellReference.  " +
             "See 'Known Issues' for more details.";
+    private static final int NO_PREVIOUS_ROW = -1;
 
-    private final SheetConfig sheetConfig;
-    private final CellValueSanitizer cellValueSanitizer;
+    public interface SheetContentEmitPolicy {
+        boolean shouldEmitRow(int rowIndex);
+        boolean shouldEmitColumn(int columnIndex);
+        default boolean shouldEmitCell(int rowIndex, int columnIndex) {
+            return shouldEmitRow(rowIndex) && shouldEmitColumn(columnIndex);
+        }
+    }
+
+    // default policy is to emit everything
+    private static final SheetContentEmitPolicy DEFAULT_POLICY =
+            new SheetContentEmitPolicy() {
+                @Override public boolean shouldEmitRow(int rowIndex) { return true; }
+                @Override public boolean shouldEmitColumn(int columnIndex) { return true; }
+            };
+
     private final StringRowConsumer stringRowConsumer;
+    private final CellValueSanitizer cellValueSanitizer;
+    private final SheetContentEmitPolicy emitPolicy;
     private final List<String> currentRowValues = new ArrayList<>();
 
-    public SheetContentHandler(SheetConfig sheetConfig, StringRowConsumer stringRowConsumer) {
-        this.sheetConfig = sheetConfig;
-        this.cellValueSanitizer = new CellValueSanitizer(
-                sheetConfig.trimStringValues(),
-                sheetConfig.getCharSanitizeFlags()
-        );
+    // Tracks the last row index observed by startRow(int).
+    private int lastProcessedRowIndex = NO_PREVIOUS_ROW;
+
+    public SheetContentHandler(
+            StringRowConsumer stringRowConsumer,
+            CellValueSanitizer cellValueSanitizer) {
+        this(stringRowConsumer,  cellValueSanitizer, null);
+    }
+
+    public SheetContentHandler(
+            StringRowConsumer stringRowConsumer,
+            CellValueSanitizer cellValueSanitizer,
+            SheetContentEmitPolicy emitPolicy) {
         this.stringRowConsumer = stringRowConsumer;
+        this.cellValueSanitizer = cellValueSanitizer;
+        this.emitPolicy = emitPolicy != null ? emitPolicy : DEFAULT_POLICY;
     }
 
     @Override
     public void startRow(int rowIndex) {
-        appendMissingRowsBefore(rowIndex);
+        appendMissingRowsBetween(lastProcessedRowIndex, rowIndex);
+        lastProcessedRowIndex = rowIndex;
     }
 
     @Override
@@ -58,20 +83,16 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
      * A cell, with the given formatted value (which may be null),
      * and possibly a comment (also may be null), was encountered.
      */
-    protected void cell(int rowIndex, int columnIndex, String formattedValue, XSSFComment comment) {
-        appendMissingColumnsBefore(columnIndex);
-        appendCellValue(formattedValue);
+    private void cell(int rowIndex, int columnIndex, String formattedValue, XSSFComment comment) {
+        if (emitPolicy.shouldEmitCell(rowIndex, columnIndex)) {
+            // todo add more tests for this appendMissingColumns scenario.
+            appendMissingColumnsBefore(columnIndex);
+            appendCellValue(formattedValue);
+        }
     }
 
-    protected void appendCellValue(String formattedValue) {
+    private void appendCellValue(String formattedValue) {
         currentRowValues.add(sanitizeCellValue(formattedValue));
-    }
-
-    /**
-     * Appends an empty cell value to the current row.
-     */
-    protected void appendEmptyCellValue() {
-        appendCellValue(EMPTY_CELL_VALUE);
     }
 
     private CellAddress toCellAddress(String cellReference) {
@@ -83,46 +104,38 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
      * Emits the current row to the consumer
      * @param rowIndex current row number (for reference)
      */
-    protected void emitCurrentRow(int rowIndex) {
-        stringRowConsumer.accept(currentRowValues);
-    }
-
-    // todo: better name?? (inverted)
-    protected boolean shouldIncludeBlankRows() {
-        return !sheetConfig.skipBlankRows();
-    }
-
-    protected void appendMissingRowsBefore(int rowIndex) {
-        if (shouldIncludeBlankRows()) {
-            // add any filler blank rows (if necessary)
-            while (stringRowConsumer.getRowCount() < rowIndex) {
-                appendEmptyRow();
-            }
+    private void emitCurrentRow(int rowIndex) {
+        if (emitPolicy.shouldEmitRow(rowIndex)) {
+            stringRowConsumer.accept(currentRowValues);
         }
     }
 
     /**
-     * Adds a blank row to the output via the consumer.
+     * Add in any necessary missing blank rows between
+     * the previous row that was processed and the current row.
+     * @param previousRowIndex previous row index
+     * @param currentRowIndex current row index
      */
-    protected void appendEmptyRow() {
-        stringRowConsumer.accept(null);
-    }
-
-    /**
-     * Returns the current row size (number of cells)
-     * @return current row size
-     */
-    protected int getCurrentRowSize() {
-        return currentRowValues.size();
+    private void appendMissingRowsBetween(int previousRowIndex, int currentRowIndex) {
+        // add any filler blank rows (if necessary)
+        int firstMissingRowIndex = previousRowIndex + 1;
+        for (int rowIndex = firstMissingRowIndex; rowIndex < currentRowIndex; rowIndex++) {
+            if (emitPolicy.shouldEmitRow(rowIndex)) {
+                // Emits a blank row to the output
+                stringRowConsumer.accept(null);
+            }
+        }
     }
 
     /**
      * Appends any missing columns (if necessary)
      * @param columnIndex fill columns up to this index
      */
-    protected void appendMissingColumnsBefore(int columnIndex) {
+    private void appendMissingColumnsBefore(int columnIndex) {
         for (int columnToFill = currentRowValues.size(); columnToFill < columnIndex; columnToFill++) {
-            appendEmptyCellValue();
+            if (this.emitPolicy.shouldEmitColumn(columnToFill)) {
+                appendCellValue(EMPTY_CELL_VALUE);
+            }
         }
     }
 

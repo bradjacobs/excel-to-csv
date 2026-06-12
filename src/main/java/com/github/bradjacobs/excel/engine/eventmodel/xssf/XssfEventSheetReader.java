@@ -10,8 +10,8 @@ import com.github.bradjacobs.excel.engine.eventmodel.shared.EventSheetReader;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.PoiSheetStreamProvider;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetContentHandler;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetVisibilityTracker;
-import com.github.bradjacobs.excel.engine.eventmodel.shared.VisibleAwareSheetContentHandler;
 import com.github.bradjacobs.excel.engine.row.StringRowConsumer;
+import com.github.bradjacobs.excel.sanitize.CellValueSanitizer;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -131,8 +131,8 @@ public class XssfEventSheetReader implements EventSheetReader {
                 styles,
                 sharedStrings,
                 new SheetContentHandler(
-                        sheetConfig,
-                        rowConsumer
+                        rowConsumer,
+                        createCellValueSanitizer(sheetConfig)
                 ),
                 dataFormatter,
                 FORMULAS_NOT_RESULTS
@@ -145,9 +145,9 @@ public class XssfEventSheetReader implements EventSheetReader {
         return new XssfVisibleAwareSheetXmlHandler(
                 styles,
                 sharedStrings,
-                new VisibleAwareSheetContentHandler(
-                        sheetConfig,
+                new SheetContentHandler(
                         rowConsumer,
+                        createCellValueSanitizer(sheetConfig),
                         sheetVisibilityTracker
                 ),
                 dataFormatter,
@@ -176,5 +176,9 @@ public class XssfEventSheetReader implements EventSheetReader {
     private static boolean requires1904DateWindowing(XSSFReader reader)
             throws IOException, ParserConfigurationException, InvalidFormatException, SAXException {
         return DATE_WINDOWING_DETECTOR.is1904DateWindowing(reader);
+    }
+
+    private static CellValueSanitizer createCellValueSanitizer(SheetConfig sheetConfig) {
+        return new CellValueSanitizer(sheetConfig.trimStringValues(), sheetConfig.getCharSanitizeFlags());
     }
 }
