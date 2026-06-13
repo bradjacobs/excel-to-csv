@@ -91,14 +91,18 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
         return new CellAddress(cellReference);
     }
 
+    private void emitRowIfIncluded(int rowIndex, List<String> rowValues) {
+        if (shouldEmitRow(rowIndex)) {
+            stringRowConsumer.accept(rowValues);
+        }
+    }
+
     /**
      * Emits the current row to the consumer.
      * @param rowIndex current row number
      */
     private void emitCurrentRowIfIncluded(int rowIndex) {
-        if (shouldEmitRow(rowIndex)) {
-            stringRowConsumer.accept(currentRowValues);
-        }
+        emitRowIfIncluded(rowIndex, currentRowValues);
     }
 
     /**
@@ -110,10 +114,7 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
     private void appendMissingRowsBetween(int previousRowIndex, int currentRowIndex) {
         int firstMissingRowIndex = previousRowIndex + 1;
         for (int rowIndex = firstMissingRowIndex; rowIndex < currentRowIndex; rowIndex++) {
-            if (shouldEmitRow(rowIndex)) {
-                // Emits a blank row to the output
-                stringRowConsumer.accept(null);
-            }
+            emitRowIfIncluded(rowIndex, null); // emit blank/empty row
         }
     }
 
