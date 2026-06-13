@@ -7,7 +7,6 @@ import com.github.bradjacobs.excel.engine.objectmodel.StandardExcelReader;
 import com.github.bradjacobs.excel.model.BasicSheetContent;
 import com.github.bradjacobs.excel.model.SheetContent;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -273,21 +272,20 @@ class CsvWriterTest {
         }
     }
 
-    private static final String DIR_PATH = Paths.get("").toAbsolutePath().toString();
-    protected static List<Arguments> invalidOutputPaths() {
-        return Arrays.asList(
-                // note: trying to avoid 'os-specific' scenarios
-                arguments(named("Invalid Output file extension", "outfile.exe"), IllegalArgumentException.class, "Illegal outputFile extension 'exe'.  Must be either 'csv', 'txt' or blank"),
-                arguments(named("Invalid Output directory", "/fakeDirectory/myOutputFile.csv"), IllegalArgumentException.class, "Attempted to save CSV output file in a non-existent directory: /fakeDirectory/myOutputFile.csv"),
-                arguments(named("Null Csv Output Param", null), IllegalArgumentException.class, "Must supply outputFile location to save CSV data."),
-                arguments(named("Directory Output Param", DIR_PATH), IllegalArgumentException.class, "The outputFile cannot be an existing directory.")
-        );
-    }
-
     @Nested
-    @DisplayName("Exception Behavior")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class ExceptionBehaviorTests {
+
+        private final String EMPTY_DIR_PATH = Paths.get("").toAbsolutePath().toString();
+        private List<Arguments> invalidOutputPaths() {
+            return Arrays.asList(
+                    // note: trying to avoid 'os-specific' scenarios
+                    arguments(named("Invalid Output file extension", "outfile.exe"), IllegalArgumentException.class, "Illegal outputFile extension 'exe'.  Must be either 'csv', 'txt' or blank"),
+                    arguments(named("Invalid Output directory", "/fakeDirectory/myOutputFile.csv"), IllegalArgumentException.class, "Attempted to save CSV output file in a non-existent directory: /fakeDirectory/myOutputFile.csv"),
+                    arguments(named("Null Csv Output Param", null), IllegalArgumentException.class, "Must supply outputFile location to save CSV data."),
+                    arguments(named("Directory Output Param", EMPTY_DIR_PATH), IllegalArgumentException.class, "The outputFile cannot be an existing directory.")
+            );
+        }
 
         @Test
         void dontAllowFileOverwrite() throws Exception {
@@ -393,7 +391,7 @@ class CsvWriterTest {
         }
 
         @ParameterizedTest
-        @MethodSource("com.github.bradjacobs.excel.csv.CsvWriterTest#invalidOutputPaths")
+        @MethodSource("invalidOutputPaths")
         void invalidOutputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             Path path = location != null ? Paths.get(location) : null;
 
@@ -405,7 +403,7 @@ class CsvWriterTest {
         }
 
         @ParameterizedTest
-        @MethodSource("com.github.bradjacobs.excel.csv.CsvWriterTest#invalidOutputPaths")
+        @MethodSource("invalidOutputPaths")
         void invalidOutputFileParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             File file = location != null ? new File(location) : null;
 
