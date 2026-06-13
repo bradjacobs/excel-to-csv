@@ -17,6 +17,7 @@ import java.util.List;
 // TODO: more javaDocs and unitTests
 public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
     private static final String EMPTY_CELL_VALUE = "";
+    private static final List<String> EMPTY_ROW = List.of();
     private static final String EXCEL_ERROR_PREFIX = "ERROR:";
     private static final String MISSING_CELL_REFERENCE_MESSAGE = "Unable to parse Excel Sheet. " +
             "A cell value was encountered without a cellReference.  " +
@@ -115,7 +116,7 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
     private void appendMissingRowsBetween(int previousRowIndex, int currentRowIndex) {
         int firstMissingRowIndex = previousRowIndex + 1;
         for (int rowIndex = firstMissingRowIndex; rowIndex < currentRowIndex; rowIndex++) {
-            emitRowIfIncluded(rowIndex, null); // emit blank/empty row
+            emitRowIfIncluded(rowIndex, EMPTY_ROW);
         }
     }
 
