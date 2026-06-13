@@ -51,37 +51,37 @@ class SpecialCharacterSanitizerTest {
     //   becomes a "normal" space character
     @ParameterizedTest
     @FieldSource("spaceChars")
-    public void sanitizeSpecialSpaceCharacter(String spaceChar) {
+    void sanitizeSpecialSpaceCharacter(String spaceChar) {
         assertSanitizedEquals("a b", "a" + spaceChar + "b", SPACES);
     }
 
     @Test
-    public void sanitizeWithDoubleCurlyQuotes() {
+    void sanitizeWithDoubleCurlyQuotes() {
         assertSanitizedEquals("she said \"hi\" to my dog", "she said “hi” to my dog", QUOTES);
     }
 
     @Test
-    public void sanitizeWithSingleCurlyQuotes() {
+    void sanitizeWithSingleCurlyQuotes() {
         assertSanitizedEquals("she said 'hi' to my dog", "she said ‘hi’ to my dog", QUOTES);
     }
 
     @Test
-    public void sanitizeLeadingTrailingQuotes() {
+    void sanitizeLeadingTrailingQuotes() {
         assertSanitizedEquals("\"\"Hi there\"\"", "““Hi there””", QUOTES);
     }
 
     @Test
-    public void validateDisablingWhitespaceSanitization() {
+    void validateDisablingWhitespaceSanitization() {
         assertUnchanged("has \u00a0 special space", NO_SANITIZATION_TYPES);
     }
 
     @Test
-    public void validateDisablingQuoteSanitization() {
+    void validateDisablingQuoteSanitization() {
         assertUnchanged("has special \u201C quote", NO_SANITIZATION_TYPES);
     }
 
     @Test
-    public void sanitizeDashCharacters() {
+    void sanitizeDashCharacters() {
         String inputWithDashCharacters = "aaa–bbb－ccc˗d−e";
         assertSanitizedEquals("aaa-bbb-ccc-d-e", inputWithDashCharacters, DASHES);
     }
@@ -95,12 +95,12 @@ class SpecialCharacterSanitizerTest {
             "résumé, resume",
             "déjà vu, deja vu"
     })
-    public void sanitizeBasicDiacritics(String input, String expected) {
+    void sanitizeBasicDiacritics(String input, String expected) {
         assertSanitizedEquals(expected, input, BASIC_DIACRITICS);
     }
 
     @Test
-    public void unsupportedSanitizeType() {
+    void unsupportedSanitizeType() {
         // a 'null' is the only way to test invalid param
         //   error message for an unsupported enum type
         Exception exception = assertThrows(IllegalArgumentException.class, () ->
@@ -115,37 +115,37 @@ class SpecialCharacterSanitizerTest {
     class DefaultSanitizeFlagTests {
         // whitespace sanitization ON by default
         @Test
-        public void whitespaceDefaultSanitize() {
+        void whitespaceDefaultSanitize() {
             assertDefaultSanitizedEquals("good day", "good\u00a0day");
         }
 
         // quote sanitization ON by default
         @Test
-        public void quoteDefaultSanitize() {
+        void quoteDefaultSanitize() {
             assertDefaultSanitizedEquals("with \"doubles\" and 'singles'", "with “doubles” and ‘singles’");
         }
 
         // dash sanitization OFF by default
         @Test
-        public void dashDefaultSanitize() {
+        void dashDefaultSanitize() {
             assertDefaultSanitizedEquals("Foo–Bar", "Foo–Bar");
         }
 
         // diacritics sanitization OFF by default
         @Test
-        public void diacriticsDefaultSanitize() {
+        void diacriticsDefaultSanitize() {
             assertDefaultSanitizedEquals("résumé", "résumé");
         }
     }
 
     @Test
-    public void validateNullTypesParameter() {
+    void validateNullTypesParameter() {
         assertInvalidSanitizeTypes(() -> new SpecialCharacterSanitizer((Set<SanitizeType>) null));
         assertInvalidSanitizeTypes(() -> new SpecialCharacterSanitizer((SanitizeType[]) null));
     }
 
     @Test
-    public void sanitizeNullString() {
+    void sanitizeNullString() {
         // normal usage won't try to sanitize a 'null', but test for completeness.
         assertNull(sanitize(null, SPACES), "expected a 'null' to be sanitized to a 'null'");
     }

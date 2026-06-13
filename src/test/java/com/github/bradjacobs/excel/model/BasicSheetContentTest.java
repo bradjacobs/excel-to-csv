@@ -33,7 +33,7 @@ class BasicSheetContentTest extends SheetContentTest {
     }
 
     @Test
-    public void testWithNullDataMatrixInput() {
+    void testWithNullDataMatrixInput() {
         SheetContent sheetContent = new BasicSheetContent("mySheet", (String[][])null);
         assertEquals(0, sheetContent.getRowCount());
         assertEquals(0, sheetContent.getColumnCount());
@@ -42,7 +42,7 @@ class BasicSheetContentTest extends SheetContentTest {
     }
 
     @Test
-    public void testWithNullDataRowsInput() {
+    void testWithNullDataRowsInput() {
         SheetContent sheetContent = new BasicSheetContent("mySheet", (List<List<String>>)null);
         assertEquals(0, sheetContent.getRowCount());
         assertEquals(0, sheetContent.getColumnCount());
@@ -51,13 +51,13 @@ class BasicSheetContentTest extends SheetContentTest {
     }
 
     @Test
-    public void testWithNullSheetNameInput() {
+    void testWithNullSheetNameInput() {
         SheetContent sheetContent = new BasicSheetContent(null, INPUT_MATRIX);
         assertEquals("", sheetContent.getSheetName());
     }
 
     @Test
-    public void attemptUpdateGetRow() {
+    void attemptUpdateGetRow() {
         SheetContent sheetContent = createDefaultSheetContent();
         assertThrows(UnsupportedOperationException.class, () -> {
             List<String> row = sheetContent.getRow(0);
@@ -66,7 +66,7 @@ class BasicSheetContentTest extends SheetContentTest {
     }
 
     @Test
-    public void attemptUpdateGetRows() {
+    void attemptUpdateGetRows() {
         SheetContent sheetContent = createDefaultSheetContent();
         assertThrows(UnsupportedOperationException.class, () -> {
             List<List<String>> rows = sheetContent.getRows();

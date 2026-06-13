@@ -19,21 +19,21 @@ class StringRowConsumerTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class BasicConsumerTests {
         @Test
-        public void basicRowAccept() {
+        void basicRowAccept() {
             String[][] input = {{"value1", "value2"}};
             String[][] expected = {{"value1", "value2"}};
             runConsumerTest(createBasicConsumer(), input, expected);
         }
 
         @Test
-        public void noInputRowAccept() {
+        void noInputRowAccept() {
             String[][] input = {};
             String[][] expected = {};
             runConsumerTest(createBasicConsumer(), input, expected);
         }
 
         @Test
-        public void consumeNullRow() {
+        void consumeNullRow() {
             String[][] input = {
                     {"aa", "aa"},
                     null,
@@ -48,7 +48,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void consumeEmptyRow() {
+        void consumeEmptyRow() {
             String[][] input = {
                     {"aa", "aa"},
                     {},
@@ -63,7 +63,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void consumeEmptyFirstRow() {
+        void consumeEmptyFirstRow() {
             String[][] input = {
                     {},
                     {"bb", "bb"}
@@ -76,7 +76,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void consumeWithNullInLastColumn() {
+        void consumeWithNullInLastColumn() {
             String[][] input = {
                     {"aa", null},
                     {},
@@ -91,7 +91,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void consumeRowWithNullValue() {
+        void consumeRowWithNullValue() {
             String[][] input = {
                     {"aa", null, "bb"}
             };
@@ -103,7 +103,7 @@ class StringRowConsumerTest {
 
 
         @Test
-        public void longestRowFirst() {
+        void longestRowFirst() {
             String[][] input = {
                     {"aa", "aa", "aa", "aa"},
                     {"bb", "bb"},
@@ -118,7 +118,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void longestRowMiddle() {
+        void longestRowMiddle() {
             String[][] input = {
                     {"aa", "aa"},
                     {"bb", "", "bb", "bb"},
@@ -133,7 +133,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void longestRowLast() {
+        void longestRowLast() {
             String[][] input = {
                     {"aa"},
                     {"bb", "bb"},
@@ -148,7 +148,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void fluctuatingRowSizes() {
+        void fluctuatingRowSizes() {
             String[][] input = {
                     {"aa", "aa", "aa"},
                     {"bb"},
@@ -165,7 +165,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void longestBlankRow() {
+        void longestBlankRow() {
             String[][] input = {
                     {"aa", "aa"},
                     {"", "", "", "", ""},
@@ -180,7 +180,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void startingBlankColumns() {
+        void startingBlankColumns() {
             String[][] input = {
                     {"", "aa"},
                     {"", "", "bb"},
@@ -198,7 +198,7 @@ class StringRowConsumerTest {
         // beginning blanks rows are to be kept,
         //   if not configured to skip blank rows.
         @Test
-        public void retainFirstBlankRows() {
+        void retainFirstBlankRows() {
             String[][] input = {
                     {"", ""},
                     {"", ""},
@@ -216,7 +216,7 @@ class StringRowConsumerTest {
 
         // prune all final blank rows, regardless of configuration.
         @Test
-        public void pruneTrailingBlankRows() {
+        void pruneTrailingBlankRows() {
             String[][] input = {
                     {"bb", "bb"},
                     {"", ""},
@@ -234,7 +234,7 @@ class StringRowConsumerTest {
 
         // prune all final blank columns, regardless of configuration.
         @Test
-        public void pruneTrailingBlankColumns() {
+        void pruneTrailingBlankColumns() {
             String[][] input = {
                     {"aa", "bb", "", ""},
                     {"cc"},
@@ -251,7 +251,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void createWithNullFactoryParamIsNoneBehavior() {
+        void createWithNullFactoryParamIsNoneBehavior() {
             // if you create a consumer with a 'null'
             // should behave to keep blank rows and columns
             String[][] input = {
@@ -273,7 +273,7 @@ class StringRowConsumerTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class PruneEmptyRowConsumerTests {
         @Test
-        public void skipBlankRowsWhenConfigured() {
+        void skipBlankRowsWhenConfigured() {
             String[][] input = {
                     {"aa", "bb"},
                     {"", ""},
@@ -287,7 +287,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void skipMultiBlankRowsWhenConfigured() {
+        void skipMultiBlankRowsWhenConfigured() {
             String[][] input = {
                     {"", "", ""},
                     {"", ""},
@@ -311,7 +311,7 @@ class StringRowConsumerTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class PruneEmptyColumnConsumerTests {
         @Test
-        public void basicPruneBlankColumns() {
+        void basicPruneBlankColumns() {
             String[][] input = {
                     {"aa", "", "cc"},
                     {"dd", "", "ff"},
@@ -324,7 +324,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void basicBlankColumnsDifferentRowLengths() {
+        void basicBlankColumnsDifferentRowLengths() {
             String[][] input = {
                     {"", "", "cc"},
                     {"dd", "", "ff", "", "hh"},
@@ -341,7 +341,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void pruneStartingBlankColumns() {
+        void pruneStartingBlankColumns() {
             String[][] input = {
                     {"", "", "cc"},
                     {"", "", "dd"},
@@ -358,7 +358,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void pruneEndingBlankColumns() {
+        void pruneEndingBlankColumns() {
             String[][] input = {
                     {"cc", ""},
                     {"dd", "", ""},
@@ -375,7 +375,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void proneEmptyColumnDifferentRowSizes() {
+        void proneEmptyColumnDifferentRowSizes() {
             String[][] input = {
                     {"aa", "bb"},
                     {"cc", "dd", "", "ff"},
@@ -392,7 +392,7 @@ class StringRowConsumerTest {
         }
 
         @Test
-        public void proneEmptyColumnEmptyInput() {
+        void proneEmptyColumnEmptyInput() {
             String[][] input = {};
             String[][] expected = {};
             runConsumerTest(createPruneBlankColumnConsumer(), input, expected);
@@ -403,7 +403,7 @@ class StringRowConsumerTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class PruneEmptyRowsAndColumnConsumerTests {
         @Test
-        public void skipBlankRowsAndColumnsWhenConfigured() {
+        void skipBlankRowsAndColumnsWhenConfigured() {
             String[][] input = {
                     {"", "aa", "", "bb", ""},
                     {"", "", "", "", "", "", ""},

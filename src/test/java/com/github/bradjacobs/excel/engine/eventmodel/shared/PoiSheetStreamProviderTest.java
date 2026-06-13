@@ -25,7 +25,7 @@ class PoiSheetStreamProviderTest {
      *  from an Excel file.
      */
     @Test
-    public void readSheetData() throws OpenXML4JException, IOException {
+    void readSheetData() throws OpenXML4JException, IOException {
         Path testFilePath = TestResourceUtil.getResourceFilePath("repro.xlsx");
         String[] expectedSheetNames = {
                 "BadRow", "WithUnicode", "ExtraBlankRowsAfterData",
@@ -55,7 +55,7 @@ class PoiSheetStreamProviderTest {
     }
 
     @Test
-    public void testNullReaderParameter() {
+    void testNullReaderParameter() {
         Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
             PoiSheetStreamProvider poiSheetStreamProvider = new PoiSheetStreamProvider();
             poiSheetStreamProvider.getSheets(null);

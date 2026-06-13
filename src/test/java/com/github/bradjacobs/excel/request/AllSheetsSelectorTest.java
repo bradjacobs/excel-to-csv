@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class AllSheetsSelectorTest {
 
     @Test
-    public void allSheetsSelectorHappyPath() {
+    void allSheetsSelectorHappyPath() {
         AllSheetsSelector selector = new AllSheetsSelector();
         List<SheetInfo> inputSheets = List.of(
                 TestSheetInfoUtil.sheet("a1", 0),

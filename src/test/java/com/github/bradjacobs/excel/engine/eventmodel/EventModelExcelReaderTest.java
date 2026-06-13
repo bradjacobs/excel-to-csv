@@ -22,7 +22,7 @@ class EventModelExcelReaderTest extends AbstractExcelReaderTest<EventModelExcelR
     }
 
     @Test
-    public void oldFileFormatThrowsException() {
+    void oldFileFormatThrowsException() {
         // event reader doesn't support older formats,
         // thus expect exception thrown if given old file format.
         Path oldFilePath = TestResourceUtil.getResourceFilePath("test_data.xls");

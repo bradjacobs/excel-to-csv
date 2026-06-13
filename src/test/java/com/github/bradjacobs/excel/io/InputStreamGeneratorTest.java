@@ -41,7 +41,7 @@ class InputStreamGeneratorTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class HappyPathTests {
         @Test
-        public void pathToInputStream() throws IOException {
+        void pathToInputStream() throws IOException {
             String testText = "hello world";
             Path tempFile = createTempTextFile(testText);
             try (InputStream is = inputStreamGenerator.getInputStream(tempFile)) {
@@ -50,7 +50,7 @@ class InputStreamGeneratorTest {
         }
 
         @Test
-        public void fileToInputStream() throws IOException {
+        void fileToInputStream() throws IOException {
             String testText = "hello world";
             Path tempFile = createTempTextFile(testText);
             try (InputStream is = inputStreamGenerator.getInputStream(tempFile.toFile())) {
@@ -60,7 +60,7 @@ class InputStreamGeneratorTest {
 
         // give a file as a URL, and expect valid input stream.
         @Test
-        public void fileAsUrlInputStream() throws IOException {
+        void fileAsUrlInputStream() throws IOException {
             String testText = "hello world";
             Path tempFile = createTempTextFile(testText);
             URL url = tempFile.toUri().toURL();
@@ -71,7 +71,7 @@ class InputStreamGeneratorTest {
 
         // test getting inputStream from URL via mocks.
         @Test
-        public void urlToInputStream() throws IOException {
+        void urlToInputStream() throws IOException {
             String testText = "hello world";
             InputStreamGenerator streamGenerator =
                     createUrlMockedInputStreamGenerator(testText, false);
@@ -83,7 +83,7 @@ class InputStreamGeneratorTest {
 
         // test getting inputStream from URL with gzip via mocks.
         @Test
-        public void urlGzipToInputStream() throws IOException {
+        void urlGzipToInputStream() throws IOException {
             String testText = "hello world";
             InputStreamGenerator streamGenerator =
                     createUrlMockedInputStreamGenerator(testText, true);
@@ -94,7 +94,7 @@ class InputStreamGeneratorTest {
         }
 
         @Test
-        public void getUrlConnection() throws IOException {
+        void getUrlConnection() throws IOException {
             // silly test to enforce code coverage stats,
             // as this method used by the Mocks doesn't always register.
             URLConnection connection = inputStreamGenerator.openConnection(new URL("http://fakefake"));
@@ -139,7 +139,7 @@ class InputStreamGeneratorTest {
     class ErrorHandlingTests {
 
         @Test
-        public void nullPathInput() {
+        void nullPathInput() {
             Exception exception = assertThrows(IllegalArgumentException.class,
                     () -> inputStreamGenerator.getInputStream((Path)null));
             assertEquals("Must provide an input file.",
@@ -147,7 +147,7 @@ class InputStreamGeneratorTest {
         }
 
         @Test
-        public void nullFileInput() {
+        void nullFileInput() {
             Exception exception = assertThrows(IllegalArgumentException.class,
                     () -> inputStreamGenerator.getInputStream((File)null));
             assertEquals("Must provide an input file.",
@@ -155,7 +155,7 @@ class InputStreamGeneratorTest {
         }
 
         @Test
-        public void fileNotExistPathInput() {
+        void fileNotExistPathInput() {
             Path fakeFile = Path.of("fake/file.xlsx").toAbsolutePath();
             Exception exception = assertThrows(FileNotFoundException.class,
                     () -> inputStreamGenerator.getInputStream(fakeFile));
@@ -164,7 +164,7 @@ class InputStreamGeneratorTest {
         }
 
         @Test
-        public void isDirectoryPathInput() {
+        void isDirectoryPathInput() {
             Path dir = Path.of(".").toAbsolutePath();
             Exception exception = assertThrows(IllegalArgumentException.class,
                     () -> inputStreamGenerator.getInputStream(dir));
@@ -173,7 +173,7 @@ class InputStreamGeneratorTest {
         }
 
         @Test
-        public void nullUrlInput() {
+        void nullUrlInput() {
             Exception exception = assertThrows(IllegalArgumentException.class,
                     () -> inputStreamGenerator.getInputStream((URL)null));
             assertEquals("Must provide an input url.",
@@ -181,7 +181,7 @@ class InputStreamGeneratorTest {
         }
 
         @Test
-        public void invalidSchemeUrlInput() throws MalformedURLException {
+        void invalidSchemeUrlInput() throws MalformedURLException {
             URL url = new URL("jar:file:/path/abc.jar!/foo/file.xlsx");
             Exception exception = assertThrows(IllegalArgumentException.class,
                     () -> inputStreamGenerator.getInputStream(url));

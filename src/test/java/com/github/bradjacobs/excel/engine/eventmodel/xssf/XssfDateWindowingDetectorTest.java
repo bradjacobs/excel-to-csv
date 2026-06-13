@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class XssfDateWindowingDetectorTest {
 
     @Test
-    public void is1904DateWindowingTrue() throws Exception {
+    void is1904DateWindowingTrue() throws Exception {
         Path testFilePath = TestResourceUtil.getResourceFilePath("date1904.xlsx");
 
         try (OPCPackage pkg = OPCPackage.open(testFilePath.toFile())) {
@@ -25,7 +25,7 @@ public class XssfDateWindowingDetectorTest {
     }
 
     @Test
-    public void is1904DateWindowingFalse() throws Exception {
+    void is1904DateWindowingFalse() throws Exception {
         Path testFilePath = TestResourceUtil.getResourceFilePath("test_data.xlsx");
 
         try (OPCPackage pkg = OPCPackage.open(testFilePath.toFile())) {

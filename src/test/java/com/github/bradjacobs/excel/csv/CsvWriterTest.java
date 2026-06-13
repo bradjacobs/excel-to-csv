@@ -56,14 +56,14 @@ class CsvWriterTest {
     @Nested
     class ToCsvStringTests {
         @Test
-        public void emptyMatrixToEmptyString() {
+        void emptyMatrixToEmptyString() {
             assertEquals("", DEFAULT_CSV_WRITER.toCsv(null), "Expected empty string");
             assertEquals("", DEFAULT_CSV_WRITER.toCsv(new BasicSheetContent(new String[0][0])), "Expected empty string");
             assertEquals("", DEFAULT_CSV_WRITER.toCsv(new BasicSheetContent(new String[1][0])), "Expected empty string");
         }
 
         @Test
-        public void simpleMatrixToString() {
+        void simpleMatrixToString() {
             String[][] matrix = {
                     {"dog", "cow"},
                     {"frog", "cat"}
@@ -76,7 +76,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void matrixToStringWithQuoting() {
+        void matrixToStringWithQuoting() {
             String[][] matrix = {
                     {"dog", "say \"hi\""},
                     {"frog", "aa,bb"}
@@ -89,7 +89,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void noQuotesForBlankValue() {
+        void noQuotesForBlankValue() {
             String[][] matrix = {{"cow bell", "", "hot dog"}};
             String expected = "\"cow bell\",,\"hot dog\"";
 
@@ -98,7 +98,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void convertWithNullValue() {
+        void convertWithNullValue() {
             // NOTE: the 'null' will become an empty string (expected)
             String[][] matrix = {{"cow bell", null, "hot dog"}};
             String expected = "\"cow bell\",,\"hot dog\"";
@@ -155,7 +155,7 @@ class CsvWriterTest {
 
     @ParameterizedTest
     @MethodSource("quoteTestProvider")
-    public void quoteModeChecking(String input, QuoteMode quoteMode, String expectedOutput) {
+    void quoteModeChecking(String input, QuoteMode quoteMode, String expectedOutput) {
 
         CsvWriter csvWriter = CsvWriter.builder().quoteMode(quoteMode).build();
         String[][] matrix = {{input}};
@@ -167,7 +167,7 @@ class CsvWriterTest {
     @Nested
     class SavingCsvFileTests {
         @Test
-        public void testSavePathObject() throws Exception {
+        void testSavePathObject() throws Exception {
             Path testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME);
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
@@ -178,7 +178,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void testSaveFileObject() throws Exception {
+        void testSaveFileObject() throws Exception {
             Path testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME);
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
@@ -191,7 +191,7 @@ class CsvWriterTest {
         // if the output csv file saved does _NOT_ have any Unicode,
         //  then the 'saveUnicodeFileWithBom' flag should have no effect.
         @Test
-        public void testBomFlagWithoutUnicode() throws Exception {
+        void testBomFlagWithoutUnicode() throws Exception {
             Path testOutputFileOff1 = tempDir.resolve("test_bom_flag_off.csv");
             Path testOutputFileOn2 = tempDir.resolve("test_bom_flag_on.csv");
 
@@ -210,7 +210,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void testBomFlagWithUnicode() throws Exception {
+        void testBomFlagWithUnicode() throws Exception {
             Path testOutputFileOff1 = tempDir.resolve("test_bom_flag_off.csv");
             Path testOutputFileOn2 = tempDir.resolve("test_bom_flag_on.csv");
 
@@ -230,7 +230,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void saveMultipleFilesToDirectoryPath() throws Exception {
+        void saveMultipleFilesToDirectoryPath() throws Exception {
             String[][] data1 = {
                 {"aa", "bb"},
                 {"cc", "dd"}
@@ -255,7 +255,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void saveAllowFileOverwrite() throws Exception {
+        void saveAllowFileOverwrite() throws Exception {
             Path testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME);
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
@@ -290,7 +290,7 @@ class CsvWriterTest {
     class ExceptionBehaviorTests {
 
         @Test
-        public void dontAllowFileOverwrite() throws Exception {
+        void dontAllowFileOverwrite() throws Exception {
             Path testOutputFile = tempDir.resolve(TEST_OUTPUT_FILE_NAME);
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
@@ -307,7 +307,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void invalidNullQuoteMode() {
+        void invalidNullQuoteMode() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 CsvWriter.builder().quoteMode(null).build();
             });
@@ -315,7 +315,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void missingSheetContentParameter() {
+        void missingSheetContentParameter() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 DEFAULT_CSV_WRITER.saveToDirectory(Path.of("."), null);
             });
@@ -323,7 +323,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void emptySheetContentListParameter() {
+        void emptySheetContentListParameter() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 DEFAULT_CSV_WRITER.saveToDirectory(Path.of("."), List.of());
             });
@@ -331,7 +331,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void invalidDelimiterParameter() {
+        void invalidDelimiterParameter() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 CsvWriter.builder().delimiter('a').build();
             });
@@ -339,7 +339,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void nullOutputFilePathParameter() {
+        void nullOutputFilePathParameter() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
                 DEFAULT_CSV_WRITER.saveToFile((Path)null, sheetContent(matrix));
@@ -348,7 +348,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void nullOutputDirectoryParameter() {
+        void nullOutputDirectoryParameter() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
                 DEFAULT_CSV_WRITER.saveToDirectory((Path)null, List.of(sheetContent(matrix)));
@@ -357,7 +357,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void nullSheetNameOnMultiSave() {
+        void nullSheetNameOnMultiSave() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
                 SheetContent sheetContent1 = new BasicSheetContent("sheet", matrix);
@@ -368,7 +368,7 @@ class CsvWriterTest {
             assertEquals("Must supply a non-empty sheetName for each sheetContent to write.", exception.getMessage());
         }
         @Test
-        public void emptySheetNameOnMultiSave() {
+        void emptySheetNameOnMultiSave() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
                 SheetContent sheetContent1 = new BasicSheetContent("sheet", matrix);
@@ -380,7 +380,7 @@ class CsvWriterTest {
         }
 
         @Test
-        public void emptyNullInListOnMultiSave() {
+        void emptyNullInListOnMultiSave() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 String[][] matrix = {{"cow bell", "", "hot dog"}};
                 List<SheetContent> sheetContentList = new ArrayList<>();
@@ -394,7 +394,7 @@ class CsvWriterTest {
 
         @ParameterizedTest
         @MethodSource("com.github.bradjacobs.excel.csv.CsvWriterTest#invalidOutputPaths")
-        public void invalidOutputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
+        void invalidOutputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             Path path = location != null ? Paths.get(location) : null;
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};
@@ -406,7 +406,7 @@ class CsvWriterTest {
 
         @ParameterizedTest
         @MethodSource("com.github.bradjacobs.excel.csv.CsvWriterTest#invalidOutputPaths")
-        public void invalidOutputFileParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
+        void invalidOutputFileParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) {
             File file = location != null ? new File(location) : null;
 
             String[][] matrix = {{"cow bell", "", "hot dog"}};

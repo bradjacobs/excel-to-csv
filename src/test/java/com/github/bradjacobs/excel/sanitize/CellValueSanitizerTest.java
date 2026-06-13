@@ -16,14 +16,14 @@ class CellValueSanitizerTest {
     private static final String ASSERTION_MESSAGE = "mismatch expected cell value string";
 
     @Test
-    public void sanitizeCellValueReturnsEmptyStringForNullInput() {
+    void sanitizeCellValueReturnsEmptyStringForNullInput() {
         CellValueSanitizer sanitizer = new CellValueSanitizer(true, Set.of(QUOTES));
         String result = sanitizer.sanitizeCellValue(null);
         assertEquals("", result, ASSERTION_MESSAGE);
     }
 
     @Test
-    public void sanitizeCellValueTrimsInputWhenTrimEnabled() {
+    void sanitizeCellValueTrimsInputWhenTrimEnabled() {
         CellValueSanitizer sanitizer = new CellValueSanitizer(true, Set.of(QUOTES));
         String inputString = "  dog  ";
         String expectedString = inputString.trim();
@@ -32,7 +32,7 @@ class CellValueSanitizerTest {
     }
 
     @Test
-    public void sanitizeCellValuePreservesWhitespaceWhenTrimDisabled() {
+    void sanitizeCellValuePreservesWhitespaceWhenTrimDisabled() {
         CellValueSanitizer sanitizer = new CellValueSanitizer(false, Set.of(QUOTES));
         String inputString = "  dog  ";
         String result = sanitizer.sanitizeCellValue(inputString);
@@ -40,7 +40,7 @@ class CellValueSanitizerTest {
     }
 
     @Test
-    public void sanitizeCellValueRemovesBasicDiacriticsWhenConfigured() {
+    void sanitizeCellValueRemovesBasicDiacriticsWhenConfigured() {
         CellValueSanitizer sanitizer = new CellValueSanitizer(true, Set.of(BASIC_DIACRITICS));
         String inputString = "Façade";
         String result = sanitizer.sanitizeCellValue(inputString);

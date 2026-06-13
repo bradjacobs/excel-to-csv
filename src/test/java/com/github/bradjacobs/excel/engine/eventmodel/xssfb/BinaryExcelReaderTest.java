@@ -42,7 +42,7 @@ class BinaryExcelReaderTest {
             "LastValueHidden",
             "LongestRowHidden"
     })
-    public void testMissingRowsAndColumns(String sheetNamePrefix) throws IOException {
+    void testMissingRowsAndColumns(String sheetNamePrefix) throws IOException {
         String testDataSheetName = sheetNamePrefix + INPUT_DATA_SHEET_SUFFIX;
         String expectedDataSheetName = sheetNamePrefix + EXPECTED_DATA_SHEET_SUFFIX;
 

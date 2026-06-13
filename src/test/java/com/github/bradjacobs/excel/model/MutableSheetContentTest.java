@@ -78,7 +78,7 @@ class MutableSheetContentTest extends SheetContentTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class SetSheetNameTests {
         @Test
-        public void setSheetName() {
+        void setSheetName() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             String newSheetName = "newSheetName";
             mutableSheetContent.setSheetName(newSheetName);
@@ -86,14 +86,14 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void setSheetNameWithNull() {
+        void setSheetNameWithNull() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.setSheetName(null);
             assertEquals("", mutableSheetContent.getSheetName());
         }
 
         @Test
-        public void createWithNullSheetName() {
+        void createWithNullSheetName() {
             MutableSheetContent mutableSheetContent = new MutableSheetContent(null, INPUT_LIST);
             assertEquals("", mutableSheetContent.getSheetName());
         }
@@ -104,7 +104,7 @@ class MutableSheetContentTest extends SheetContentTest {
     class CreateWithEmptyDataTests {
 
         @Test
-        public void createMutableSheetContentWithNullRows() {
+        void createMutableSheetContentWithNullRows() {
             MutableSheetContent mutableSheetContent = new MutableSheetContent("sheet", null);
             assertEquals(0, mutableSheetContent.getRowCount());
             assertEquals(0, mutableSheetContent.getColumnCount());
@@ -116,7 +116,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void copyOfNullSheetContent() {
+        void copyOfNullSheetContent() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 MutableSheetContent.copyOf(null);
             });
@@ -162,7 +162,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void insertRowInFront() {
+        void insertRowInFront() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             List<String> newRow = List.of("foo", "bar", "baz");
             mutableSheetContent.insertRow(0, newRow);
@@ -173,7 +173,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void insertRowAtEnd() {
+        void insertRowAtEnd() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             List<String> newRow = List.of("foo", "bar", "baz");
             mutableSheetContent.insertRow(INPUT_LIST.size(), newRow);
@@ -184,12 +184,12 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void insertRowNegativeRowIndexException() {
+        void insertRowNegativeRowIndexException() {
             runNegativeRowIndexExceptionScenario(RowOperation.INSERT);
         }
 
         @Test
-        public void insertRowTooBigRowIndexException() {
+        void insertRowTooBigRowIndexException() {
             runTooBigRowIndexExceptionScenario(RowOperation.INSERT);
         }
     }
@@ -213,12 +213,12 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void replaceRowNegativeRowIndexException() {
+        void replaceRowNegativeRowIndexException() {
             runNegativeRowIndexExceptionScenario(RowOperation.REPLACE);
         }
 
         @Test
-        public void replaceRowTooBigRowIndexException() {
+        void replaceRowTooBigRowIndexException() {
             runTooBigRowIndexExceptionScenario(RowOperation.REPLACE);
         }
     }
@@ -228,7 +228,7 @@ class MutableSheetContentTest extends SheetContentTest {
     class TransformRowTests {
 
         @Test
-        public void transformRow() {
+        void transformRow() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.transformRow(0, String::toUpperCase);
 
@@ -241,7 +241,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void transformRowMissingTransformer() {
+        void transformRowMissingTransformer() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 mutableSheetContent.transformRow(0, null);
@@ -250,12 +250,12 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void transformRowNegativeRowIndexException() {
+        void transformRowNegativeRowIndexException() {
             runNegativeRowIndexExceptionScenario(RowOperation.TRANSFORM);
         }
 
         @Test
-        public void transformRowTooBigRowIndexException() {
+        void transformRowTooBigRowIndexException() {
             runTooBigRowIndexExceptionScenario(RowOperation.TRANSFORM);
         }
     }
@@ -264,7 +264,7 @@ class MutableSheetContentTest extends SheetContentTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class RemoveRowTests {
         @Test
-        public void removeRow() {
+        void removeRow() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             List<String> removedRow = mutableSheetContent.removeRow(0);
 
@@ -278,7 +278,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void removeAllRows() {
+        void removeAllRows() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.removeRow(0);
             mutableSheetContent.removeRow(0);
@@ -289,12 +289,12 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void removeRowNegativeRowIndexException() {
+        void removeRowNegativeRowIndexException() {
             runNegativeRowIndexExceptionScenario(RowOperation.REMOVE);
         }
 
         @Test
-        public void removeRowTooBigRowIndexException() {
+        void removeRowTooBigRowIndexException() {
             runTooBigRowIndexExceptionScenario(RowOperation.REMOVE);
         }
     }
@@ -303,7 +303,7 @@ class MutableSheetContentTest extends SheetContentTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class SetCellTests {
         @Test
-        public void setCellValue() {
+        void setCellValue() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             String newCellValue = "UPDATED";
             mutableSheetContent.setCellValue(1, 1, newCellValue);
@@ -312,7 +312,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void setCellValueWithNull() {
+        void setCellValueWithNull() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.setCellValue(1, 1, null);
             assertEquals("", mutableSheetContent.getCellValue(1, 1));
@@ -339,7 +339,7 @@ class MutableSheetContentTest extends SheetContentTest {
     class TransformCellTests {
 
         @Test
-        public void transformCellValues() {
+        void transformCellValues() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.transformCells(String::toUpperCase);
 
@@ -349,7 +349,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void transformCellsMissingTransformer() {
+        void transformCellsMissingTransformer() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
                 mutableSheetContent.transformCells(null);
@@ -363,7 +363,7 @@ class MutableSheetContentTest extends SheetContentTest {
     class AddColumnTests {
 
         @Test
-        public void addColumn() {
+        void addColumn() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.addColumn();
             assertEquals(INPUT_LIST.size(), mutableSheetContent.getRowCount());
@@ -380,7 +380,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void addColumnWithFillerValue() {
+        void addColumnWithFillerValue() {
             String fillerValue = "filler";
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.addColumn(fillerValue);
@@ -418,21 +418,21 @@ class MutableSheetContentTest extends SheetContentTest {
 
 
         @Test
-        public void removeColumnsByIndex() {
+        void removeColumnsByIndex() {
             MutableSheetContent mutableSheetContent = new MutableSheetContent("", REMOVE_COLUMNS_INPUT_ROWS);
             mutableSheetContent.removeColumn(1, 3);
             assertEquals(REMOVE_COLUMNS_EXPECTED_ROWS, mutableSheetContent.getRows());
         }
 
         @Test
-        public void removeColumnsWithDuplicatesByIndex() {
+        void removeColumnsWithDuplicatesByIndex() {
             MutableSheetContent mutableSheetContent = new MutableSheetContent("", REMOVE_COLUMNS_INPUT_ROWS);
             mutableSheetContent.removeColumn(1, 3, 1, 1, 3);
             assertEquals(REMOVE_COLUMNS_EXPECTED_ROWS, mutableSheetContent.getRows());
         }
 
         @Test
-        public void removeAllColumnsByIndex() {
+        void removeAllColumnsByIndex() {
             // removing all columns will result in removing all data.
             //   thus the row data will be empty.
             MutableSheetContent mutableSheetContent = new MutableSheetContent("", REMOVE_COLUMNS_INPUT_ROWS);
@@ -443,21 +443,21 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void removeColumnsByHeaderName() {
+        void removeColumnsByHeaderName() {
             MutableSheetContent mutableSheetContent = new MutableSheetContent("", REMOVE_COLUMNS_INPUT_ROWS);
             mutableSheetContent.removeColumn("Name", "Notes");
             assertEquals(REMOVE_COLUMNS_EXPECTED_ROWS, mutableSheetContent.getRows());
         }
 
         @Test
-        public void removeColumnsByHeaderNameCaseInsensitive() {
+        void removeColumnsByHeaderNameCaseInsensitive() {
             MutableSheetContent mutableSheetContent = new MutableSheetContent("", REMOVE_COLUMNS_INPUT_ROWS);
             mutableSheetContent.removeColumn("name", "NOTES");
             assertEquals(REMOVE_COLUMNS_EXPECTED_ROWS, mutableSheetContent.getRows());
         }
 
         @Test
-        public void removeColumnsUnknownHeaderNames() {
+        void removeColumnsUnknownHeaderNames() {
             // trying to delete a header that doesn't exist will have no effect
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.removeColumn("FOOBAR");
@@ -466,7 +466,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void testRemoveNegativeColumnIndexException() {
+        void testRemoveNegativeColumnIndexException() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
                 mutableSheetContent.removeColumn(-1);
@@ -475,7 +475,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void testRemoveTooBigColumnIndexException() {
+        void testRemoveTooBigColumnIndexException() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
                 mutableSheetContent.removeColumn(99);
@@ -484,7 +484,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void testRemoveColumnWithNameNoRows() {
+        void testRemoveColumnWithNameNoRows() {
             MutableSheetContent mutableSheetContent = new MutableSheetContent("", List.of());
             Exception exception = assertThrows(IllegalStateException.class, () -> {
                 mutableSheetContent.removeColumn("Name");
@@ -493,7 +493,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void removeWithInvalidColumnNoSideEffect() {
+        void removeWithInvalidColumnNoSideEffect() {
             // if an invalid index was passed in, ensure that NO columns were removed.
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
@@ -506,7 +506,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void removeNullColumnIndex() {
+        void removeNullColumnIndex() {
             // if an invalid index was passed in, ensure that NO columns were removed.
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.removeColumn((int[])null);
@@ -515,7 +515,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void removeEmptyColumnIndex() {
+        void removeEmptyColumnIndex() {
             // if an invalid index was passed in, ensure that NO columns were removed.
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.removeColumn(new int[0]);
@@ -524,7 +524,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void removeNullColumnHeaderNames() {
+        void removeNullColumnHeaderNames() {
             // if an invalid index was passed in, ensure that NO columns were removed.
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.removeColumn((String[])null);
@@ -533,7 +533,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void removeEmptyColumnHeaderNames() {
+        void removeEmptyColumnHeaderNames() {
             // if an invalid index was passed in, ensure that NO columns were removed.
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             mutableSheetContent.removeColumn(new String[0]);
@@ -549,7 +549,7 @@ class MutableSheetContentTest extends SheetContentTest {
         // Will allow updating row values without having to call 'setRow'
         //  (may change mind and not allow later, tbd)
         @Test
-        public void getRowUpdateValue() {
+        void getRowUpdateValue() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             List<String> firstRow = mutableSheetContent.getRow(0);
 
@@ -568,7 +568,7 @@ class MutableSheetContentTest extends SheetContentTest {
         // Will allow updating row values without having to call 'setRow'
         //  (may change mind and not allow later, tbd)
         @Test
-        public void getRowsUpdateValue() {
+        void getRowsUpdateValue() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             List<List<String>> rows = mutableSheetContent.getRows();
 
@@ -582,7 +582,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void attemptInsertRowOnGetRows() {
+        void attemptInsertRowOnGetRows() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             List<List<String>> rows = mutableSheetContent.getRows();
             assertThrows(UnsupportedOperationException.class, () -> {
@@ -591,7 +591,7 @@ class MutableSheetContentTest extends SheetContentTest {
         }
 
         @Test
-        public void attemptReplaceRowOnGetRows() {
+        void attemptReplaceRowOnGetRows() {
             MutableSheetContent mutableSheetContent = createDefaultMutableSheetContent();
             List<List<String>> rows = mutableSheetContent.getRows();
             assertThrows(UnsupportedOperationException.class, () -> {
@@ -607,7 +607,7 @@ class MutableSheetContentTest extends SheetContentTest {
         assertEquals("Row index out of range: -1, size: 2", exception.getMessage());
     }
 
-    public void runTooBigRowIndexExceptionScenario(RowOperation rowOperation) {
+    void runTooBigRowIndexExceptionScenario(RowOperation rowOperation) {
         Executable executable = createExecutable(rowOperation, 200, List.of("foo", "bar", "baz"));
         Exception exception = assertThrows(IndexOutOfBoundsException.class, executable);
         assertEquals("Row index out of range: 200, size: 2", exception.getMessage());

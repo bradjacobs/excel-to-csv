@@ -23,7 +23,7 @@ public class ExamplesTest {
     private Path tempDir;
 
     @Test
-    public void readExcelWriteCsv() throws IOException {
+    void readExcelWriteCsv() throws IOException {
         Path inputFile = TestResourceUtil.getResourceFilePath("test_data.xlsx");
         Path outputFile = tempDir.resolve("output.csv");
 

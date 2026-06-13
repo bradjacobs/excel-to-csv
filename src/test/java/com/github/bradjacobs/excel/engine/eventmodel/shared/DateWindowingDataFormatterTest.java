@@ -15,7 +15,7 @@ class DateWindowingDataFormatterTest {
      * regardless of how DateWindowingDataFormatter was created.
      */
     @Test
-    public void checkEmulateCsvFlag() {
+    void checkEmulateCsvFlag() {
         DataFormatter dataFormatterA = new DateWindowingDataFormatter(false);
         DataFormatter dataFormatterB = new DateWindowingDataFormatter(true);
         assertTrue(dataFormatterA.isEmulateCSV());
@@ -23,7 +23,7 @@ class DateWindowingDataFormatterTest {
     }
 
     @Test
-    public void checkUseCachedValuesForFormulaCellsFlag() {
+    void checkUseCachedValuesForFormulaCellsFlag() {
         DataFormatter dataFormatterA = new DateWindowingDataFormatter(false);
         DataFormatter dataFormatterB = new DateWindowingDataFormatter(true);
         assertTrue(dataFormatterA.useCachedValuesForFormulaCells());

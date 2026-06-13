@@ -20,7 +20,7 @@ class NoPackageCyclesTest {
      * and be tuned later if/when needed.
      */
     @Test
-    public void everyPackageMustBeCycleFree() {
+    void everyPackageMustBeCycleFree() {
         JavaClasses classes = new ClassFileImporter()
                 .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
                 .importPackages("com.github.bradjacobs.excel");

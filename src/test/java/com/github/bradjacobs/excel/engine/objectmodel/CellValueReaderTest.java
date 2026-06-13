@@ -29,7 +29,7 @@ class CellValueReaderTest {
     private static final String NULL_SANITIZE_TYPES_MESSAGE = "Must provide non-null sanitizeTypes.";
 
     @Test
-    public void trimsStringCellValueWhenTrimEnabled() {
+    void trimsStringCellValueWhenTrimEnabled() {
         String inputString = "  dog  ";
         String expectedString = inputString.trim();
         CellValueReader cellValueReader = createCellValueReader(true, Set.of());
@@ -39,7 +39,7 @@ class CellValueReaderTest {
     }
 
     @Test
-    public void preservesStringCellValueWhenTrimDisabled() {
+    void preservesStringCellValueWhenTrimDisabled() {
         String inputString = "  dog  ";
         CellValueReader cellValueReader = createCellValueReader(false, Set.of());
         Cell cell = createMockStringCell(inputString);
@@ -48,7 +48,7 @@ class CellValueReaderTest {
     }
 
     @Test
-    public void removesBasicDiacriticsWhenConfigured() {
+    void removesBasicDiacriticsWhenConfigured() {
         CellValueReader cellValueReader = createCellValueReader(true, Set.of(BASIC_DIACRITICS));
         Cell cell = createMockStringCell("Façade");
         String result = cellValueReader.getCellValue(cell);
@@ -56,14 +56,14 @@ class CellValueReaderTest {
     }
 
     @Test
-    public void returnsEmptyStringForNullCell() {
+    void returnsEmptyStringForNullCell() {
         CellValueReader cellValueReader = createCellValueReader(true, Set.of(QUOTES));
         String result = cellValueReader.getCellValue(null);
         assertEquals("", result, CELL_VALUE_MISMATCH_MESSAGE);
     }
 
     @Test
-    public void readsCachedNumericValueFromFormulaCell() {
+    void readsCachedNumericValueFromFormulaCell() {
         // note: this is a semi-poor representation of a true Excel Formula cell.
         CellValueReader cellValueReader = createCellValueReader(true, Set.of(QUOTES));
         Cell cell = mock(Cell.class);
@@ -78,7 +78,7 @@ class CellValueReaderTest {
     }
 
     @Test
-    public void throwsExceptionWhenSanitizeTypesIsNull() {
+    void throwsExceptionWhenSanitizeTypesIsNull() {
         Exception exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> new CellValueReader(true, null)

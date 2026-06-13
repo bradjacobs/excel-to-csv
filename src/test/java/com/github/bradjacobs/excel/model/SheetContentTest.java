@@ -69,49 +69,49 @@ abstract class SheetContentTest {
     class DefaultGetTests {
 
         @Test
-        public void getSheetName() {
+        void getSheetName() {
             SheetContent sheetContent = createDefaultSheetContent();
             assertEquals(INPUT_SHEET_NAME, sheetContent.getSheetName());
         }
 
         @Test
-        public void getRowCount() {
+        void getRowCount() {
             SheetContent sheetContent = createDefaultSheetContent();
             assertEquals(INPUT_MATRIX.length, sheetContent.getRowCount());
         }
 
         @Test
-        public void getColumnCount() {
+        void getColumnCount() {
             SheetContent sheetContent = createDefaultSheetContent();
             assertEquals(INPUT_MATRIX[0].length, sheetContent.getColumnCount());
         }
 
         @Test
-        public void isEmpty() {
+        void isEmpty() {
             SheetContent sheetContent = createDefaultSheetContent();
             assertFalse(sheetContent.isEmpty());
         }
 
         @Test
-        public void getMatrix() {
+        void getMatrix() {
             SheetContent sheetContent = createDefaultSheetContent();
             assertArrayEquals(INPUT_MATRIX, sheetContent.getMatrix());
         }
 
         @Test
-        public void getRows() {
+        void getRows() {
             SheetContent sheetContent = createDefaultSheetContent();
             assertEquals(INPUT_LIST, sheetContent.getRows());
         }
 
         @Test
-        public void getRow() {
+        void getRow() {
             SheetContent sheetContent = createDefaultSheetContent();
             assertEquals(INPUT_LIST.get(1), sheetContent.getRow(1));
         }
 
         @Test
-        public void getCell() {
+        void getCell() {
             SheetContent sheetContent = createDefaultSheetContent();
             assertEquals(INPUT_MATRIX[1][1], sheetContent.getCellValue(1, 1));
         }
@@ -123,31 +123,31 @@ abstract class SheetContentTest {
     class EmptyGetTests {
 
         @Test
-        public void getEmptySheetName() {
+        void getEmptySheetName() {
             SheetContent sheetContent = createEmptySheetContent();
             assertEquals("", sheetContent.getSheetName());
         }
 
         @Test
-        public void getEmptyRowCount() {
+        void getEmptyRowCount() {
             SheetContent sheetContent = createEmptySheetContent();
             assertEquals(0, sheetContent.getRowCount());
         }
 
         @Test
-        public void getEmptyColumnCount() {
+        void getEmptyColumnCount() {
             SheetContent sheetContent = createEmptySheetContent();
             assertEquals(0, sheetContent.getColumnCount());
         }
 
         @Test
-        public void isEmptyTrue() {
+        void isEmptyTrue() {
             SheetContent sheetContent = createEmptySheetContent();
             assertTrue(sheetContent.isEmpty());
         }
 
         @Test
-        public void emptyGetRows() {
+        void emptyGetRows() {
             SheetContent sheetContent = createEmptySheetContent();
             List<List<String>> rows = sheetContent.getRows();
             assertNotNull(rows);
@@ -155,7 +155,7 @@ abstract class SheetContentTest {
         }
 
         @Test
-        public void emptyGetMatrix() {
+        void emptyGetMatrix() {
             SheetContent sheetContent = createEmptySheetContent();
             String[][] matrix = sheetContent.getMatrix();
             assertNotNull(matrix);
@@ -168,7 +168,7 @@ abstract class SheetContentTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class DefaultGetOutOfRangeTests {
         @Test
-        public void getRowIndexNegative() {
+        void getRowIndexNegative() {
             SheetContent sheetContent = createDefaultSheetContent();
             Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
                 sheetContent.getRow(-1);
@@ -177,7 +177,7 @@ abstract class SheetContentTest {
         }
 
         @Test
-        public void getRowIndexTooLarge() {
+        void getRowIndexTooLarge() {
             SheetContent sheetContent = createDefaultSheetContent();
             Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
                 sheetContent.getRow(200);
@@ -186,7 +186,7 @@ abstract class SheetContentTest {
         }
 
         @Test
-        public void getCellWithRowIndexNegative() {
+        void getCellWithRowIndexNegative() {
             SheetContent sheetContent = createDefaultSheetContent();
             Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
                 sheetContent.getCellValue(-1, 1);
@@ -195,7 +195,7 @@ abstract class SheetContentTest {
         }
 
         @Test
-        public void getCellWithRowIndexTooLarge() {
+        void getCellWithRowIndexTooLarge() {
             SheetContent sheetContent = createDefaultSheetContent();
             Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
                 sheetContent.getCellValue(9999, 1);
@@ -204,7 +204,7 @@ abstract class SheetContentTest {
         }
 
         @Test
-        public void getCellWithColumnIndexNegative() {
+        void getCellWithColumnIndexNegative() {
             SheetContent sheetContent = createDefaultSheetContent();
             Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
                 sheetContent.getCellValue(1, -1);
@@ -213,7 +213,7 @@ abstract class SheetContentTest {
         }
 
         @Test
-        public void getCellWithColumnIndexTooLarge() {
+        void getCellWithColumnIndexTooLarge() {
             SheetContent sheetContent = createDefaultSheetContent();
             Exception exception = assertThrows(IndexOutOfBoundsException.class, () -> {
                 sheetContent.getCellValue(1, 9999);
@@ -223,7 +223,7 @@ abstract class SheetContentTest {
     }
 
     @Test
-    public void attemptGetRowAddition() {
+    void attemptGetRowAddition() {
         SheetContent sheetContent = createDefaultSheetContent();
         assertThrows(UnsupportedOperationException.class, () -> {
             List<String> row = sheetContent.getRow(0);
@@ -233,7 +233,7 @@ abstract class SheetContentTest {
     }
 
     @Test
-    public void attemptGetRowsAddition() {
+    void attemptGetRowsAddition() {
         SheetContent sheetContent = createDefaultSheetContent();
         assertThrows(UnsupportedOperationException.class, () -> {
             List<List<String>> rows = sheetContent.getRows();
@@ -242,7 +242,7 @@ abstract class SheetContentTest {
     }
 
     @Test
-    public void attemptGetRowsUpdate() {
+    void attemptGetRowsUpdate() {
         SheetContent sheetContent = createDefaultSheetContent();
         assertThrows(UnsupportedOperationException.class, () -> {
             List<List<String>> rows = sheetContent.getRows();
@@ -251,7 +251,7 @@ abstract class SheetContentTest {
     }
 
     @Test
-    public void createSheetWithNullValue() {
+    void createSheetWithNullValue() {
         SheetContent sheetContent = createSheetWithNullContent();
         List<String> rowValueList = sheetContent.getRow(0);
 

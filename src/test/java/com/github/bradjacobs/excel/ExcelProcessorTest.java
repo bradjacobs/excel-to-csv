@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class ExcelProcessorTest {
 
     @Test
-    public void excelProcessorTest() {
+    void excelProcessorTest() {
         // TODO - add tests to check selection of standard vs advanced sheet readers
     }
 }

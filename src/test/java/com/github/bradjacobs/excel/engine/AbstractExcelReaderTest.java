@@ -98,7 +98,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
     class GeneralTests {
 
         @Test
-        public void basicRead() throws IOException {
+        void basicRead() throws IOException {
             Path testFile = TestResourceUtil.getResourceFilePath("test_data.xlsx");
             ExcelReadRequest request = createRequest(testFile);
 
@@ -116,7 +116,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
          * should have a value for at least 1 of the rows
          */
         @Test
-        public void ensureColumnSize() throws IOException {
+        void ensureColumnSize() throws IOException {
             ExcelReadRequest request = createRequest(TEST_FILE, GROWING_COLUMN_LENGTH_SHEET);
 
             List<SheetContent> sheetContentList = defaultSheetReader.readSheets(request);
@@ -128,7 +128,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void readBlankSheet() throws IOException {
+        void readBlankSheet() throws IOException {
             ExcelReadRequest request = createRequest(TEST_FILE, "BlankSheet");
             String[][] matrix = readDefaultMatrix(request);
             assertEquals(0, matrix.length, EXPECTED_ROW_COUNT_MESSAGE);
@@ -140,7 +140,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
          * Ensure sheet is still read correctly when these rows are encountered.
          */
         @Test
-        public void negativeRowCellNumberRepro() throws IOException {
+        void negativeRowCellNumberRepro() throws IOException {
             ExcelReadRequest request = createRequest(TEST_FILE, "BadRow");
             String[][] matrix = readDefaultMatrix(request);
 
@@ -157,14 +157,14 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
          * Then this last column should be removed from the result.
          */
         @Test
-        public void handleExtraBlankWhitespaceColumn() throws IOException {
+        void handleExtraBlankWhitespaceColumn() throws IOException {
             ExcelReadRequest request = createRequest(TEST_FILE, "LastColWhitespace");
             String[][] matrix = readDefaultMatrix(request);
             assertEquals(1, matrix[0].length, "mismatch of expected number of columns in csv output.");
         }
 
         @Test
-        public void readMultipleSheets() throws IOException {
+        void readMultipleSheets() throws IOException {
             List<String> sheetNames = List.of(GROWING_COLUMN_LENGTH_SHEET, WITH_TWO_BLANK_COLUMNS_SHEET, WITH_THREE_BLANK_ROWS_SHEET);
             List<String> expectedFirstCells = List.of("aa", "aa11", "Name");
 
@@ -183,7 +183,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class TrimStringValuesTests {
         @Test
-        public void trimStringValuesEnabled(@TempDir Path tempDir) throws IOException {
+        void trimStringValuesEnabled(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Path testFile = TestExcelFileSheetUtils.createSingleCellExcelFile(tempDir, testValue);
             ExcelReadRequest request = createRequest(testFile);
@@ -194,7 +194,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void trimStringValuesDisabled(@TempDir Path tempDir) throws IOException {
+        void trimStringValuesDisabled(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Path testFile = TestExcelFileSheetUtils.createSingleCellExcelFile(tempDir, testValue);
             ExcelReadRequest request = createRequest(testFile);
@@ -205,7 +205,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void trimStringValuesDefault(@TempDir Path tempDir) throws IOException {
+        void trimStringValuesDefault(@TempDir Path tempDir) throws IOException {
             String testValue = "  aa bb  ";
             Path testFile = TestExcelFileSheetUtils.createSingleCellExcelFile(tempDir, testValue);
             ExcelReadRequest request = createRequest(testFile);
@@ -223,7 +223,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
          * skipBlankRows = true vs. false
          */
         @Test
-        public void skipBlankRows() throws IOException {
+        void skipBlankRows() throws IOException {
             T retainBlankRowsReader = createBuilder().skipBlankRows(false).build();
             T skipBlankRowsReader = createBuilder().skipBlankRows(true).build();
 
@@ -235,7 +235,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void defaultRetainBlankRows() throws IOException {
+        void defaultRetainBlankRows() throws IOException {
             T retainBlankRowsReader = createBuilder().skipBlankRows(false).build();
 
             ExcelReadRequest request = createRequest(TEST_FILE, WITH_THREE_BLANK_ROWS_SHEET);
@@ -250,7 +250,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
          * (i.e. the last row should contain some values for a non-blank sheet)
          */
         @Test
-        public void pruneExtraBlankRows() throws IOException {
+        void pruneExtraBlankRows() throws IOException {
             T sheetReader = createBuilder().skipBlankRows(true).build();
 
             ExcelReadRequest request = createRequest(TEST_FILE, "ExtraBlankRowsAfterData");
@@ -267,7 +267,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
          * skipBlankColumns = true vs. false
          */
         @Test
-        public void skipBlankColumns() throws IOException {
+        void skipBlankColumns() throws IOException {
             T retainBlankColumnsReader = createBuilder().skipBlankColumns(false).build();
             T skipBlankColumnsReader = createBuilder().skipBlankColumns(true).build();
 
@@ -279,7 +279,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void defaultRetainBlankColumns() throws IOException {
+        void defaultRetainBlankColumns() throws IOException {
             T retainBlankColumnsReader = createBuilder().skipBlankColumns(false).build();
 
             ExcelReadRequest request = createRequest(TEST_FILE, WITH_TWO_BLANK_COLUMNS_SHEET);
@@ -323,7 +323,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
                 "LastValueHidden",
                 "LongestRowHidden"
         })
-        public void testMissingRowsAndColumns(String sheetNamePrefix) throws IOException {
+        void testMissingRowsAndColumns(String sheetNamePrefix) throws IOException {
             String testDataSheetName = sheetNamePrefix + INPUT_DATA_SHEET_SUFFIX;
             String expectedDataSheetName = sheetNamePrefix + EXPECTED_DATA_SHEET_SUFFIX;
 
@@ -342,7 +342,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void withHiddenConfigsReadAllSheets() throws IOException {
+        void withHiddenConfigsReadAllSheets() throws IOException {
             T sheetReader = createBuilder().skipHiddenCells(true).build();
 
             ExcelReadRequest request = ExcelReadRequest.from(HIDDEN_CELLS_FILE).allSheets().build();
@@ -359,7 +359,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
 
         // extra test for multi-hidden blank columns
         @Test
-        public void skipMultipleHiddenColumnsInMiddle() throws IOException {
+        void skipMultipleHiddenColumnsInMiddle() throws IOException {
             T sheetReader = createBuilder().skipHiddenCells(true).build();
 
             Path inputFile = TestResourceUtil.getResourceFilePath("multiHiddenColumnRepro.xlsx");
@@ -371,7 +371,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void skipMultipleHiddenColumnsInFront() throws IOException {
+        void skipMultipleHiddenColumnsInFront() throws IOException {
             T sheetReader = createBuilder().skipHiddenCells(true).build();
 
             Path inputFile = TestResourceUtil.getResourceFilePath("multiHiddenColumnRepro.xlsx");
@@ -397,7 +397,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
 
         @ParameterizedTest
         @FieldSource("sanitizeCases")
-        public void sanitizeSheet(
+        void sanitizeSheet(
                 SanitizeType type,
                 String originalValue,
                 String sanitizedValue,
@@ -447,7 +447,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
      * would be incorrect for the 'AdvancedExcelSheetReader' class.
      */
     @Test
-    public void test1904Windowing() throws IOException {
+    void test1904Windowing() throws IOException {
         Path date1904File = TestResourceUtil.getResourceFilePath("date1904.xlsx");
 
         T sheetReader = createBuilder().build();
@@ -489,7 +489,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class ErrorHandlingTests {
         @Test
-        public void nullRequestParameter() {
+        void nullRequestParameter() {
             assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();
                 sheetReader.readSheet(null);
@@ -497,7 +497,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void negativeSheetIndex() {
+        void negativeSheetIndex() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();
                 ExcelReadRequest request = createRequest(Path.of("fake.xlsx"), -2);
@@ -507,7 +507,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void nullSheetName() {
+        void nullSheetName() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();
                 ExcelReadRequest request = createRequest(Path.of("fake.xlsx"), null);
@@ -517,7 +517,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void emptySheetName() {
+        void emptySheetName() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();
                 ExcelReadRequest request = createRequest(TEST_FILE, "");
@@ -527,7 +527,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void unknownSheetName() {
+        void unknownSheetName() {
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
                 T sheetReader = createBuilder().build();
                 ExcelReadRequest request = createRequest(TEST_FILE, "UnknownSheetName");
@@ -537,7 +537,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
         }
 
         @Test
-        public void requestManySheetsOnSingleSheetCall() throws IOException {
+        void requestManySheetsOnSingleSheetCall() throws IOException {
             ExcelReadRequest request = ExcelReadRequest.from(TEST_FILE).bySheetIndex(0, 1).build();
 
             Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
@@ -549,7 +549,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
     }
 
     @Test
-    public void corruptInputFile(@TempDir Path tempDir) throws IOException {
+    void corruptInputFile(@TempDir Path tempDir) throws IOException {
         Path badFilePath = tempDir.resolve("bad.xlsx");
         Files.writeString(badFilePath, "bad");
 
@@ -562,7 +562,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
 
     @ParameterizedTest
     @MethodSource("invalidInputPaths")
-    public void invalidInputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) throws IOException {
+    void invalidInputPathParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) throws IOException {
         Path path = location != null ? Paths.get(location) : null;
         T sheetReader = createBuilder().build();
 
@@ -575,7 +575,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
 
     @ParameterizedTest
     @MethodSource("invalidInputUrls")
-    public void invalidInputUrlParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) throws IOException {
+    void invalidInputUrlParameter(String location, Class<? extends Exception> expectedException, String expectedMessage) throws IOException {
         URL url = location != null ? new URL(location) : null;
         T sheetReader = createBuilder().build();
 
@@ -590,7 +590,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
     private static final Path VALID_TEST_INPUT_PSWD_PATH = getResourceFilePath("test_data_w_pswd_1234.xlsx");
 
     @Test
-    public void testReadPasswordProtectedFile() throws Exception {
+    void testReadPasswordProtectedFile() throws Exception {
         URL resourceUrl = getResourceFileUrl("test_data_w_pswd_1234.xlsx");
 
         T sheetReader = createBuilder().build();
@@ -614,7 +614,7 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
                 ",no password was supplied",  // first param is null password
                 "'',no password was supplied" // first param is empty string password
         })
-        public void invalidPasswordCheck(String password, String expectedMessageSubstring) {
+        void invalidPasswordCheck(String password, String expectedMessageSubstring) {
             T sheetReader = createBuilder().build();
             ExcelReadRequest request = ExcelReadRequest
                     .from(VALID_TEST_INPUT_PSWD_PATH)
