@@ -14,6 +14,9 @@ import org.apache.poi.xssf.model.SharedStrings;
 
 import java.io.InputStream;
 
+/*
+TODO: NOTE this class references POI classes that are marked as "internal"
+ */
 class XssfbVisibleAwareSheetHandler extends XSSFBSheetHandler {
 
     private final SheetVisibilityTracker sheetVisibilityTracker;
