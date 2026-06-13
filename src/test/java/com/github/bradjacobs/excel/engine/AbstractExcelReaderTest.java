@@ -356,6 +356,31 @@ public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B e
                 assertArrayEquals(expectedMatrix, actualMatrix);
             }
         }
+
+        // extra test for multi-hidden blank columns
+        @Test
+        public void skipMultipleHiddenColumnsInMiddle() throws IOException {
+            T sheetReader = createBuilder().skipHiddenCells(true).build();
+
+            Path inputFile = TestResourceUtil.getResourceFilePath("multiHiddenColumnRepro.xlsx");
+            ExcelReadRequest request = ExcelReadRequest.from(inputFile)
+                    .bySheetName("Scenario1").build();
+            SheetContent responseContent = sheetReader.readSheet(request);
+            List<String> expectedFirstRow = List.of("AAAA1", "", "FFFF1", "GGGG1");
+            assertEquals(expectedFirstRow, responseContent.getRow(0));
+        }
+
+        @Test
+        public void skipMultipleHiddenColumnsInFront() throws IOException {
+            T sheetReader = createBuilder().skipHiddenCells(true).build();
+
+            Path inputFile = TestResourceUtil.getResourceFilePath("multiHiddenColumnRepro.xlsx");
+            ExcelReadRequest request = ExcelReadRequest.from(inputFile)
+                    .bySheetName("Scenario2").build();
+            SheetContent responseContent = sheetReader.readSheet(request);
+            List<String> expectedFirstRow = List.of("", "ddd1", "eee1");
+            assertEquals(expectedFirstRow, responseContent.getRow(0));
+        }
     }
 
     @Nested

@@ -22,6 +22,7 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
             "A cell value was encountered without a cellReference.  " +
             "See 'Known Issues' for more details.";
     private static final int NO_PREVIOUS_ROW = -1;
+    private static final int NO_PREVIOUS_COLUMN = -1;
 
     public interface SheetContentEmitPolicy {
         boolean shouldEmitRow(int rowIndex);
@@ -44,6 +45,7 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
 
     // Tracks the last row index observed by startRow(int).
     private int lastProcessedRowIndex = NO_PREVIOUS_ROW;
+    private int lastProcessedColumnIndex = NO_PREVIOUS_COLUMN;
 
     public SheetContentHandler(
             StringRowConsumer stringRowConsumer,
@@ -64,6 +66,7 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
     public void startRow(int rowIndex) {
         appendMissingRowsBetween(lastProcessedRowIndex, rowIndex);
         lastProcessedRowIndex = rowIndex;
+        lastProcessedColumnIndex = NO_PREVIOUS_COLUMN;
     }
 
     @Override
@@ -75,15 +78,13 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
     @Override
     public void cell(String cellReference, String formattedValue, XSSFComment comment) {
         CellAddress cellAddress = parseCellAddress(cellReference);
-        appendCellIfIncluded(cellAddress.getRow(), cellAddress.getColumn(), formattedValue);
-    }
-
-    private void appendCellIfIncluded(int rowIndex, int columnIndex, String formattedValue) {
+        int rowIndex = cellAddress.getRow();
+        int columnIndex = cellAddress.getColumn();
         if (shouldEmitCell(rowIndex, columnIndex)) {
-            // todo add more tests for this appendMissingColumns scenario.
-            appendMissingColumnsBefore(columnIndex);
+            appendMissingColumnsBetween(lastProcessedColumnIndex, columnIndex);
             appendCellValue(formattedValue);
         }
+        lastProcessedColumnIndex = columnIndex;
     }
 
     private CellAddress parseCellAddress(String cellReference) {
@@ -120,11 +121,13 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
 
     /**
      * Appends any missing columns before the given column index.
-     * @param columnIndex fill columns up to this index
+     * @param previousColumnIndex previous row index
+     * @param currentColumnIndex fill columns up to this index
      */
-    private void appendMissingColumnsBefore(int columnIndex) {
-        for (int columnToFill = currentRowValues.size(); columnToFill < columnIndex; columnToFill++) {
-            if (shouldEmitColumn(columnToFill)) {
+    private void appendMissingColumnsBetween(int previousColumnIndex, int currentColumnIndex) {
+        int firstMissingColumnIndex = previousColumnIndex + 1;
+        for (int columnIndex = firstMissingColumnIndex; columnIndex < currentColumnIndex; columnIndex++) {
+            if (shouldEmitColumn(columnIndex)) {
                 appendCellValue(EMPTY_CELL_VALUE);
             }
         }
