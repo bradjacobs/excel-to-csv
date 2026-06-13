@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class XssfDateWindowingDetectorTest {
+class XssfDateWindowingDetectorTest {
 
     @Test
     void is1904DateWindowingTrue() throws Exception {
