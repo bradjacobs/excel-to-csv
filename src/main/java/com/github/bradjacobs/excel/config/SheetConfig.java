@@ -172,7 +172,7 @@ public class SheetConfig {
             return self();
         }
 
-        public SheetConfig buildConfig() {
+        protected SheetConfig buildConfig() {
             return new SheetConfig(
                     skipBlankRows,
                     skipBlankColumns,
