@@ -57,7 +57,6 @@ public class SheetConfig {
 
     // Builder...
 
-
     public interface ConfigBuilder<T, B extends ConfigBuilder<T, B>> {
         /**
          * Disable all default sanitation settings.

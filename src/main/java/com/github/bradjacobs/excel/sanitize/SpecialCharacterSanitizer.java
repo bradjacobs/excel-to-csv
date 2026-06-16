@@ -204,7 +204,6 @@ public class SpecialCharacterSanitizer {
         return minChar;
     }
 
-
     private static Map<Character,Character> generateSpaceReplacementMap() {
         Map<Character, Character> replacementMap = new LinkedHashMap<>();
         for (char c = 0; c < Character.MAX_VALUE; c++) {

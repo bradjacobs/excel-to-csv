@@ -167,5 +167,4 @@ public class XssfbEventSheetReader implements EventSheetReader {
     private static CellValueSanitizer createCellValueSanitizer(SheetConfig sheetConfig) {
         return new CellValueSanitizer(sheetConfig.trimStringValues(), sheetConfig.getCharSanitizeFlags());
     }
-
 }
