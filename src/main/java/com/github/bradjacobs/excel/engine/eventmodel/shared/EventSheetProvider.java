@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PoiSheetStreamProvider {
+public class EventSheetProvider {
 
     public List<EventSheet> getSheets(XSSFReader reader) throws IOException, InvalidFormatException {
         Validate.isTrue(reader != null, "Must provide an XSSFReader reader");

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class PoiSheetStreamProviderTest {
+class EventSheetProviderTest {
 
     /**
      * Simple case of reading sheet data (sheet name, index, and stream)
@@ -32,12 +32,12 @@ class PoiSheetStreamProviderTest {
                 "WithBlankColumns1", "WithBlankColumns2"
         };
 
-        PoiSheetStreamProvider poiSheetStreamProvider = new PoiSheetStreamProvider();
+        EventSheetProvider eventSheetProvider = new EventSheetProvider();
         List<EventSheet> eventSheets = null;
 
         try (OPCPackage pkg = OPCPackage.open(testFilePath.toFile())) {
             XSSFReader reader = new XSSFReader(pkg);
-            eventSheets = poiSheetStreamProvider.getSheets(reader);
+            eventSheets = eventSheetProvider.getSheets(reader);
             for (int i = 0; i < eventSheets.size(); i++) {
                 EventSheet sheet = eventSheets.get(i);
                 assertEquals(i, sheet.getIndex());
@@ -57,8 +57,8 @@ class PoiSheetStreamProviderTest {
     @Test
     void testNullReaderParameter() {
         Exception thrown = assertThrows(IllegalArgumentException.class, () -> {
-            PoiSheetStreamProvider poiSheetStreamProvider = new PoiSheetStreamProvider();
-            poiSheetStreamProvider.getSheets(null);
+            EventSheetProvider eventSheetProvider = new EventSheetProvider();
+            eventSheetProvider.getSheets(null);
         });
         assertEquals("Must provide an XSSFReader reader", thrown.getMessage());
 

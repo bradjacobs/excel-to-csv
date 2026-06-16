@@ -5,8 +5,8 @@ package com.github.bradjacobs.excel.engine.eventmodel.xssf;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.EventSheet;
+import com.github.bradjacobs.excel.engine.eventmodel.shared.EventSheetProvider;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.EventSheetReader;
-import com.github.bradjacobs.excel.engine.eventmodel.shared.PoiSheetStreamProvider;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetContentHandler;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetVisibilityTracker;
 import com.github.bradjacobs.excel.engine.rows.StringRowConsumer;
@@ -35,7 +35,7 @@ import java.util.List;
 public class XssfEventSheetReader implements EventSheetReader {
 
     private static final XssfDateWindowingDetector DATE_WINDOWING_DETECTOR = new XssfDateWindowingDetector();
-    private static final PoiSheetStreamProvider SHEET_STREAM_PROVIDER = new PoiSheetStreamProvider();
+    private static final EventSheetProvider EVENT_SHEET_PROVIDER = new EventSheetProvider();
     private static final boolean FORMULAS_NOT_RESULTS = false;
     private static final String INITIALIZATION_FAILURE_MESSAGE = "Failed to initialize XssfEventSheetReader";
 
@@ -83,7 +83,7 @@ public class XssfEventSheetReader implements EventSheetReader {
 
     @Override
     public List<EventSheet> getSheets() throws IOException, InvalidFormatException {
-        return SHEET_STREAM_PROVIDER.getSheets(reader);
+        return EVENT_SHEET_PROVIDER.getSheets(reader);
     }
 
     @Override
