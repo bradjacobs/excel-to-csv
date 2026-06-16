@@ -1,9 +1,9 @@
 /*
  * This file is subject to the terms and conditions defined in the 'LICENSE' file.
  */
-package com.github.bradjacobs.excel.engine.row;
+package com.github.bradjacobs.excel.engine.rows;
 
-import com.github.bradjacobs.excel.engine.row.StringRowConsumer.BlankRemoval;
+import com.github.bradjacobs.excel.engine.rows.StringRowConsumer.BlankRemoval;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

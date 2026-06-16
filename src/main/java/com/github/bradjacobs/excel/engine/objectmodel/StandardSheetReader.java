@@ -4,7 +4,7 @@
 package com.github.bradjacobs.excel.engine.objectmodel;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.engine.row.StringRowConsumer;
+import com.github.bradjacobs.excel.engine.rows.StringRowConsumer;
 import com.github.bradjacobs.excel.model.BasicSheetContent;
 import com.github.bradjacobs.excel.model.SheetContent;
 import org.apache.commons.lang3.Validate;
