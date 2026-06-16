@@ -3,7 +3,6 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel.xssfb;
 
-import com.github.bradjacobs.excel.config.SheetConfig;
 import com.github.bradjacobs.excel.engine.eventmodel.EventModelExcelReader;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
 import com.github.bradjacobs.excel.testutils.TestResourceUtil;
@@ -46,11 +45,9 @@ class BinaryExcelReaderTest {
         String testDataSheetName = sheetNamePrefix + INPUT_DATA_SHEET_SUFFIX;
         String expectedDataSheetName = sheetNamePrefix + EXPECTED_DATA_SHEET_SUFFIX;
 
-        SheetConfig config = EventModelExcelReader.builder()
+        EventModelExcelReader sheetReader = EventModelExcelReader.builder()
                 .skipHiddenCells(true)
-                .buildConfig();
-
-        EventModelExcelReader sheetReader = new EventModelExcelReader(config);
+                .build();
 
         ExcelReadRequest request = createRequest(HIDDEN_CELLS_FILE, testDataSheetName);
         ExcelReadRequest expectedRequest = createRequest(HIDDEN_CELLS_FILE, expectedDataSheetName);

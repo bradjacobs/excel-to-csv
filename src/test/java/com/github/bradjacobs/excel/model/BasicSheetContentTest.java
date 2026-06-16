@@ -34,6 +34,17 @@ class BasicSheetContentTest extends SheetContentTest {
 
     @Test
     void testWithNullDataMatrixInput() {
+
+        final String[][] JAGGED_ARRAY = {
+                {"A", "B", "C"},
+                {"D"},
+                {"E", "F"},
+                {"G", "H", "I", "J"}
+        };
+
+        SheetContent sheetContent2 = new BasicSheetContent("mySheet", JAGGED_ARRAY);
+
+
         SheetContent sheetContent = new BasicSheetContent("mySheet", (String[][])null);
         assertEquals(0, sheetContent.getRowCount());
         assertEquals(0, sheetContent.getColumnCount());

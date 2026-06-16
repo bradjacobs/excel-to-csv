@@ -3,8 +3,8 @@
  */
 package com.github.bradjacobs.excel.engine.objectmodel;
 
+import com.github.bradjacobs.excel.api.ExcelWorkbookReader;
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.engine.AbstractExcelReader;
 import com.github.bradjacobs.excel.model.SheetContent;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
 import com.github.bradjacobs.excel.request.SheetInfo;
@@ -23,14 +23,17 @@ import java.util.stream.Collectors;
 /**
  * Reads an Excel File sheets
  */
-public class StandardExcelReader extends AbstractExcelReader {
+public class StandardExcelReader implements ExcelWorkbookReader {
 
     private final StandardSheetReader sheetReader;
 
-    // todo: still deciding if this constructor is ok or terrible.
-    public StandardExcelReader(SheetConfig sheetConfig) {
-        super(sheetConfig);
-        this.sheetReader = new StandardSheetReader(sheetConfig);
+    private StandardExcelReader(SheetConfig config) {
+        Validate.isTrue(config != null, "SheetConfig cannot be null.");
+        this.sheetReader = new StandardSheetReader(config);
+
+        // override the internal POI utils size limit to allow for 'bigger Excel files'
+        //   (as of POI version 5.2.0 the default value is 100_000_000)
+        org.apache.poi.util.IOUtils.setByteArrayMaxOverride(Integer.MAX_VALUE);
     }
 
     @Override
@@ -72,22 +75,6 @@ public class StandardExcelReader extends AbstractExcelReader {
         return sheetInfos;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder extends AbstractSheetConfigBuilder<StandardExcelReader, Builder> {
-        @Override
-        protected Builder self() {
-            return this;
-        }
-
-        @Override
-        public StandardExcelReader build() {
-            return new StandardExcelReader(this.buildConfig());
-        }
-    }
-
     private static class WorkbookSheetInfo implements SheetInfo {
         private final String sheetName;
         private final int sheetIndex;
@@ -111,6 +98,22 @@ public class StandardExcelReader extends AbstractExcelReader {
 
         public Sheet getSheet() {
             return sheet;
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder extends SheetConfig.AbstractSheetConfigBuilder<StandardExcelReader, Builder> {
+        @Override
+        protected Builder self() {
+            return this;
+        }
+
+        @Override
+        public StandardExcelReader build() {
+            return new StandardExcelReader(this.buildConfig());
         }
     }
 }

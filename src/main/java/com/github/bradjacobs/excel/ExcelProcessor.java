@@ -5,7 +5,6 @@ package com.github.bradjacobs.excel;
 
 import com.github.bradjacobs.excel.api.ExcelWorkbookReader;
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.engine.AbstractExcelReader.AbstractSheetConfigBuilder;
 import com.github.bradjacobs.excel.engine.eventmodel.EventModelExcelReader;
 import com.github.bradjacobs.excel.engine.objectmodel.StandardExcelReader;
 import com.github.bradjacobs.excel.model.SheetContent;
@@ -32,9 +31,8 @@ public class ExcelProcessor implements ExcelWorkbookReader {
 
     private ExcelProcessor(Builder builder) {
         this.useEventReader = builder.useEventReader;
-        SheetConfig sheetConfig = builder.buildConfig();
-        this.standardExcelWorkbookReader = new StandardExcelReader(sheetConfig);
-        this.eventExcelWorkbookReader = new EventModelExcelReader(sheetConfig);
+        this.standardExcelWorkbookReader = builder.standardBuilder.build();
+        this.eventExcelWorkbookReader = builder.eventBuilder.build();
     }
 
     @Override
@@ -79,22 +77,84 @@ public class ExcelProcessor implements ExcelWorkbookReader {
         return new Builder();
     }
 
-    // this builder extends the abstract class to allow any of the
-    //   AbstractSheetConfigBuilder values to be set on this Builder as well.
-    public static class Builder extends AbstractSheetConfigBuilder<ExcelProcessor, Builder> {
+    // Special Builder that acts as composite builder for both standard and event readers.
+    public static class Builder implements SheetConfig.ConfigBuilder<ExcelProcessor, Builder> {
         private boolean useEventReader = true;
-
-        @Override
-        protected Builder self() {
-            return this;
-        }
+        private final StandardExcelReader.Builder standardBuilder = StandardExcelReader.builder();
+        private final EventModelExcelReader.Builder eventBuilder = EventModelExcelReader.builder();
 
         /**
-         * Toggle using the event reader
+         * Toggle preference for using the event reader.
+         * Note this value will be ignored when trying to read old '.xls' files.
          * (typically only used for testing convenience)
+         * @param useEventReader true to use the event reader... "if possible"
+         * @return this builder
          */
         public Builder useEventReader(boolean useEventReader) {
             this.useEventReader = useEventReader;
+            return this;
+        }
+
+        @Override
+        public Builder disableAllSanitation() {
+            standardBuilder.disableAllSanitation();
+            eventBuilder.disableAllSanitation();
+            return this;
+        }
+
+        @Override
+        public Builder trimStringValues(boolean trimStringValues) {
+            standardBuilder.trimStringValues(trimStringValues);
+            eventBuilder.trimStringValues(trimStringValues);
+            return this;
+        }
+
+        @Override
+        public Builder skipBlankRows(boolean skipBlankRows) {
+            standardBuilder.skipBlankRows(skipBlankRows);
+            eventBuilder.skipBlankRows(skipBlankRows);
+            return this;
+        }
+
+        @Override
+        public Builder skipBlankColumns(boolean skipBlankColumns) {
+            standardBuilder.skipBlankColumns(skipBlankColumns);
+            eventBuilder.skipBlankColumns(skipBlankColumns);
+            return this;
+        }
+
+        @Override
+        public Builder skipHiddenCells(boolean skipHiddenCells) {
+            standardBuilder.skipHiddenCells(skipHiddenCells);
+            eventBuilder.skipHiddenCells(skipHiddenCells);
+            return this;
+        }
+
+        @Override
+        public Builder sanitizeSpaces(boolean sanitizeSpaces) {
+            standardBuilder.sanitizeSpaces(sanitizeSpaces);
+            eventBuilder.sanitizeSpaces(sanitizeSpaces);
+            return this;
+        }
+
+        @Override
+        public Builder sanitizeQuotes(boolean sanitizeQuotes) {
+            standardBuilder.sanitizeQuotes(sanitizeQuotes);
+            eventBuilder.sanitizeQuotes(sanitizeQuotes);
+            return this;
+        }
+
+        @Override
+        public Builder sanitizeDiacritics(boolean sanitizeDiacritics) {
+            standardBuilder.sanitizeDiacritics(sanitizeDiacritics);
+            eventBuilder.sanitizeDiacritics(sanitizeDiacritics);
+            return this;
+        }
+
+        @Override
+        public Builder sanitizeDashes(boolean sanitizeDashes) {
+            standardBuilder.sanitizeDashes(sanitizeDashes);
+            eventBuilder.sanitizeDashes(sanitizeDashes);
             return this;
         }
 

@@ -3,8 +3,8 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel;
 
+import com.github.bradjacobs.excel.api.ExcelWorkbookReader;
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.engine.AbstractExcelReader;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.EventSheet;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.EventSheetReader;
 import com.github.bradjacobs.excel.engine.eventmodel.xssf.XssfEventSheetReader;
@@ -36,14 +36,20 @@ import java.util.List;
 import static org.apache.poi.extractor.ExtractorFactory.OOXML_PACKAGE;
 import static org.apache.poi.poifs.crypt.Decryptor.DEFAULT_POIFS_ENTRY;
 
-public class EventModelExcelReader extends AbstractExcelReader {
+public class EventModelExcelReader implements ExcelWorkbookReader {
+
+    private final SheetConfig sheetConfig;
 
     /**
      * Constructor
      */
-    // TODO: Maybe change constructor to non-public
-    public EventModelExcelReader(SheetConfig config) {
-        super(config);
+    private EventModelExcelReader(SheetConfig config) {
+        Validate.isTrue(config != null, "SheetConfig cannot be null.");
+        this.sheetConfig = config;
+
+        // override the internal POI utils size limit to allow for 'bigger Excel files'
+        //   (as of POI version 5.2.0 the default value is 100_000_000)
+        org.apache.poi.util.IOUtils.setByteArrayMaxOverride(Integer.MAX_VALUE);
     }
 
     @Override
@@ -146,7 +152,7 @@ public class EventModelExcelReader extends AbstractExcelReader {
         return new Builder();
     }
 
-    public static class Builder extends AbstractSheetConfigBuilder<EventModelExcelReader, Builder> {
+    public static class Builder extends SheetConfig.AbstractSheetConfigBuilder<EventModelExcelReader, Builder> {
         @Override
         protected Builder self() {
             return this;
