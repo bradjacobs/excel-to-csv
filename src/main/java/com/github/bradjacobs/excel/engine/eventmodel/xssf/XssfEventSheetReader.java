@@ -4,13 +4,13 @@
 package com.github.bradjacobs.excel.engine.eventmodel.xssf;
 
 import com.github.bradjacobs.excel.config.SheetConfig;
-import com.github.bradjacobs.excel.engine.eventmodel.shared.DateWindowingDataFormatter;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.EventSheet;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.EventSheetReader;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.PoiSheetStreamProvider;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetContentHandler;
 import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetVisibilityTracker;
 import com.github.bradjacobs.excel.engine.row.StringRowConsumer;
+import com.github.bradjacobs.excel.engine.shared.ExcelDataFormatters;
 import com.github.bradjacobs.excel.sanitize.CellValueSanitizer;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -158,7 +158,7 @@ public class XssfEventSheetReader implements EventSheetReader {
 
     private static DataFormatter createDataFormatter(XSSFReader reader)
             throws IOException, ParserConfigurationException, InvalidFormatException, SAXException {
-        return new DateWindowingDataFormatter(requires1904DateWindowing(reader));
+        return ExcelDataFormatters.withDateWindowing(requires1904DateWindowing(reader));
     }
 
     private static SharedStrings getSharedStrings(XSSFReader reader)

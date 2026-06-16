@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel.engine.objectmodel;
 
+import com.github.bradjacobs.excel.engine.shared.ExcelDataFormatters;
 import com.github.bradjacobs.excel.sanitize.CellValueSanitizer;
 import com.github.bradjacobs.excel.sanitize.SanitizeType;
 import org.apache.poi.ss.usermodel.Cell;
@@ -11,12 +12,8 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import java.util.Set;
 
 public class CellValueReader {
-    private static final boolean EMULATE_CSV = true;
-    private static final DataFormatter EXCEL_DATA_FORMATTER = new DataFormatter(EMULATE_CSV);
-    static {
-        // set true to get actual visible value in a formula cell, and not the raw formula itself.
-        EXCEL_DATA_FORMATTER.setUseCachedValuesForFormulaCells(true);
-    }
+    private static final DataFormatter EXCEL_DATA_FORMATTER =
+            ExcelDataFormatters.standard();
 
     private final CellValueSanitizer sanitizer;
 
