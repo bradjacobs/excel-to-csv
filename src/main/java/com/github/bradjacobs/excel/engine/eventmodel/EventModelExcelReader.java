@@ -62,19 +62,15 @@ public class EventModelExcelReader implements ExcelWorkbookReader {
         try (InputStream inputStream = preprocessFileInputStream(sourceInputStream, request.getPassword());
             OPCPackage pkg = OPCPackage.open(inputStream)) {
 
-            EventSheetReader eventSheetReader =
-                    createEventSheetReader(pkg, sheetConfig);
+            EventSheetReader eventSheetReader = createEventSheetReader(pkg, sheetConfig);
 
             List<EventSheet> selectedSheets = fetchSelectedSheets(eventSheetReader, request.getSheetSelector());
 
-            try {
-                for (EventSheet selectedSheet : selectedSheets) {
-                    List<List<String>> sheetDataRows = eventSheetReader.read(selectedSheet.getInputStream());
+            for (EventSheet selectedSheet : selectedSheets) {
+                try (InputStream sheetInputStream = selectedSheet.getInputStream()) {
+                    List<List<String>> sheetDataRows = eventSheetReader.read(sheetInputStream);
                     sheetContentList.add(new BasicSheetContent(selectedSheet.getName(), sheetDataRows));
                 }
-            }
-            finally {
-                closeInputStreams(selectedSheets);
             }
         }
         catch (OpenXML4JException | SAXException | IOException e) {
@@ -84,19 +80,14 @@ public class EventModelExcelReader implements ExcelWorkbookReader {
         return sheetContentList;
     }
 
-    private void closeInputStreams(List<EventSheet> eventSheets) {
-        for (EventSheet eventSheet : eventSheets) {
-            IOUtils.closeQuietly(eventSheet.getInputStream());
-        }
-    }
-
     private List<EventSheet> fetchSelectedSheets(EventSheetReader eventSheetReader, SheetSelector sheetSelector) throws IOException, InvalidFormatException {
         List<EventSheet> allSheets = eventSheetReader.getSheets();
         List<EventSheet> selectedSheets = sheetSelector.filterSheets(allSheets);
         List<EventSheet> unselectedSheets = ListUtils.subtract(allSheets, selectedSheets);
 
-        // close the inputStreams on the unselected sheets that will not be processed.
-        closeInputStreams(unselectedSheets);
+        // close the inputStreams on the unselected sheets that will _not_ be processed.
+        unselectedSheets.forEach(obj -> IOUtils.closeQuietly(obj.getInputStream()));
+
         return selectedSheets;
     }
 
