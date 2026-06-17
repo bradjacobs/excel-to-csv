@@ -28,7 +28,6 @@ public class StandardExcelReader implements ExcelWorkbookReader {
     private final StandardSheetReader sheetReader;
 
     private StandardExcelReader(SheetConfig config) {
-        Validate.isTrue(config != null, "SheetConfig cannot be null.");
         this.sheetReader = new StandardSheetReader(config);
 
         // override the internal POI utils size limit to allow for 'bigger Excel files'

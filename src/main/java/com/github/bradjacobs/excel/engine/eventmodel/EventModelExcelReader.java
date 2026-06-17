@@ -44,7 +44,6 @@ public class EventModelExcelReader implements ExcelWorkbookReader {
      * Constructor
      */
     private EventModelExcelReader(SheetConfig config) {
-        Validate.isTrue(config != null, "SheetConfig cannot be null.");
         this.sheetConfig = config;
 
         // override the internal POI utils size limit to allow for 'bigger Excel files'
