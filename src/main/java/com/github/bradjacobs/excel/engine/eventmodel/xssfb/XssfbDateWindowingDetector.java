@@ -26,7 +26,9 @@ class XssfbDateWindowingDetector {
     }
 
     private static class WorkbookPropsHandler extends XSSFBSheetHandler {
-        private static final int EXPECTED_RECORD_ID = 153;
+        // the '153' was from comment in org.apache.poi.xssf.binary.XSSFBRecordType
+        // "BrtWbProp(153), //Workbook prop contains 1904/1900-date based bit"
+        private static final int EXPECTED_RECORD_TYPE_ID = 153;
         private boolean uses1904DateWindowing = false;
 
         public WorkbookPropsHandler(InputStream is) {
@@ -39,7 +41,7 @@ class XssfbDateWindowingDetector {
 
         @Override
         public void handleRecord(int id, byte[] data) throws XSSFBParseException {
-            if (id == EXPECTED_RECORD_ID) {
+            if (id == EXPECTED_RECORD_TYPE_ID) {
                 int flags = LittleEndian.getUShort(data);
                 // bit 0 = date1904
                 this.uses1904DateWindowing = (flags & 0x0001) != 0;
