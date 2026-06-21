@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Named.named;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B extends SheetConfig.AbstractSheetConfigBuilder<T, B>> {
+public abstract class AbstractExcelReaderTest<T extends ExcelWorkbookReader, B extends SheetConfig.ConfigBuilder<T, B>> {
     private static final String TEST_DATA_FILE = "testSheetData.xlsx";
     private static final Path TEST_FILE = TestResourceUtil.getResourceFilePath(TEST_DATA_FILE);
 

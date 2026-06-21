@@ -3,7 +3,7 @@
  */
 package com.github.bradjacobs.excel.csv;
 
-import com.github.bradjacobs.excel.engine.objectmodel.StandardExcelReader;
+import com.github.bradjacobs.excel.engine.usermodel.StandardExcelReader;
 import com.github.bradjacobs.excel.model.BasicSheetContent;
 import com.github.bradjacobs.excel.model.SheetContent;
 import com.github.bradjacobs.excel.request.ExcelReadRequest;
