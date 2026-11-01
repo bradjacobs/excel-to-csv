@@ -7,6 +7,7 @@ import com.github.bradjacobs.excel.engine.rows.StringRowConsumer;
 import com.github.bradjacobs.excel.sanitize.CellValueSanitizer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.usermodel.XSSFComment;
@@ -86,6 +87,11 @@ public class SheetContentHandler implements XSSFSheetXMLHandler.SheetContentsHan
             appendCellValue(formattedValue);
         }
         lastProcessedColumnIndex = columnIndex;
+    }
+
+    @Override
+    public void cell(String cellReference, String formattedValue, Comment comment) {
+        cell(cellReference, formattedValue, (XSSFComment) null);
     }
 
     private CellAddress parseCellAddress(String cellReference) {

@@ -3,12 +3,12 @@
  */
 package com.github.bradjacobs.excel.engine.eventmodel.xssfb;
 
+import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.ExcelNumberFormat;
 import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.xssf.binary.XSSFBSheetHandler;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
-import org.apache.poi.xssf.usermodel.XSSFComment;
 
 /**
  * IMPORTANT NOTE: this is a copy of the private XSSFBSheetContentsHandlerWrapper class.
@@ -46,26 +46,26 @@ class XssfbCustomSheetContentsHandlerWrapper implements XSSFBSheetHandler.XSSFBS
         delegate.endRow(rowNum);
     }
 
+
     @Override
-    public void stringCell(String cellReference, String value, XSSFComment comment) {
+    public void stringCell(String cellReference, String value, Comment comment) {
         delegate.cell(cellReference, value, comment);
     }
 
     @Override
-    public void doubleCell(
-            String cellReference, double value, XSSFComment comment, ExcelNumberFormat nf) {
+    public void doubleCell(String cellReference, double value, Comment comment, ExcelNumberFormat nf) {
         String formattedValue =
                 dataFormatter.formatRawCellContents(value, nf.getIdx(), nf.getFormat());
         delegate.cell(cellReference, formattedValue, comment);
     }
 
     @Override
-    public void booleanCell(String cellReference, boolean value, XSSFComment comment) {
+    public void booleanCell(String cellReference, boolean value, Comment comment) {
         delegate.cell(cellReference, Boolean.toString(value), comment);
     }
 
     @Override
-    public void errorCell(String cellReference, FormulaError fe, XSSFComment comment) {
+    public void errorCell(String cellReference, FormulaError fe, Comment comment) {
         String errorValue = (fe != null) ? fe.getString() : "ERROR";
         delegate.cell(cellReference, errorValue, comment);
     }

@@ -28,28 +28,28 @@ The API follows a simple pipeline:
 
 ```java
 // Bare Bones Example...
-ExcelReadRequest request = ExcelReadRequest.from("input.xlsx").build();
+ExcelReadRequest request = ExcelReadRequest.from(Paths.get("input.xlsx")).build();
 SheetContent sheetContent = ExcelProcessor.builder().build().readSheet(request);
-CsvWriter.writeToFile(Paths.get("output.csv"), content);
+CsvWriter.writeToFile(Paths.get("output.csv"), sheetContent);
 ```
 
 ```java
 // With Custom Options Example...
-ExcelSheetReadRequest request = ExcelSheetReadRequest
-    .from(Paths.get("input.xlsx"))
-    .byName("MyDataSheet") // specific sheet to parse
-    .build();
+ExcelReadRequest request = ExcelReadRequest
+                .from(Paths.get("input.xlsx"))
+                .bySheetName("MyDataSheet") // specific sheet to parse
+                .build();
 
 ExcelProcessor processor = ExcelProcessor.builder()
-    .skipBlankRows(true) // skip/ignore blank rows
-    .skipBlankColumns(true) // skip/ignore blank columns
-    .sanitizeDiacritics(true) // sanitize diacritics (accents). e.g. "résumé" -> "resume"
-    .build();
+        .skipBlankRows(true) // skip/ignore blank rows
+        .skipBlankColumns(true) // skip/ignore blank columns
+        .sanitizeDiacritics(true) // sanitize diacritics (accents). e.g. "résumé" -> "resume"
+        .build();
 
 // read the sheet data
-SheetContent content = processor.readSheet(request);
+SheetContent sheetContent = processor.readSheet(request);
 // write the sheet data to a CSV file, and only quote values required for CSV compliance.
-CsvWriter.writeToFile(Paths.get("output.csv"), content, QuoteMode.MINIMAL);
+CsvWriter.writeToFile(Paths.get("output.csv"), sheetContent, QuoteMode.MINIMAL);
 ```
 
 TODO – document a full list of API options with descriptions.
