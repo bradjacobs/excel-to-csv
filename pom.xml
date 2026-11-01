@@ -10,8 +10,8 @@
 	<description>Tool to convert Excel Worksheet to CSV</description>
 
 	<properties>
-		<java.version>11</java.version> <!-- minimum JDK required -->
-		<maven.compiler.release>11</maven.compiler.release>
+		<java.version>17</java.version> <!-- minimum JDK required -->
+		<maven.compiler.release>17</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<apache.poi.version>5.5.1</apache.poi.version>
@@ -74,6 +74,9 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- TODO: there was a reason used 'archunit' instead of 'archunit-junit5',
+		       but cannot recall what that reason was.  Research this in the future.
+		-->
 		<dependency>
 			<groupId>com.tngtech.archunit</groupId>
 			<artifactId>archunit</artifactId>
@@ -89,7 +92,6 @@
 			<scope>test</scope>
 		</dependency>
 		-->
-
 	</dependencies>
 
 	<dependencyManagement>
