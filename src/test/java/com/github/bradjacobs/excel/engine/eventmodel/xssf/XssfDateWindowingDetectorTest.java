@@ -10,32 +10,28 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class XssfDateWindowingDetectorTest {
 
     @Test
     void is1904DateWindowingTrue() throws Exception {
         Path testFilePath = TestResourceUtil.getResourceFilePath("date1904.xlsx");
-
-        try (OPCPackage pkg = OPCPackage.open(testFilePath.toFile())) {
-            XSSFReader reader = new XSSFReader(pkg);
-            XssfDateWindowingDetector detector = new XssfDateWindowingDetector();
-            boolean is1904DateWindowing = detector.is1904DateWindowing(reader);
-            assertTrue(is1904DateWindowing);
-        }
+        checkFile1904DateWindowing(testFilePath, true);
     }
 
     @Test
     void is1904DateWindowingFalse() throws Exception {
         Path testFilePath = TestResourceUtil.getResourceFilePath("test_data.xlsx");
+        checkFile1904DateWindowing(testFilePath, false);
+    }
 
+    private void checkFile1904DateWindowing(Path testFilePath, boolean expected1904Windowing) throws Exception {
         try (OPCPackage pkg = OPCPackage.open(testFilePath.toFile())) {
             XSSFReader reader = new XSSFReader(pkg);
             XssfDateWindowingDetector detector = new XssfDateWindowingDetector();
             boolean is1904DateWindowing = detector.is1904DateWindowing(reader);
-            assertFalse(is1904DateWindowing);
+            assertEquals(expected1904Windowing, is1904DateWindowing);
         }
     }
 }
