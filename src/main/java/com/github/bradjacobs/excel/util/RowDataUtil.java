@@ -4,6 +4,7 @@
 package com.github.bradjacobs.excel.util;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
+import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,4 +95,29 @@ public class RowDataUtil {
         }
         return false;
     }
+
+    /**
+     * Check if there are rows of different length.
+     * @param rows rows
+     * @return true if any row has a different length than the first row.
+     */
+    public static boolean isJagged(List<List<String>> rows) {
+        if (rows == null || rows.isEmpty()) {
+            return false;
+        }
+
+        List<String> firstRow = rows.get(0);
+        Validate.isTrue(firstRow != null, "Firsr row cannot be null.");
+        int expectedSize = firstRow.size();
+
+        // Directly loop through every row (including the first one)
+        for (List<String> row : rows) {
+            if (row == null || row.size() != expectedSize) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

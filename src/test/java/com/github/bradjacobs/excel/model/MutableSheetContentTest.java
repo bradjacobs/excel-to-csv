@@ -630,4 +630,16 @@ class MutableSheetContentTest extends SheetContentTest {
                 throw new IllegalStateException("Unexpected value: " + rowOperation);
         }
     }
+
+    @Test
+    void mutableSheetContentShouldRejectRaggedRows() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                new MutableSheetContent("Sheet1", List.of(
+                        List.of("A1", "B1", "C1"),
+                        List.of("A2")
+                ))
+        );
+        assertEquals("all rows must be the same length", exception.getMessage());
+    }
+
 }

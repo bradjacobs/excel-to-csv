@@ -3,6 +3,7 @@
  */
 package com.github.bradjacobs.excel.model;
 
+import com.github.bradjacobs.excel.util.RowDataUtil;
 import org.apache.commons.collections4.list.FixedSizeList;
 import org.apache.commons.lang3.Validate;
 
@@ -39,6 +40,7 @@ public class MutableSheetContent implements SheetContent {
     }
 
     public MutableSheetContent(String sheetName, List<List<String>> rowContent) {
+        Validate.isTrue(! RowDataUtil.isJagged(rowContent), "all rows must be the same length");
         setSheetName(sheetName);
         // generate modifiable copy of input rows
         this.rowContent = generateInternalRowData(rowContent);

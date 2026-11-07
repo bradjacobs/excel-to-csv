@@ -3,6 +3,9 @@
  */
 package com.github.bradjacobs.excel.model;
 
+import com.github.bradjacobs.excel.util.RowDataUtil;
+import org.apache.commons.lang3.Validate;
+
 import java.util.List;
 
 import static com.github.bradjacobs.excel.util.RowDataUtil.toArray;
@@ -26,6 +29,7 @@ public class BasicSheetContent implements SheetContent {
     }
 
     public BasicSheetContent(String sheetName, List<List<String>> rows) {
+        Validate.isTrue(! RowDataUtil.isJagged(rows), "all rows must be the same length");
         this.sheetName = normalizeSheetName(sheetName);
         this.rows = toUnmodifiableRows(rows);
         this.rowCount = this.rows.size();
@@ -95,4 +99,6 @@ public class BasicSheetContent implements SheetContent {
             );
         }
     }
+
+
 }

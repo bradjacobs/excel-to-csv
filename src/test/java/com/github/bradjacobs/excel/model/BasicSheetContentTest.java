@@ -10,6 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BasicSheetContentTest extends SheetContentTest {
 
@@ -74,4 +75,14 @@ class BasicSheetContentTest extends SheetContentTest {
         });
     }
 
+    @Test
+    void basicSheetContentShouldRejectRaggedRows() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                new BasicSheetContent("Sheet1", List.of(
+                        List.of("A1", "B1", "C1"),
+                        List.of("A2")
+                ))
+        );
+        assertEquals("all rows must be the same length", exception.getMessage());
+    }
 }
