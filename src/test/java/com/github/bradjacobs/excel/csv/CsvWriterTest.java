@@ -365,6 +365,7 @@ class CsvWriterTest {
             });
             assertEquals("Must supply a non-empty sheetName for each sheetContent to write.", exception.getMessage());
         }
+
         @Test
         void emptySheetNameOnMultiSave() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -413,6 +414,27 @@ class CsvWriterTest {
             Executable executable1 = () -> DEFAULT_CSV_WRITER.saveToFile(file, sheetContent);
             assertExecutableException(executable1, expectedException, expectedMessage);
         }
+
+
+        /**
+         * the saved sheet file name is based on the sheet name.
+         * Disallow duplicate sheet names so what one doesn't overrite theother.
+         */
+        @Test
+        void saveWithDuplicateSheetNamesThrowsException() {
+            List<SheetContent> sheets = List.of(
+                    new BasicSheetContent("Data", new String[][]{{"first"}}),
+                    new BasicSheetContent("Data", new String[][]{{"second"}})
+            );
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    CsvWriter.builder()
+                            .build()
+                            .saveToDirectory(tempDir, sheets)
+            );
+            assertEquals("Must supply unique sheetNames for each sheetContent to write.", exception.getMessage());
+        }
+
     }
 
     /**

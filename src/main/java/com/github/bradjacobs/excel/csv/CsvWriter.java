@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -86,8 +87,10 @@ public class CsvWriter {
 
     public void saveToDirectory(Path outputDirectory, List<SheetContent> sheetContentList) throws IOException {
         validateOutputDirectoryParameter(outputDirectory);
+        // TODO - make error messages less klunky.
         Validate.isTrue(!CollectionUtils.isEmpty(sheetContentList), "Must supply at least one sheetContent to write.");
         Validate.isTrue(!containsMissingSheetName(sheetContentList), "Must supply a non-empty sheetName for each sheetContent to write.");
+        Validate.isTrue(!containsDuplicateSheetName(sheetContentList), "Must supply unique sheetNames for each sheetContent to write.");
 
         Map<Path, SheetContent> fileToSheetContentMap = new LinkedHashMap<>();
         // first create all the output file paths and validate.
@@ -224,6 +227,18 @@ public class CsvWriter {
                         obj.getSheetName() == null ||
                         obj.getSheetName().trim().isEmpty());
     }
+
+    private static boolean containsDuplicateSheetName(List<SheetContent> sheetContentList) {
+        Set<String> sheetNames = new HashSet<>();
+        for (SheetContent sheetContent : sheetContentList) {
+            String sheetName = sheetContent.getSheetName().trim();
+            if (!sheetNames.add(sheetName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public static Builder builder() {
         return new Builder();
