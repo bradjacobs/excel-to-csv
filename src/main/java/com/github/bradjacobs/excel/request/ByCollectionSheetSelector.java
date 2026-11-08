@@ -34,11 +34,16 @@ abstract class ByCollectionSheetSelector<T> implements SheetSelector {
 
     @Override
     public <S extends SheetInfo> List<S> filterSheets(List<S> sheets) {
-        Map<T, S> sheetMap = sheets.stream().collect(
-                Collectors.toMap(this::mapKey,
-                        identity(),
-                        (oldValue, newValue) -> { throw new IllegalStateException("Duplicate key found: " + oldValue); },
-                        LinkedHashMap::new));
+        Validate.isTrue(sheets != null, "Sheets cannot be null");
+        Map<T, S> sheetMap = sheets.stream()
+                .filter(Objects::nonNull)
+                .collect(
+                        Collectors.toMap(this::mapKey,
+                                identity(),
+                                (oldValue, newValue) -> {
+                                    throw new IllegalArgumentException("Duplicate sheet key found: " + oldValue);
+                                },
+                                LinkedHashMap::new));
         return filterSheets(sheetMap);
     }
 

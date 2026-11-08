@@ -29,6 +29,9 @@ class ByNameSheetSelectorTest {
         return Arrays.asList(sheetInfos);
     }
 
+    // TODO - add a test that flexes the
+    //  sheet filter ".filter(Objects::nonNull)"
+
     @Nested
     @DisplayName("selection behavior")
     class SelectionTests {
@@ -127,6 +130,7 @@ class ByNameSheetSelectorTest {
             assertEquals("Names cannot contain empty values", e.getMessage());
         }
 
+        // TODO - need to double check if this should be desired behavior.
         @Test
         void throwsWhenRequestedNameMissing() {
             // NOTE: want the throw message to have sheetName case that was passed in.
@@ -147,15 +151,28 @@ class ByNameSheetSelectorTest {
         }
 
         @Test
+        void throwsWithNullSheets() {
+            ByNameSheetSelector selector = new ByNameSheetSelector(List.of("mySheet"));
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                    () -> selector.filterSheets((List<SheetInfo>)null));
+            assertTrue(e.getMessage().contains("Sheets cannot be null"));
+        }
+
+
+
+
+
+
+        @Test
         void throwsWhenSheetsContainsDuplicateIndexes() {
             ByNameSheetSelector selector = new ByNameSheetSelector(List.of("foo"));
-            IllegalStateException e = assertThrows(IllegalStateException.class,
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                     // _NOTE_: this won't happen with a real excel file.
                     () -> selector.filterSheets(sheets(
                             sheet("foo", 0),
                             sheet("foo", 0)
                     )));
-            assertTrue(e.getMessage().contains("Duplicate key"));
+            assertTrue(e.getMessage().contains("Duplicate sheet key"));
         }
     }
 }

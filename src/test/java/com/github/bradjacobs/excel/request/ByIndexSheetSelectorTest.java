@@ -108,13 +108,13 @@ class ByIndexSheetSelectorTest {
         @Test
         void throwsWhenSheetsContainsDuplicateIndexes() {
             ByIndexSheetSelector selector = new ByIndexSheetSelector(List.of(0));
-            IllegalStateException e = assertThrows(IllegalStateException.class,
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                     // _NOTE_: this won't happen with a real excel file.
                     () -> selector.filterSheets(sheets(
                             sheet("a", 0),
                             sheet("b", 0)
                     )));
-            assertTrue(e.getMessage().contains("Duplicate key"));
+            assertTrue(e.getMessage().contains("Duplicate sheet key"));
         }
     }
 }
