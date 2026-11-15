@@ -129,7 +129,7 @@ public class CsvWriter {
         int lastColumnIndex = columnCount - 1;
 
         for (List<String> row : rows) {
-            if (sb.length() != 0) {
+            if (!sb.isEmpty()) {
                 sb.append(NEW_LINE);
             }
             for (int i = 0; i < columnCount; i++) {
@@ -171,7 +171,6 @@ public class CsvWriter {
         }
         return csvContent;
     }
-
 
     private Path buildOutputFilePath(Path outputDirectory, SheetContent sheetContent) {
         Path normalizedOutputDirectory = outputDirectory.toAbsolutePath().normalize();
@@ -244,7 +243,6 @@ public class CsvWriter {
         }
         return false;
     }
-
 
     public static Builder builder() {
         return new Builder();
