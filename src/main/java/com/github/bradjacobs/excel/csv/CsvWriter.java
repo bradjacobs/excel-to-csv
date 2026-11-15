@@ -172,9 +172,15 @@ public class CsvWriter {
         return csvContent;
     }
 
+
     private Path buildOutputFilePath(Path outputDirectory, SheetContent sheetContent) {
+        Path normalizedOutputDirectory = outputDirectory.toAbsolutePath().normalize();
         String fileName = sheetContent.getSheetName().trim() + ".csv";
-        Path outputPath = outputDirectory.resolve(fileName);
+        Path outputPath = normalizedOutputDirectory.resolve(fileName).normalize();
+
+        Validate.isTrue(outputPath.startsWith(normalizedOutputDirectory),
+                "Sheet name produces an output path outside the target directory: %s",
+                sheetContent.getSheetName());
         validateOutputFileParameter(outputPath);
         return outputPath;
     }

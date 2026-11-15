@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 import static com.github.bradjacobs.excel.testutils.TestResourceUtil.getResourceFileObject;
 import static com.github.bradjacobs.excel.testutils.TestResourceUtil.readResourceFileText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Named.named;
@@ -435,6 +436,28 @@ class CsvWriterTest {
             assertEquals("Must supply unique sheetNames for each sheetContent to write.", exception.getMessage());
         }
 
+        //
+
+        /**
+         * Do _not_ allow relative path on the sheet name
+         * in an attempt to save outside of the directory.
+         */
+        @Test
+        void csvWriterSaveToDirectoryShouldRejectPathTraversalFromSheetName() throws IOException {
+            Path outputDirectory = tempDir.resolve("export");
+            Files.createDirectory(outputDirectory);
+
+            SheetContent content = new BasicSheetContent("../outside",
+                    new String[][]{{"some_data"}});
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                    CsvWriter.builder()
+                            .build()
+                            .saveToDirectory(outputDirectory, List.of(content))
+            );
+            assertTrue(exception.getMessage().contains(" outside the target directory"));
+            assertFalse(Files.exists(tempDir.resolve("outside.csv")));
+        }
     }
 
     /**
