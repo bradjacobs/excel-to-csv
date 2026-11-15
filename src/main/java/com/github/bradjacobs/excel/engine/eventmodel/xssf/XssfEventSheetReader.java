@@ -12,6 +12,7 @@ import com.github.bradjacobs.excel.engine.eventmodel.shared.SheetVisibilityTrack
 import com.github.bradjacobs.excel.engine.rows.StringRowConsumer;
 import com.github.bradjacobs.excel.engine.shared.ExcelDataFormatters;
 import com.github.bradjacobs.excel.sanitize.CellValueSanitizer;
+import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -63,7 +64,7 @@ public class XssfEventSheetReader implements EventSheetReader {
                     createDataFormatter(xssfReader)
             );
         }
-        catch (IOException | SAXException | OpenXML4JException | ParserConfigurationException e) {
+        catch (IOException | POIXMLException | SAXException | OpenXML4JException | ParserConfigurationException e) {
             throw new IllegalStateException(INITIALIZATION_FAILURE_MESSAGE + ": " + e.getMessage(), e);
         }
     }

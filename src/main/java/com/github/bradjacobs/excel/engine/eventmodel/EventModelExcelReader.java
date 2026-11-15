@@ -17,6 +17,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.poi.ooxml.POIXMLDocumentPart;
+import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -72,7 +73,7 @@ public class EventModelExcelReader implements ExcelWorkbookReader {
                 }
             }
         }
-        catch (OpenXML4JException | SAXException | IOException e) {
+        catch (OpenXML4JException | POIXMLException | SAXException | IOException e) {
             throw new IOException("Failed to read Excel sheet data: " + e.getMessage(), e);
         }
 
