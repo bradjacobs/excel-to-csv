@@ -7,6 +7,7 @@ import com.github.bradjacobs.excel.util.RowDataUtil;
 import org.apache.commons.collections4.list.FixedSizeList;
 import org.apache.commons.lang3.Validate;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -331,6 +332,8 @@ public class MutableSheetContent implements SheetContent {
     }
 
     private static class FixedSizeRow extends FixedSizeList<String> {
+
+        @Serial
         private static final long serialVersionUID = 1L;
 
         protected FixedSizeRow(List<String> list) {
